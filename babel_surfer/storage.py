@@ -1,20 +1,32 @@
 """JSON + image-file storage, laid out so a static website can read it.
 
     <data_dir>/stats.json        totals, sigma histogram, recent runs
-    <data_dir>/finds.json        every frame at/above the interesting threshold
-    <data_dir>/near_misses.json  the highest-scoring frames that were still static
-    <data_dir>/images/<location>.jpg
+    <data_dir>/finds.json        the top MAX_FINDS frames at/above the threshold
+    <data_dir>/near_misses.json  the highest-scoring frames below the threshold
+    <data_dir>/images/<location>.jpg   320x208 previews (~28 KB)
+
+Only small previews are stored: a full Babelia frame is ~460 KB, and the
+location (seed) regenerates it exactly at babelia.cgi?location=N, which the
+website loads on demand. Finds are capped at the MAX_FINDS highest scores so
+the published site stays well under GitHub Pages' 1 GB limit.
 """
 
 from __future__ import annotations
 
+import io
 import json
 import os
 import threading
 import time
 from pathlib import Path
 
+from PIL import Image
+
 NEAR_MISS_KEEP = 12
+MAX_FINDS = 100
+THUMB_SIZE = (320, 208)
+THUMB_QUALITY = 75
+THUMB_MAX_BYTES = 100_000      # anything bigger is a full frame -> shrink it
 # sigma histogram bin edges; the last bin is "everything above"
 HIST_EDGES = [-2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 12, 16, 40]
 RUN_HISTORY = 60
@@ -31,6 +43,16 @@ def _write(path: Path, data) -> None:
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(data, indent=1))
     os.replace(tmp, path)
+
+
+def make_thumb(image: bytes) -> bytes:
+    """Downscale a frame to a small JPEG preview (box filter: averages, so a
+    genuine pattern stays visible)."""
+    im = Image.open(io.BytesIO(image)).convert("RGB")
+    im = im.resize(THUMB_SIZE, Image.BOX)
+    buf = io.BytesIO()
+    im.save(buf, "JPEG", quality=THUMB_QUALITY, optimize=True)
+    return buf.getvalue()
 
 
 def hist_bin(sigma: float) -> int:
@@ -54,6 +76,40 @@ class Store:
         self.stats.setdefault("runs", [])
         self.finds = _read(self.dir / "finds.json", [])
         self.near = _read(self.dir / "near_misses.json", [])
+        self.stats.setdefault("finds_total", len(self.finds))
+        self._tidy()
+
+    # ------------------------------------------------------------------
+    def _img(self, location: str) -> Path:
+        return self.image_dir / f"{location}.jpg"
+
+    def _save_image(self, location: str, image: bytes) -> None:
+        self._img(location).write_bytes(make_thumb(image))
+
+    def _referenced(self) -> set[str]:
+        return {e["location"] for e in self.finds} | {e["location"] for e in self.near}
+
+    def _cap_finds(self) -> None:
+        if len(self.finds) <= MAX_FINDS:
+            return
+        self.finds.sort(key=lambda f: f["sigma"], reverse=True)
+        dropped = self.finds[MAX_FINDS:]
+        del self.finds[MAX_FINDS:]
+        keep = self._referenced()
+        for f in dropped:
+            if f["location"] not in keep:
+                self._img(f["location"]).unlink(missing_ok=True)
+
+    def _tidy(self) -> None:
+        """Migrate older data: shrink full-size images, apply the finds cap
+        and delete images nothing refers to."""
+        self._cap_finds()
+        keep = self._referenced()
+        for p in self.image_dir.glob("*.jpg"):
+            if p.stem not in keep:
+                p.unlink()
+            elif p.stat().st_size > THUMB_MAX_BYTES:
+                p.write_bytes(make_thumb(p.read_bytes()))
 
     # ------------------------------------------------------------------
     def record(self, location: str, image: bytes, result, run: dict) -> str | None:
@@ -72,9 +128,14 @@ class Store:
 
             if result.is_interesting:
                 if not any(f["location"] == location for f in self.finds):
-                    (self.image_dir / f"{location}.jpg").write_bytes(image)
-                    self.finds.append(entry)
+                    self.stats["finds_total"] += 1
                     run["finds"] += 1
+                    lowest = min((f["sigma"] for f in self.finds), default=float("-inf"))
+                    if len(self.finds) >= MAX_FINDS and result.sigma <= lowest:
+                        return "find"      # counted, but not in the top MAX_FINDS
+                    self._save_image(location, image)
+                    self.finds.append(entry)
+                    self._cap_finds()
                     return "find"
                 return None
 
@@ -82,12 +143,12 @@ class Store:
             if len(self.near) < NEAR_MISS_KEEP or result.sigma > lowest:
                 if any(n["location"] == location for n in self.near):
                     return None
-                (self.image_dir / f"{location}.jpg").write_bytes(image)
+                self._save_image(location, image)
                 self.near.append(entry)
                 self.near.sort(key=lambda n: n["sigma"], reverse=True)
                 for gone in self.near[NEAR_MISS_KEEP:]:
                     if not any(f["location"] == gone["location"] for f in self.finds):
-                        (self.image_dir / f"{gone['location']}.jpg").unlink(missing_ok=True)
+                        self._img(gone["location"]).unlink(missing_ok=True)
                 del self.near[NEAR_MISS_KEEP:]
                 return "near"
         return None
@@ -102,10 +163,12 @@ class Store:
                 if n["sigma"] >= threshold:
                     if not any(f["location"] == n["location"] for f in self.finds):
                         self.finds.append({**n, "tier": tier_for(n["sigma"])})
+                        self.stats["finds_total"] += 1
                         moved += 1
                 else:
                     keep.append(n)
             self.near = keep
+            self._cap_finds()
         return moved
 
     def error(self, run: dict) -> None:
