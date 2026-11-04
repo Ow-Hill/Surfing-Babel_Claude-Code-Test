@@ -53,7 +53,8 @@ main section { margin-top: 36px; }
 
 .tag { display: inline-block; font-size: .72rem; padding: 1px 8px; border-radius: 99px; white-space: nowrap;
        font-family: var(--mono); color: var(--c, var(--muted)); background: color-mix(in srgb, var(--c, var(--muted)) 16%, transparent); }
-.tag.static { --c: var(--t-static); } .tag.near { --c: var(--t-near); } .tag.faint { --c: var(--t-faint); }
+.tag.static { --c: var(--t-static); } .tag.near { --c: var(--t-near); } .tag.anomaly { --c: var(--accent); }
+.tag.faint { --c: var(--t-faint); }
 .tag.clear { --c: var(--t-clear); } .tag.striking { --c: var(--t-striking); }
 
 .how p { max-width: 75ch; }

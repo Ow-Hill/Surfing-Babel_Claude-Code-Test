@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 const BABELIA = "https://babelia.libraryofbabel.info/babelia.cgi?location=";
-let THRESHOLD = 8;
+let THRESHOLD = 4;
 
 const fmtInt = (n) => Number(n || 0).toLocaleString();
 const fmtSigma = (s) => {
@@ -123,8 +123,8 @@ async function load() {
   if (bench) {
     const n = bench.null;
     $("null-note").textContent =
-      `Calibration check: ${fmtInt(n.frames)} frames of simulated Babel static scored at most ${n.max_sigma}σ ` +
-      `(${n.false_positives} false positives at the ${bench.threshold_sigma}σ threshold).`;
+      `Calibration check: of ${fmtInt(n.frames)} frames of simulated Babel static, ${n.false_positives} reached the ` +
+      `${bench.threshold_sigma}σ threshold (expected: about 1 in 400); the highest scored ${n.max_sigma}σ.`;
     $("bench").replaceChildren(...(bench.examples || []).map((e) =>
       tile({ img: `benchmark/${e.file}`, sigma: e.sigma, tier: e.tier, caption: e.label,
              onClick: () => window.open(`benchmark/${e.file}`, "_blank") })));

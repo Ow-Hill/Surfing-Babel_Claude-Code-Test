@@ -6,7 +6,7 @@ from PIL import Image
 
 from babel_surfer import benchmark
 from babel_surfer.calibrate import babel_static
-from babel_surfer.classifier import INTERESTING_SIGMA, classify, tier_for
+from babel_surfer.classifier import PICTURE_SIGMA, classify, tier_for
 
 
 @pytest.fixture
@@ -17,8 +17,7 @@ def rng():
 def test_simulated_babel_static_is_static(rng):
     for _ in range(25):
         c = classify(babel_static(rng))
-        assert not c.is_interesting, c
-        assert c.sigma < INTERESTING_SIGMA - 2
+        assert c.sigma < PICTURE_SIGMA - 2, c
 
 
 @pytest.mark.parametrize("name", ["large disc", "landscape", "word 'BABEL'"])
@@ -48,5 +47,6 @@ def test_flat_image_and_tiers():
     buf = io.BytesIO()
     Image.new("RGB", (64, 64), "gray").save(buf, "PNG")
     assert classify(buf.getvalue()).label == "striking"
-    assert tier_for(1) == "static" and tier_for(6) == "near miss"
+    assert tier_for(1) == "static" and tier_for(3.5) == "near miss"
+    assert tier_for(5) == "anomaly"
     assert tier_for(9) == "faint" and tier_for(20) == "clear" and tier_for(50) == "striking"

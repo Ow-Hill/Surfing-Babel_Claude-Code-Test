@@ -73,6 +73,10 @@ class Location:
 def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
          threshold: float = INTERESTING_SIGMA, max_frames: int | None = None) -> dict:
     store = Store(out)
+    promoted = store.promote(threshold)
+    if promoted:
+        log.info("promoted %d earlier near misses to finds (threshold %.1fσ)",
+                 promoted, threshold)
     start = random.randrange(SLIDESHOW_MAX) if start is None else start
     counter = Location(start)
     run = {"started_at": time.time(), "start_location": str(start + 1),

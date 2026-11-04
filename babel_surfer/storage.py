@@ -92,6 +92,22 @@ class Store:
                 return "near"
         return None
 
+    def promote(self, threshold: float) -> int:
+        """Move stored near misses at/above ``threshold`` into finds (used
+        when the threshold is lowered). Returns how many moved."""
+        from .classifier import tier_for
+        with self._lock:
+            keep, moved = [], 0
+            for n in self.near:
+                if n["sigma"] >= threshold:
+                    if not any(f["location"] == n["location"] for f in self.finds):
+                        self.finds.append({**n, "tier": tier_for(n["sigma"])})
+                        moved += 1
+                else:
+                    keep.append(n)
+            self.near = keep
+        return moved
+
     def error(self, run: dict) -> None:
         with self._lock:
             self.stats["errors"] += 1

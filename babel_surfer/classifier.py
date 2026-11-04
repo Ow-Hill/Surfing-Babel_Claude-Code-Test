@@ -51,14 +51,18 @@ LINE_BANDS = (1, 2, 4, 8)
 TESTS = ("shape", "blob", "lines", "texture", "palette", "tone")
 
 #: Sigma tiers. A frame is saved as a find at ``INTERESTING_SIGMA`` or above.
-#: Real static never exceeded ~4 sigma in calibration (see README), so 8 is
-#: a wide safety margin while still catching shapes too faint to see easily.
-INTERESTING_SIGMA = 8.0
+#: About 1 in 400 frames of pure static reaches 4 sigma (4,000-frame
+#: simulation), so finds between 4 and 8 sigma are statistical anomalies:
+#: the most unusual static, not pictures. Pure static never reached 8 sigma
+#: in calibration; anything there is a real departure from randomness.
+INTERESTING_SIGMA = 4.0
+PICTURE_SIGMA = 8.0
 TIERS = (            # (minimum sigma, label)
     (40.0, "striking"),
     (16.0, "clear"),
-    (INTERESTING_SIGMA, "faint"),
-    (5.0, "near miss"),
+    (PICTURE_SIGMA, "faint"),
+    (INTERESTING_SIGMA, "anomaly"),
+    (3.0, "near miss"),
     (float("-inf"), "static"),
 )
 

@@ -44,13 +44,17 @@ GitHub Actions (every 3 h) ─► scan.py ─► POST babelia.cgi location=N, N+
 
 | score | tier | what happens |
 |---|---|---|
-| < 5σ | static | counted |
-| 5–8σ | near miss | top 12 kept as "closest calls" |
-| **≥ 8σ** | **faint** (8–16), **clear** (16–40), **striking** (≥ 40) | **saved as a find** with seed and image |
+| < 3σ | static | counted |
+| 3–4σ | near miss | top 12 kept as "closest calls" |
+| **≥ 4σ** | **anomaly** (4–8), **faint** (8–16), **clear** (16–40), **striking** (≥ 40) | **saved as a find** with seed and image |
 
-Why 8σ: across 1,000 simulated static frames the highest score was 4.99σ, and across 48 real
-Babelia frames it was 2.88σ. 8σ leaves a wide margin while still catching signals far too faint
-to see by eye.
+The find threshold is **4σ**, chosen so the scanner actually finds things. In a 4,000-frame
+simulation of Babel static, about 1 in 400 frames reached 4σ, so expect 2–3 finds per hour of
+scanning (about 1 per scheduled run). These **anomalies** are the strangest static, not pictures.
+
+**8σ** is the line for a genuine pattern. Pure static never got there: the maximum was 5.45σ over
+4,000 simulated frames and 2.88σ over 48 real Babelia frames. The benchmark shows shapes far too
+faint to see still scoring well above it. Change the threshold with `scan --threshold`.
 
 ## Benchmark (`python -m babel_surfer.benchmark`)
 
@@ -65,7 +69,7 @@ Known pictures blended into simulated Babel static (8 trials each):
 | 24 px square | 25% | 8/8 | 10.1σ |
 | greyscale / dark static, 1 px checkerboard | – | 8/8 | > 5,000σ |
 | *anything at 2%* | 2% | 0/8 | erased by Babel's 16-level colour quantization |
-| pure static (1,000 frames) | – | 0 false positives | max 4.99σ |
+| pure static (1,000 frames) | – | none reach 8σ | max 4.99σ |
 
 ## Hosting
 
