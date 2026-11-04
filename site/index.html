@@ -17,7 +17,7 @@
 
   <section class="wrap stats" id="stats">
     <div class="stat"><b id="s-scanned">–</b><small>frames scanned</small></div>
-    <div class="stat"><b id="s-finds">–</b><small>finds (≥ <span class="thr">8</span>σ)</small></div>
+    <div class="stat"><b id="s-finds">–</b><small>finds (≥ <span class="thr">4</span>σ)</small></div>
     <div class="stat"><b id="s-best">–</b><small>highest score so far</small></div>
     <div class="stat"><b id="s-last">–</b><small>last scan</small></div>
   </section>
@@ -35,13 +35,12 @@
       <div class="sec-head"><h2>Finds</h2><span class="muted" id="finds-note"></span></div>
       <div id="finds" class="gallery"></div>
       <p id="finds-empty" class="empty" hidden>
-        Nothing yet, and that's expected. There are 4096<sup>266,240</sup> possible images, and only an absurdly small
-        fraction of them look like anything. Every frame below the threshold is still checked and counted above.
+        Nothing yet. About 1 in 400 frames should cross the threshold, so check back after the next scan.
       </p>
     </section>
 
     <section>
-      <div class="sec-head"><h2>Closest calls</h2><span class="muted">highest-scoring frames that were still static</span></div>
+      <div class="sec-head"><h2>Closest calls</h2><span class="muted">highest-scoring frames below the threshold</span></div>
       <div id="near" class="gallery"></div>
     </section>
 
@@ -63,13 +62,16 @@
       <table class="tiers">
         <thead><tr><th>Score</th><th>Tier</th><th>What happens</th></tr></thead>
         <tbody>
-          <tr><td>&lt; 5σ</td><td><span class="tag static">static</span></td><td>counted, discarded</td></tr>
-          <tr><td>5 – 8σ</td><td><span class="tag near">near miss</span></td><td>top 12 kept as “closest calls”</td></tr>
-          <tr><td>8 – 16σ</td><td><span class="tag faint">faint</span></td><td rowspan="3">saved as a <b>find</b>, with its location (seed) and image</td></tr>
+          <tr><td>&lt; 3σ</td><td><span class="tag static">static</span></td><td>counted, discarded</td></tr>
+          <tr><td>3 – 4σ</td><td><span class="tag near">near miss</span></td><td>top 12 kept as “closest calls”</td></tr>
+          <tr><td>4 – 8σ</td><td><span class="tag anomaly">anomaly</span></td><td rowspan="4">saved as a <b>find</b>, with its location (seed) and image</td></tr>
+          <tr><td>8 – 16σ</td><td><span class="tag faint">faint</span></td></tr>
           <tr><td>16 – 40σ</td><td><span class="tag clear">clear</span></td></tr>
           <tr><td>≥ 40σ</td><td><span class="tag striking">striking</span></td></tr>
         </tbody>
       </table>
+      <p>Anomalies are the strangest static the scanner has met: about 1 in 400 random frames lands there by chance.
+        Real static has never reached 8σ in calibration, so a find at 8σ or above would mean a genuine pattern.</p>
       <p class="muted" id="null-note"></p>
       <h3>Benchmark: signals hidden in static</h3>
       <p class="muted">These are <b>synthetic test images</b>, not Babel finds: known pictures blended into simulated Babel

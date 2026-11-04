@@ -34,6 +34,16 @@ def test_store_finds_near_misses_and_persistence(tmp_path):
     assert json.loads((tmp_path / "stats.json").read_text())["best"]["location"] == "42"
 
 
+def test_promote_when_threshold_lowered(tmp_path):
+    s = Store(tmp_path)
+    run = {"scanned": 0, "finds": 0, "errors": 0}
+    s.record("7", b"\xff\xd8a", fake(5.0), run)
+    s.record("8", b"\xff\xd8b", fake(2.0), run)
+    assert s.promote(4.0) == 1
+    assert [f["location"] for f in s.finds] == ["7"] and s.finds[0]["tier"] == "anomaly"
+    assert [n["location"] for n in s.near] == ["8"]
+
+
 def test_hist_bin():
     assert hist_bin(-5) == 0 and hist_bin(0.5) == 3 and hist_bin(1000) == 13
 
