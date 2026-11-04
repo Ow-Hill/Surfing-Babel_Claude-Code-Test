@@ -1,86 +1,96 @@
 # Surfing Babel
 
-A small website that scans the [Babelia slideshow](https://babelia.libraryofbabel.info/slideshow.html)
-(the Library of Babel's image archive) for the rare frame that is **more than random static**.
-When it finds one, it saves the **seed** and the **image**, and shows them in a gallery.
+**Live site: https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/**
 
-![flow](https://img.shields.io/badge/slideshow-%E2%86%92%20classifier%20%E2%86%92%20gallery-8a5a2b)
-
-## Quick start
-
-```bash
-pip install -r requirements.txt
-playwright install chromium     # skip if you already have a Chromium Playwright can use
-python app.py                   # open http://localhost:5000
-```
-
-Scanning starts as soon as the app starts (set `AUTOSTART=0` to start it from the page instead).
+The [Babel Image Archive](https://babelia.libraryofbabel.info/slideshow.html) contains every
+possible 640×416 image, so nearly all of it is random static. Surfing Babel pulls frames from the
+archive's slideshow, scores how far each one is from pure static and keeps anything that looks
+like *something*, along with its location (the seed that regenerates it).
 
 ## How it works
 
 ```
-headless Chromium ──► slideshow page ──► grab frame + seed ──► classifier ──► score ≥ threshold?
-                                                                                  │ yes
-                                                                 SQLite + data/images/ ──► web gallery
+GitHub Actions (every 3 h) ─► scan.py ─► POST babelia.cgi location=N, N+1, … ─► classifier
+                                                                                    │
+                    gh-pages branch ◄─ build_site.py ◄─ data/*.json + images ◄──────┘
+                         │
+                         └─► GitHub Pages
 ```
 
-1. **Scraper** (`babel_surfer/scraper.py`) opens the slideshow in headless Chromium with
-   Playwright and, every `INTERVAL` seconds, reads what is shown:
-   - the **image**: the largest visible `<img>` or `<canvas>` (full-resolution download for
-     `<img>`, `toDataURL` for `<canvas>`, element screenshot as a last resort);
-   - the **seed**: from `SEED_SELECTOR` if set, otherwise heuristically from elements, inputs or
-     links mentioning *seed / location / bookmark*, then from `location=` / `seed=` query
-     parameters in the image or page URL.
+* **Scanner** (`babel_surfer/scan.py`) does what the slideshow's own `/js/slideshow.js` does: it
+  picks a random location below 9,007,199,250,000,000, then requests `location=N, N+1, …` from
+  `/babelia.cgi`. Each frame is a 640×416 JPEG, and the location number *is* its seed
+  (`https://babelia.libraryofbabel.info/babelia.cgi?location=N` shows it again). It uses 3
+  parallel requests to stay polite: the server takes 5 to 25 s per frame.
+* **Classifier** (`babel_surfer/classifier.py`): six statistical tests, each run on brightness and both colour
+  channels, each expressed in **σ** (standard deviations away from what static produces):
 
-   Frames are de-duplicated by hash, so polling faster than the slideshow is harmless.
-2. **Classifier** (`babel_surfer/classifier.py`) decides static vs. "something". Babel images are
-   independent random pixels, so it measures departure from that:
-   - **multi-scale block-variance ratio**: average the image over k×k blocks. For i.i.d. noise
-     the variance of block means is exactly σ²/k², so the ratio *observed / expected* is ≈ 1
-     for static and grows fast for any shape, gradient or region, even a faint one;
-   - **neighbour-pixel correlation**: ≈ 0 for static, high for real pictures;
-   - **compressibility**: static doesn't compress.
+  | test | catches |
+  |---|---|
+  | shape | regions, gradients, big shapes (variance of 4–64 px block means) |
+  | blob | small strong objects (most extreme sliding 8–48 px window) |
+  | lines | horizons, stripes, bands (rows/columns, 1–8 px thick) |
+  | texture | smooth surfaces or fine checkerboards (neighbour correlation) |
+  | palette | greyscale or limited palettes (cross-channel correlation) |
+  | tone | too dark, too bright, too few colours (histogram vs. static's) |
 
-   On synthetic tests, 200 random-static frames never scored above 1.36, while a circle only
-   +10 brightness above the noise (barely visible) scored 5.8. Default threshold: **3.0**.
-   Labels: `static` < threshold ≤ `faint structure` < 3×threshold ≤ `structure`.
-3. **Storage** (`babel_surfer/storage.py`): finds go in `data/babel.db` (SQLite) with the image
-   in `data/images/`. Duplicates are skipped by hash.
-4. **Website** (`app.py`, `templates/`, `static/`): live scanner status, a sparkline of recent
-   scores, and a gallery of finds. Click one to see the full image, copy the seed, download it,
-   or delete it. The threshold can be changed live.
+* **Calibration** (`babel_surfer/calibrate.py`): every test is re-centred on its null
+  distribution, measured on simulated Babel static. The simulation uses 16 levels per channel
+  and is JPEG-encoded with **Babelia's own quantization tables**, read from real frames. The
+  tone baseline comes from 48 real Babelia frames (leave-one-out). With Pillow's generic
+  quality-90 encoder instead, real static scored up to 14σ on the tone test.
 
-## Configuration (environment variables)
+## Threshold for interesting images
 
-| Variable | Default | Purpose |
+| score | tier | what happens |
 |---|---|---|
-| `SLIDESHOW_URL` | Babelia slideshow URL | Page to scan |
-| `IMAGE_SELECTOR` | auto (largest img/canvas) | CSS selector for the slide image |
-| `SEED_SELECTOR` | auto (heuristic) | CSS selector for the element holding the seed |
-| `NEXT_SELECTOR` | none (slideshow auto-advances) | Button to click to advance |
-| `INTERVAL` | `1.0` | Seconds between frame checks |
-| `THRESHOLD` | `3.0` | Minimum score to save a frame |
-| `CHROMIUM_PATH` | auto | Path to a Chromium binary |
-| `DATA_DIR` | `./data` | Where the DB and images go |
-| `HOST` / `PORT` | `127.0.0.1` / `5000` | Web server bind |
-| `AUTOSTART` | `1` | Start scanning on launch |
+| < 5σ | static | counted |
+| 5–8σ | near miss | top 12 kept as "closest calls" |
+| **≥ 8σ** | **faint** (8–16), **clear** (16–40), **striking** (≥ 40) | **saved as a find** with seed and image |
 
-If the seed shown in the gallery isn't the right value, open the slideshow in your browser,
-inspect the element showing the seed, and set `SEED_SELECTOR` to it (likewise for the image).
+Why 8σ: across 1,000 simulated static frames the highest score was 4.99σ, and across 48 real
+Babelia frames it was 2.88σ. 8σ leaves a wide margin while still catching signals far too faint
+to see by eye.
 
-## API
+## Benchmark (`python -m babel_surfer.benchmark`)
 
-- `GET /api/finds`, `GET/DELETE /api/finds/<id>`, `GET /images/<file>`
-- `GET /api/status`, `POST /api/scraper/start`, `POST /api/scraper/stop`
-- `POST /api/threshold` `{"threshold": 4}`
-- `POST /api/classify` (multipart `image`): score any image, handy for checking the classifier
+Known pictures blended into simulated Babel static (8 trials each):
 
-## Tests
+| hidden signal | strength | detected | weakest score |
+|---|---|---|---|
+| large disc | 5% | 8/8 | 105σ |
+| landscape | 5% | 8/8 | 2,597σ |
+| word "BABEL" | 5% | 8/8 | 4,287σ |
+| 2 px horizon line | 25% | 8/8 | 16.9σ |
+| 24 px square | 25% | 8/8 | 10.1σ |
+| greyscale / dark static, 1 px checkerboard | – | 8/8 | > 5,000σ |
+| *anything at 2%* | 2% | 0/8 | erased by Babel's 16-level colour quantization |
+| pure static (1,000 frames) | – | 0 false positives | max 4.99σ |
+
+## Hosting
+
+The workflow `.github/workflows/scan-and-publish.yml` runs every 3 hours (and on pushes that
+change the code). It scans for 25 minutes, adds the results to the data already on the
+`gh-pages` branch, rebuilds the site and pushes it. GitHub Pages serves that branch.
+
+The scheduled run only fires once the workflow is on the default branch (`main`). Until then, run
+it from the Actions tab or push to this branch.
+
+## Running locally
 
 ```bash
-python -m pytest -q
+pip install -r requirements.txt
+python -m babel_surfer.scan --out public/data --minutes 10
+python -m babel_surfer.build_site --out public
+python -m http.server -d public 8000
 ```
 
-Includes an end-to-end test that runs the real scraper against a local stand-in slideshow
-(`tests/fixtures/slideshow.html`), which alternates static with frames containing a shape and
-checks that only the shapes get saved, with the right seeds.
+Other commands: `python -m babel_surfer.calibrate --real-dir <dir of real frames>` and
+`python -m pytest -q`.
+
+## Honest expectations
+
+There are 4096^266,240 possible images, and the slideshow walks through them one at a time.
+The chance that a random frame contains a recognisable picture is effectively zero, so expect
+the Finds section to stay empty. The histogram and the "closest calls" show that every frame is
+still being checked.

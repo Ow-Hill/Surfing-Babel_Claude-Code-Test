@@ -1,49 +1,52 @@
+import io
+
 import numpy as np
 import pytest
-from PIL import Image, ImageDraw
+from PIL import Image
 
-from babel_surfer.classifier import DEFAULT_THRESHOLD, classify
-
-W, H = 640, 416
+from babel_surfer import benchmark
+from babel_surfer.calibrate import babel_static
+from babel_surfer.classifier import INTERESTING_SIGMA, classify, tier_for
 
 
 @pytest.fixture
 def rng():
-    return np.random.default_rng(1234)
+    return np.random.default_rng(99)
 
 
-def test_random_static_is_not_interesting(rng):
-    for _ in range(50):
-        img = Image.fromarray(rng.integers(0, 256, (H, W, 3), dtype=np.uint8))
-        c = classify(img)
+def test_simulated_babel_static_is_static(rng):
+    for _ in range(25):
+        c = classify(babel_static(rng))
         assert not c.is_interesting, c
-        assert c.label == "static"
-        assert c.score < DEFAULT_THRESHOLD / 2
+        assert c.sigma < INTERESTING_SIGMA - 2
 
 
-def test_4096_colour_static_is_not_interesting(rng):
-    a = (rng.integers(0, 16, (H, W, 3)) * 17).astype(np.uint8)
-    assert not classify(Image.fromarray(a)).is_interesting
+@pytest.mark.parametrize("name", ["large disc", "landscape", "word 'BABEL'"])
+def test_faint_pictures_in_static_are_found(rng, name):
+    maker, _ = benchmark.SIGNALS[name]
+    picture, mask = maker()
+    c = classify(benchmark._blend(rng, picture, mask, 0.05))
+    assert c.is_interesting, c
 
 
-def test_clear_shape_is_structure():
-    img = Image.new("RGB", (W, H), "white")
-    ImageDraw.Draw(img).ellipse((100, 80, 400, 350), fill="red")
-    c = classify(img)
-    assert c.is_interesting and c.label == "structure"
+def test_small_object_and_line(rng):
+    for name, alpha, reason in [("small square (24px)", 0.5, "blob"),
+                                ("horizon line (2px)", 0.5, "lines")]:
+        picture, mask = benchmark.SIGNALS[name][0]()
+        c = classify(benchmark._blend(rng, picture, mask, alpha))
+        assert c.is_interesting and c.reason == reason, (name, c)
 
 
-def test_faint_shape_in_noise_is_detected(rng):
-    a = rng.integers(0, 256, (H, W, 3)).astype(int)
-    yy, xx = np.ogrid[:H, :W]
-    mask = (xx - 320) ** 2 + (yy - 208) ** 2 < 120 ** 2
-    a[mask] += 12
-    c = classify(Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)))
+@pytest.mark.parametrize("kind,reason", [("greyscale static", "palette"),
+                                         ("dark static (half palette)", "tone")])
+def test_special_cases(rng, kind, reason):
+    c = classify(benchmark._special(rng, kind))
     assert c.is_interesting
 
 
-def test_flat_image_and_bytes_input():
-    import io
+def test_flat_image_and_tiers():
     buf = io.BytesIO()
     Image.new("RGB", (64, 64), "gray").save(buf, "PNG")
-    assert classify(buf.getvalue()).is_interesting
+    assert classify(buf.getvalue()).label == "striking"
+    assert tier_for(1) == "static" and tier_for(6) == "near miss"
+    assert tier_for(9) == "faint" and tier_for(20) == "clear" and tier_for(50) == "striking"
