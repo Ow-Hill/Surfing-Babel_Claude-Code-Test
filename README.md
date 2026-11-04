@@ -77,6 +77,13 @@ The workflow `.github/workflows/scan-and-publish.yml` runs every 3 hours (and on
 change the code). It scans for 25 minutes, adds the results to the data already on the
 `gh-pages` branch, rebuilds the site and pushes it. GitHub Pages serves that branch.
 
+**Scan now button:** the site shows whether a scan is running, using GitHub's public API, which needs no
+login. Starting a scan needs a fine-grained token limited to this repository, with **Actions: Read
+and write**. You paste it once in the dialog; it is kept only in that browser's localStorage and
+sent only to `api.github.com`. Without a token, the dialog links to the workflow's "Run workflow"
+page. The site can't scan from your browser because Babelia sends no CORS headers, so browsers
+can't read its pixels.
+
 The scheduled run only fires once the workflow is on the default branch (`main`). Until then, run
 it from the Actions tab or push to this branch.
 
