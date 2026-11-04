@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       minutes:
-        description: "Minutes to scan"
+        description: "Minutes to scan (max ~330; the job limit is 6 h)"
         default: "25"
   push:
     branches: [main, claude/pensive-ritchie-hc4bfy]
@@ -24,7 +24,7 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
 
@@ -49,6 +49,7 @@ jobs:
           if [ -z "$MIN" ]; then
             if [ "${{ github.event_name }}" = "push" ]; then MIN=5; else MIN=25; fi
           fi
+          if [ "$MIN" -gt 330 ]; then MIN=330; fi
           python -m babel_surfer.scan --out public/data --minutes "$MIN" --workers 3
 
       - name: Build site
