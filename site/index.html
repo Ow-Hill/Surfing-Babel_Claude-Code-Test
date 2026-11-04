@@ -13,6 +13,10 @@
     <p class="lede">The <a href="https://babelia.libraryofbabel.info/slideshow.html">Babel Image Archive</a>
       contains every possible 640×416 image, which means it is almost entirely static. A scanner runs on a schedule,
       pulls frames from the archive's slideshow and keeps any that look like <em>something</em>.</p>
+    <div class="scan-bar">
+      <button id="scan-btn" class="btn">Scan now</button>
+      <span id="scan-status" class="scan-status" aria-live="polite">checking scan status…</span>
+    </div>
   </header>
 
   <section class="wrap stats" id="stats">
@@ -101,6 +105,37 @@
     </div>
   </dialog>
 
+  <dialog id="scan-dialog" class="scan-dialog">
+    <form id="scan-form">
+      <h2>Start a scan</h2>
+      <p class="muted">Scans run in GitHub Actions and publish here when they finish, about 1,000 frames per hour.</p>
+      <label for="scan-minutes">Length</label>
+      <select id="scan-minutes">
+        <option value="5">5 minutes (~80 frames)</option>
+        <option value="15" selected>15 minutes (~250 frames)</option>
+        <option value="30">30 minutes (~500 frames)</option>
+        <option value="60">1 hour (~1,000 frames)</option>
+        <option value="180">3 hours (~3,000 frames)</option>
+      </select>
+      <div id="scan-token-row">
+        <label for="scan-token">GitHub token</label>
+        <input id="scan-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
+        <p class="hint muted">Only someone who can run this repository's workflows can start a scan. Use a
+          <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">fine-grained token</a>
+          limited to this repository with <b>Actions: Read and write</b>. It is sent only to api.github.com.</p>
+        <label class="check"><input id="scan-remember" type="checkbox" checked> Remember in this browser</label>
+      </div>
+      <p id="scan-error" class="error" hidden></p>
+      <div class="actions">
+        <button id="scan-go" class="btn" type="submit">Start scan</button>
+        <button id="scan-cancel" class="btn ghost" type="button">Cancel</button>
+        <button id="scan-forget" class="btn ghost" type="button" hidden>Forget token</button>
+      </div>
+      <p class="muted small">Or <a id="scan-github" target="_blank" rel="noopener">start it on GitHub</a> with “Run workflow”.</p>
+    </form>
+  </dialog>
+
   <script src="app.js"></script>
+  <script src="scan-now.js"></script>
 </body>
 </html>

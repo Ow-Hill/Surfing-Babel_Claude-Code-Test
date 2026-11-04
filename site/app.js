@@ -137,4 +137,5 @@ async function load() {
 }
 
 $("d-copy").onclick = () => navigator.clipboard && navigator.clipboard.writeText($("d-loc").value);
+window.reloadData = load;
 load();
