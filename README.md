@@ -77,6 +77,10 @@ The workflow `.github/workflows/scan-and-publish.yml` runs every 3 hours (and on
 change the code). It scans for 25 minutes, adds the results to the data already on the
 `gh-pages` branch, rebuilds the site and pushes it. GitHub Pages serves that branch.
 
+**Keep-alive:** GitHub turns off scheduled workflows in public repos after 60 days without
+activity. The last step of every run re-enables the workflow through GitHub's API, which resets
+that timer.
+
 **Storage stays bounded:**
 - Only the **top 100 finds** by score are kept. The total count is still tracked.
 - Images are stored as **320×208 previews** of about 28 KB, instead of ~460 KB frames. The site
