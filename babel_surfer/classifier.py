@@ -298,3 +298,70 @@ def classify(image: Image.Image | bytes | str | Path,
     return Classification(sigma=round(sigma, 3), label=tier_for(sigma),
                           is_interesting=sigma >= threshold, reason=reason,
                           tests=tests)
+
+
+# --------------------------------------------------------------------------
+# heatmap: where in the frame is the structure?
+# --------------------------------------------------------------------------
+HEAT_GRID = 40            # cells across; 640 px frames -> 16 px cells
+HEAT_SCALES = (1, 2, 4)   # neighbourhoods of 1x1, 2x2, 4x4 cells (16-64 px)
+HEAT_FLOOR = 4.5          # static never exceeded ~4.5 in tests: transparent below
+HEAT_CEIL = 14.0          # |z| at or above this: fully opaque red
+
+
+def _box_sum_same(a: np.ndarray, s: int) -> tuple[np.ndarray, np.ndarray]:
+    """Sum over the s x s neighbourhood around each cell, clipped at the
+    edges, and how many cells each sum covered."""
+    h, w = a.shape
+    ii = np.pad(a, ((1, 0), (1, 0))).cumsum(0).cumsum(1)
+    lo = s // 2
+    y0 = np.clip(np.arange(h) - lo, 0, h); y1 = np.clip(np.arange(h) - lo + s, 0, h)
+    x0 = np.clip(np.arange(w) - lo, 0, w); x1 = np.clip(np.arange(w) - lo + s, 0, w)
+    Y0, X0 = np.meshgrid(y0, x0, indexing="ij"); Y1, X1 = np.meshgrid(y1, x1, indexing="ij")
+    total = ii[Y1, X1] - ii[Y0, X1] - ii[Y1, X0] + ii[Y0, X0]
+    return total, (Y1 - Y0) * (X1 - X0)
+
+
+def heat_grid(image: Image.Image | bytes | str | Path) -> np.ndarray:
+    """Per-cell evidence of structure, as |z|: for each 16 px cell, the most
+    extreme neighbourhood (1x1, 2x2 or 4x4 cells) around it, max over Y, Cb
+    and Cr. Needs the full-resolution frame: downscaled, re-compressed
+    previews no longer have static's statistics."""
+    if isinstance(image, (bytes, bytearray)):
+        image = Image.open(io.BytesIO(image))
+    elif not isinstance(image, Image.Image):
+        image = Image.open(image)
+    ycc = np.asarray(image.convert("YCbCr"), dtype=np.float64)
+    h, w = ycc.shape[:2]
+    k = max(2, w // HEAT_GRID)
+    bh, bw = h // k, w // k
+    best = np.zeros((bh, bw))
+    for i in range(3):
+        ch = ycc[..., i]
+        sd = ch.std()
+        if sd < 1e-6:
+            continue
+        means = ch[: bh * k, : bw * k].reshape(bh, k, bw, k).mean(axis=(1, 3))
+        z = (means - ch.mean()) / (sd / k)           # per-cell z under static
+        for sc in HEAT_SCALES:
+            # the sum of n independent unit normals, divided by sqrt(n), is
+            # again a unit normal under static
+            total, n = _box_sum_same(z, sc)
+            best = np.maximum(best, np.abs(total) / np.sqrt(n))
+    return best
+
+
+def heatmap_png(image: Image.Image | bytes | str | Path) -> bytes:
+    """A small RGBA PNG (one pixel per cell) to overlay on the image:
+    transparent where the frame looks like static, yellow to red where it
+    doesn't. The browser scales it up."""
+    z = heat_grid(image)
+    t = np.clip((z - HEAT_FLOOR) / (HEAT_CEIL - HEAT_FLOOR), 0, 1)
+    rgba = np.zeros(z.shape + (4,), dtype=np.uint8)
+    rgba[..., 0] = 255
+    rgba[..., 1] = (220 * (1 - t)).astype(np.uint8)        # yellow -> red
+    rgba[..., 2] = 40
+    rgba[..., 3] = np.where(z >= HEAT_FLOOR, (70 + 100 * t), 0).astype(np.uint8)   # max ~67% opaque
+    buf = io.BytesIO()
+    Image.fromarray(rgba, "RGBA").save(buf, "PNG", optimize=True)
+    return buf.getvalue()

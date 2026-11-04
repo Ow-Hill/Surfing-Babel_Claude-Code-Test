@@ -50,3 +50,12 @@ def test_flat_image_and_tiers():
     assert tier_for(1) == "static" and tier_for(3.5) == "near miss"
     assert tier_for(5) == "anomaly"
     assert tier_for(9) == "faint" and tier_for(20) == "clear" and tier_for(50) == "striking"
+
+
+def test_heatmap_marks_the_object_not_the_static(rng):
+    from babel_surfer.classifier import HEAT_FLOOR, heat_grid
+    assert heat_grid(babel_static(rng)).max() < HEAT_FLOOR + 1
+    picture, mask = benchmark.SIGNALS["small square (24px)"][0]()
+    z = heat_grid(benchmark._blend(rng, picture, mask, 1.0))
+    y, x = np.unravel_index(z.argmax(), z.shape)
+    assert z.max() > 15 and 17 <= x <= 21 and 11 <= y <= 14   # square at (300-324, 196-220)

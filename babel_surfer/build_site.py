@@ -15,7 +15,7 @@ import json
 import shutil
 from pathlib import Path
 
-from . import benchmark
+from . import alerts, benchmark, seeded
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
@@ -29,7 +29,8 @@ def detector_fingerprint() -> str:
     return h.hexdigest()[:16]
 
 
-def build(out: Path, trials: int = 8, null_frames: int = 1000, force_bench: bool = False) -> None:
+def build(out: Path, trials: int = 8, null_frames: int = 1000, force_bench: bool = False,
+          network: bool = True) -> None:
     out.mkdir(parents=True, exist_ok=True)
     for f in SITE.iterdir():
         if f.is_file():
@@ -54,6 +55,15 @@ def build(out: Path, trials: int = 8, null_frames: int = 1000, force_bench: bool
     else:
         print("benchmark up to date")
 
+    # seeded demos (fetched from Babelia once, re-scored every build)
+    demos = seeded.ensure(out / "demo", network=network)
+    print(f"{len(demos)} seeded demo(s)")
+
+    # Atom feed of finds
+    finds_file = out / "data" / "finds.json"
+    finds = json.loads(finds_file.read_text()) if finds_file.exists() else []
+    (out / "feed.xml").write_text(alerts.build_feed(finds))
+
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
@@ -62,8 +72,9 @@ def main(argv=None) -> int:
     ap.add_argument("--trials", type=int, default=8)
     ap.add_argument("--null", type=int, default=1000)
     ap.add_argument("--force-bench", action="store_true")
+    ap.add_argument("--offline", action="store_true", help="don't fetch seeded demos")
     args = ap.parse_args(argv)
-    build(args.out, args.trials, args.null, args.force_bench)
+    build(args.out, args.trials, args.null, args.force_bench, network=not args.offline)
     return 0
 
 

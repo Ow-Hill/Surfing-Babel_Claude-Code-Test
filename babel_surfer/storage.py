@@ -3,7 +3,8 @@
     <data_dir>/stats.json        totals, sigma histogram, recent runs
     <data_dir>/finds.json        the top MAX_FINDS frames at/above the threshold
     <data_dir>/near_misses.json  the highest-scoring frames below the threshold
-    <data_dir>/images/<location>.jpg   320x208 previews (~28 KB)
+    <data_dir>/images/<location>.jpg       320x208 previews (~28 KB)
+    <data_dir>/images/<location>.heat.png  where the structure is (~200 B)
 
 Only small previews are stored: a full Babelia frame is ~460 KB, and the
 location (seed) regenerates it exactly at babelia.cgi?location=N, which the
@@ -21,6 +22,8 @@ import time
 from pathlib import Path
 
 from PIL import Image
+
+from .classifier import heatmap_png
 
 NEAR_MISS_KEEP = 12
 MAX_FINDS = 100
@@ -83,8 +86,17 @@ class Store:
     def _img(self, location: str) -> Path:
         return self.image_dir / f"{location}.jpg"
 
+    def _heat(self, location: str) -> Path:
+        return self.image_dir / f"{location}.heat.png"
+
     def _save_image(self, location: str, image: bytes) -> None:
         self._img(location).write_bytes(make_thumb(image))
+        # computed from the full frame: previews lose static's statistics
+        self._heat(location).write_bytes(heatmap_png(image))
+
+    def _drop_image(self, location: str) -> None:
+        self._img(location).unlink(missing_ok=True)
+        self._heat(location).unlink(missing_ok=True)
 
     def _referenced(self) -> set[str]:
         return {e["location"] for e in self.finds} | {e["location"] for e in self.near}
@@ -98,25 +110,36 @@ class Store:
         keep = self._referenced()
         for f in dropped:
             if f["location"] not in keep:
-                self._img(f["location"]).unlink(missing_ok=True)
+                self._drop_image(f["location"])
 
     def _tidy(self) -> None:
         """Migrate older data: shrink full-size images, apply the finds cap
         and delete images nothing refers to."""
         self._cap_finds()
         keep = self._referenced()
+        for p in self.image_dir.glob("*.heat.png"):
+            if p.name[: -len(".heat.png")] not in keep:
+                p.unlink()
         for p in self.image_dir.glob("*.jpg"):
             if p.stem not in keep:
                 p.unlink()
             elif p.stat().st_size > THUMB_MAX_BYTES:
-                p.write_bytes(make_thumb(p.read_bytes()))
+                # an old full-size frame: make its heatmap before shrinking it
+                full = p.read_bytes()
+                if not self._heat(p.stem).exists():
+                    self._heat(p.stem).write_bytes(heatmap_png(full))
+                p.write_bytes(make_thumb(full))
+        for e in self.finds + self.near:
+            e["heat"] = (f"images/{e['location']}.heat.png"
+                         if self._heat(e["location"]).exists() else None)
 
     # ------------------------------------------------------------------
     def record(self, location: str, image: bytes, result, run: dict) -> str | None:
         """Account for one classified frame. Returns 'find', 'near' or None."""
         entry = {"location": location, "sigma": result.sigma, "tier": result.label,
                  "reason": result.reason, "tests": result.tests,
-                 "found_at": time.time(), "image": f"images/{location}.jpg"}
+                 "found_at": time.time(), "image": f"images/{location}.jpg",
+                 "heat": f"images/{location}.heat.png"}
         with self._lock:
             self.stats["scanned"] += 1
             self.stats["hist"][hist_bin(result.sigma)] += 1
@@ -135,6 +158,9 @@ class Store:
                         return "find"      # counted, but not in the top MAX_FINDS
                     self._save_image(location, image)
                     self.finds.append(entry)
+                    run.setdefault("new_finds", []).append(
+                        {"location": location, "sigma": result.sigma, "tier": result.label,
+                         "reason": result.reason})
                     self._cap_finds()
                     return "find"
                 return None
@@ -148,7 +174,7 @@ class Store:
                 self.near.sort(key=lambda n: n["sigma"], reverse=True)
                 for gone in self.near[NEAR_MISS_KEEP:]:
                     if not any(f["location"] == gone["location"] for f in self.finds):
-                        self._img(gone["location"]).unlink(missing_ok=True)
+                        self._drop_image(gone["location"])
                 del self.near[NEAR_MISS_KEEP:]
                 return "near"
         return None
