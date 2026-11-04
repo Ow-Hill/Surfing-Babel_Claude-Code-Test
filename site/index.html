@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Surfing Babel</title>
+  <meta name="description" content="Combing the Library of Babel's image archive for frames that are more than random static.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="wrap">
+    <h1>Surfing Babel</h1>
+    <p class="lede">The <a href="https://babelia.libraryofbabel.info/slideshow.html">Babel Image Archive</a>
+      contains every possible 640×416 image, which means it is almost entirely static. A scanner runs on a schedule,
+      pulls frames from the archive's slideshow and keeps any that look like <em>something</em>.</p>
+  </header>
+
+  <section class="wrap stats" id="stats">
+    <div class="stat"><b id="s-scanned">–</b><small>frames scanned</small></div>
+    <div class="stat"><b id="s-finds">–</b><small>finds (≥ <span class="thr">8</span>σ)</small></div>
+    <div class="stat"><b id="s-best">–</b><small>highest score so far</small></div>
+    <div class="stat"><b id="s-last">–</b><small>last scan</small></div>
+  </section>
+
+  <section class="wrap card">
+    <div class="card-head">
+      <h2>How static is static?</h2>
+      <small class="muted">Every scanned frame, by score. Dashed line marks the find threshold.</small>
+    </div>
+    <svg id="hist" role="img" aria-label="Histogram of frame scores"></svg>
+  </section>
+
+  <main class="wrap">
+    <section>
+      <div class="sec-head"><h2>Finds</h2><span class="muted" id="finds-note"></span></div>
+      <div id="finds" class="gallery"></div>
+      <p id="finds-empty" class="empty" hidden>
+        Nothing yet, and that's expected. There are 4096<sup>266,240</sup> possible images, and only an absurdly small
+        fraction of them look like anything. Every frame below the threshold is still checked and counted above.
+      </p>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>Closest calls</h2><span class="muted">highest-scoring frames that were still static</span></div>
+      <div id="near" class="gallery"></div>
+    </section>
+
+    <section class="card how">
+      <h2>How detection works</h2>
+      <p>Each Babel pixel is an independent random 12-bit colour, so instead of asking “what is this a picture of?”
+        the detector asks “how unlikely is this frame if it were pure static?”. It runs six statistical tests on
+        brightness and both colour channels. Each test's result is measured in <b>σ</b> (standard deviations
+        away from what static produces), calibrated on simulated static that uses Babelia's own JPEG encoding and checked against real frames.</p>
+      <div class="tests">
+        <div><b>shape</b>regions, gradients and large shapes that survive block-averaging (4–64 px)</div>
+        <div><b>blob</b>small strong objects: the most extreme sliding window, 8–48 px</div>
+        <div><b>lines</b>horizons, stripes and bands: rows and columns, 1–8 px thick</div>
+        <div><b>texture</b>neighbouring pixels that agree (smooth) or alternate (checkerboards)</div>
+        <div><b>palette</b>colour channels that move together (greyscale or limited palettes)</div>
+        <div><b>tone</b>histogram skew: too dark, too bright or too few colours</div>
+      </div>
+      <h3>Thresholds</h3>
+      <table class="tiers">
+        <thead><tr><th>Score</th><th>Tier</th><th>What happens</th></tr></thead>
+        <tbody>
+          <tr><td>&lt; 5σ</td><td><span class="tag static">static</span></td><td>counted, discarded</td></tr>
+          <tr><td>5 – 8σ</td><td><span class="tag near">near miss</span></td><td>top 12 kept as “closest calls”</td></tr>
+          <tr><td>8 – 16σ</td><td><span class="tag faint">faint</span></td><td rowspan="3">saved as a <b>find</b>, with its location (seed) and image</td></tr>
+          <tr><td>16 – 40σ</td><td><span class="tag clear">clear</span></td></tr>
+          <tr><td>≥ 40σ</td><td><span class="tag striking">striking</span></td></tr>
+        </tbody>
+      </table>
+      <p class="muted" id="null-note"></p>
+      <h3>Benchmark: signals hidden in static</h3>
+      <p class="muted">These are <b>synthetic test images</b>, not Babel finds: known pictures blended into simulated Babel
+        static at a given strength, then scored by the same detector.</p>
+      <div id="bench" class="gallery small"></div>
+      <div class="table-scroll"><table id="bench-table" class="bench"></table></div>
+    </section>
+  </main>
+
+  <footer class="wrap muted">
+    Images and locations come from <a href="https://babelia.libraryofbabel.info/">babelia.libraryofbabel.info</a> by Jonathan Basile.
+    Source: <a href="https://github.com/Ow-Hill/Surfing-Babel_Claude-Code-Test">GitHub</a>.
+  </footer>
+
+  <dialog id="detail">
+    <form method="dialog"><button class="close" aria-label="Close">×</button></form>
+    <img id="d-img" alt="">
+    <div class="d-body">
+      <div><span id="d-tier" class="tag"></span> <b id="d-sigma"></b> <span class="muted" id="d-reason"></span></div>
+      <label for="d-loc">Location (seed)</label>
+      <div class="loc-row"><textarea id="d-loc" class="mono" rows="2" readonly></textarea><button id="d-copy" class="btn">Copy</button></div>
+      <div id="d-tests" class="bars"></div>
+      <div class="actions">
+        <a id="d-open" class="btn" target="_blank" rel="noopener">Open in Babelia</a>
+        <a id="d-dl" class="btn ghost" download>Download</a>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

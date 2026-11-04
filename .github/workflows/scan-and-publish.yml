@@ -1,0 +1,70 @@
+name: Scan Babel and publish site
+
+# Every few hours: pull frames from the Babelia slideshow, classify them,
+# and publish the results to GitHub Pages (served from the gh-pages branch).
+on:
+  schedule:
+    - cron: "23 */3 * * *"        # every 3 hours (runs from the default branch)
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "Minutes to scan"
+        default: "25"
+  push:
+    branches: [main, claude/pensive-ritchie-hc4bfy]
+    paths: ["babel_surfer/**", "site/**", ".github/workflows/**"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scan-and-publish
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install numpy pillow
+
+      - name: Check out existing site data (gh-pages)
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null; then
+            git fetch --depth=1 origin gh-pages
+            git worktree add public origin/gh-pages
+          else
+            mkdir -p public
+          fi
+
+      - name: Scan
+        run: |
+          MIN="${{ github.event.inputs.minutes }}"
+          if [ -z "$MIN" ]; then
+            if [ "${{ github.event_name }}" = "push" ]; then MIN=5; else MIN=25; fi
+          fi
+          python -m babel_surfer.scan --out public/data --minutes "$MIN" --workers 3
+
+      - name: Build site
+        run: python -m babel_surfer.build_site --out public
+
+      - name: Publish to gh-pages
+        working-directory: public
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ ! -d .git ] && [ ! -f .git ]; then
+            git init -q -b gh-pages
+            git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          else
+            git checkout -B gh-pages
+          fi
+          git add -A
+          git commit -q -m "Scan results $(date -u +%Y-%m-%dT%H:%MZ)" || { echo "nothing to publish"; exit 0; }
+          for i in 1 2 3; do git push origin gh-pages && break; sleep $((i * 5)); done
