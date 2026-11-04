@@ -6,6 +6,7 @@
   <title>Surfing Babel</title>
   <meta name="description" content="Combing the Library of Babel's image archive for frames that are more than random static.">
   <link rel="stylesheet" href="style.css">
+  <link rel="alternate" type="application/atom+xml" title="Surfing Babel finds" href="feed.xml">
 </head>
 <body>
   <header class="wrap">
@@ -34,9 +35,27 @@
     <svg id="hist" role="img" aria-label="Histogram of frame scores"></svg>
   </section>
 
+  <section class="wrap card live" id="live">
+    <div class="card-head">
+      <h2>Live from Babelia</h2>
+      <small class="muted">Frames streaming straight from the archive, walking locations like its slideshow.
+        Shown only: your browser can't score them (Babelia blocks pixel access), so scoring happens in scans.</small>
+    </div>
+    <div class="live-body">
+      <button class="live-frame" aria-label="Open this frame"><img id="live-img" alt="Current Babelia frame"></button>
+      <div class="live-side">
+        <div class="mono" id="live-loc">–</div>
+        <div class="muted small" id="live-status" aria-live="polite">starting…</div>
+        <button id="live-toggle" class="btn ghost">Pause</button>
+        <div id="live-history" class="gallery mini"></div>
+      </div>
+    </div>
+  </section>
+
   <main class="wrap">
     <section>
-      <div class="sec-head"><h2>Finds</h2><span class="muted" id="finds-note"></span></div>
+      <div class="sec-head"><h2>Finds</h2><span class="muted" id="finds-note"></span>
+        <a class="feed" href="feed.xml" title="Subscribe to new finds (Atom/RSS)">RSS feed</a></div>
       <div id="finds" class="gallery"></div>
       <p id="finds-empty" class="empty" hidden>
         Nothing yet. About 1 in 400 frames should cross the threshold, so check back after the next scan.
@@ -46,6 +65,15 @@
     <section>
       <div class="sec-head"><h2>Closest calls</h2><span class="muted">highest-scoring frames below the threshold</span></div>
       <div id="near" class="gallery"></div>
+    </section>
+
+    <section id="demo-section" hidden>
+      <div class="sec-head"><h2>Proof it works</h2><span class="muted">real pictures, located in Babel and fetched back</span></div>
+      <p class="muted narrow">A random frame almost never contains a picture, so we ran the pipeline backwards: we drew
+        these pictures, asked Babelia's image search for their location in the archive, then fetched each location back
+        with the scanner's own code and scored it. Their locations have about 960,000 digits each, which is why
+        the slideshow, starting below 10<sup>16</sup>, never reaches them.</p>
+      <div id="demos" class="gallery"></div>
     </section>
 
     <section class="card how">
@@ -87,21 +115,26 @@
 
   <footer class="wrap muted">
     Images and locations come from <a href="https://babelia.libraryofbabel.info/">babelia.libraryofbabel.info</a> by Jonathan Basile.
-    Source: <a href="https://github.com/Ow-Hill/Surfing-Babel_Claude-Code-Test">GitHub</a>.
+    Source: <a href="https://github.com/Ow-Hill/Surfing-Babel_Claude-Code-Test">GitHub</a> ·
+    <a href="feed.xml">RSS feed of finds</a>.
   </footer>
 
   <dialog id="detail">
     <form method="dialog"><button class="close" aria-label="Close">×</button></form>
-    <img id="d-img" alt="">
+    <div class="frame"><img id="d-img" alt=""><img id="d-heat" class="heat" alt="" hidden></div>
     <p id="d-full" class="full-note" hidden></p>
     <div class="d-body">
-      <div><span id="d-tier" class="tag"></span> <b id="d-sigma"></b> <span class="muted" id="d-reason"></span></div>
+      <p id="d-note" class="d-note" hidden></p>
+      <div id="d-score"><span id="d-tier" class="tag"></span> <b id="d-sigma"></b> <span class="muted" id="d-reason"></span></div>
+      <div id="d-heat-row" class="heat-row"><label class="check"><input id="d-heat-toggle" type="checkbox"> Show where the structure is</label>
+        <span class="muted small" id="d-heat-note"></span></div>
       <label for="d-loc">Location (seed)</label>
       <div class="loc-row"><textarea id="d-loc" class="mono" rows="2" readonly></textarea><button id="d-copy" class="btn">Copy</button></div>
       <div id="d-tests" class="bars"></div>
       <div class="actions">
-        <a id="d-open" class="btn" target="_blank" rel="noopener">Open in Babelia</a>
-        <a id="d-dl" class="btn ghost" download>Download preview</a>
+        <button id="d-open" class="btn" type="button">Open in Babelia</button>
+        <button id="d-link" class="btn ghost" type="button">Copy link</button>
+        <a id="d-dl" class="btn ghost" download>Download</a>
       </div>
     </div>
   </dialog>

@@ -71,6 +71,37 @@ Known pictures blended into simulated Babel static (8 trials each):
 | *anything at 2%* | 2% | 0/8 | erased by Babel's 16-level colour quantization |
 | pure static (1,000 frames) | – | none reach 8σ | max 4.99σ |
 
+## Proof it works (`python -m babel_surfer.seeded`)
+
+Random frames essentially never contain a picture, so the pipeline is also run backwards:
+1. Draw a picture.
+2. Upload it to Babelia's image search (`/imagesearch.cgi`), which returns its location in the
+   archive.
+3. Fetch that location back with the scanner's own code and score it.
+
+| seeded demo | location size | score |
+|---|---|---|
+| drawn landscape | 961,760 digits | 339,434σ (striking) |
+| red disc blended into static at 5% | 961,760 digits | 135σ (striking) |
+
+Pictures live at locations around 960,000 digits long, which is why the slideshow (which starts
+below 10¹⁶) never reaches them. The demos appear on the site, clearly labelled, never as finds.
+
+## Site features
+
+- **Heatmap:** "Show where the structure is" overlays a map of which 16–64 px areas depart from
+  static. It's computed from the full frame at scan time, because previews no longer have
+  static's statistics. Global signals (tone, palette, texture) are labelled as spread across the
+  whole frame.
+- **Share links:** `…/#<location>` opens a find. `#demo-landscape` opens a demo. Any other number
+  opens that location straight from Babelia, unscored.
+- **Live from Babelia:** frames stream from the archive in your browser, walking locations like
+  its slideshow. They're shown, not scored: Babelia sends no CORS headers, so a page can display
+  its images but not read their pixels.
+- **Alerts:** `feed.xml` is an Atom/RSS feed of finds; subscribe in any feed reader. If a scan
+  finds anything at **≥ 8σ**, the workflow opens a GitHub issue, which emails repository
+  watchers. The ~8 daily 4–8σ anomalies go to the feed only, to avoid spam.
+
 ## Hosting
 
 The workflow `.github/workflows/scan-and-publish.yml` runs every 3 hours (and on pushes that

@@ -28,8 +28,10 @@ def test_store_finds_near_misses_and_persistence(tmp_path):
 
     assert len(s.near) == NEAR_MISS_KEEP
     assert s.near[0]["sigma"] == NEAR_MISS_KEEP + 4
-    imgs = {p.name for p in (tmp_path / "images").iterdir()}
+    imgs = {p.name for p in (tmp_path / "images").glob("*.jpg")}
     assert imgs == {f"{n['location']}.jpg" for n in s.near} | {"42.jpg"}
+    heats = {p.name for p in (tmp_path / "images").glob("*.heat.png")}
+    assert heats == {f"{n['location']}.heat.png" for n in s.near} | {"42.heat.png"}
 
     s2 = Store(tmp_path)
     assert s2.stats["scanned"] == NEAR_MISS_KEEP + 7
@@ -63,7 +65,9 @@ def test_finds_capped_to_top_n(tmp_path, monkeypatch):
     s.save()
     assert sorted(f["sigma"] for f in s.finds) == [6, 7, 9]
     assert s.stats["finds_total"] == 5 and run["finds"] == 5
-    assert {p.stem for p in (tmp_path / "images").iterdir()} == {"101", "103", "104"}
+    assert {p.stem for p in (tmp_path / "images").glob("*.jpg")} == {"101", "103", "104"}
+    assert len(list((tmp_path / "images").glob("*.heat.png"))) == 3
+    assert [f["location"] for f in run["new_finds"]] == ["100", "101", "102", "103", "104"]
 
 
 def test_migrates_full_size_images(tmp_path):
@@ -75,6 +79,7 @@ def test_migrates_full_size_images(tmp_path):
         "found_at": 0, "image": "images/1.jpg"}]))
     s = Store(tmp_path)
     assert (tmp_path / "images" / "1.jpg").stat().st_size < 60_000
+    assert (tmp_path / "images" / "1.heat.png").exists() and s.finds[0]["heat"]
     assert not (tmp_path / "images" / "orphan.jpg").exists()
     assert s.stats["finds_total"] == 1
 

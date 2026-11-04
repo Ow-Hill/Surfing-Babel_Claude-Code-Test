@@ -17,6 +17,7 @@ on:
 permissions:
   contents: write
   actions: write        # for the keep-alive step
+  issues: write         # for find alerts
 
 concurrency:
   group: scan-and-publish
@@ -55,6 +56,16 @@ jobs:
 
       - name: Build site
         run: python -m babel_surfer.build_site --out public
+
+      - name: Alert on big finds (>= 8σ)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -m babel_surfer.alerts --data public/data --feed public/feed.xml --alert alert.md
+          if [ -f alert.md ]; then
+            gh issue create --repo "${{ github.repository }}" \
+              --title "Surfing Babel: something reached 8σ" --body-file alert.md
+          fi
 
       - name: Publish to gh-pages
         working-directory: public
