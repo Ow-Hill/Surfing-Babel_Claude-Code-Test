@@ -77,6 +77,15 @@ The workflow `.github/workflows/scan-and-publish.yml` runs every 3 hours (and on
 change the code). It scans for 25 minutes, adds the results to the data already on the
 `gh-pages` branch, rebuilds the site and pushes it. GitHub Pages serves that branch.
 
+**Storage stays bounded:**
+- Only the **top 100 finds** by score are kept. The total count is still tracked.
+- Images are stored as **320×208 previews** of about 28 KB, instead of ~460 KB frames. The site
+  loads the full frame from Babelia using the find's location (`babelia.cgi?location=N`).
+- `gh-pages` is published as one fresh commit each run, so dropped images don't pile up in git
+  history.
+
+The published site stays at a few MB, far under Pages' 1 GB limit.
+
 **Scan now button:** the site shows whether a scan is running, using GitHub's public API, which needs no
 login. Starting a scan needs a fine-grained token limited to this repository, with **Actions: Read
 and write**. You paste it once in the dialog; it is kept only in that browser's localStorage and

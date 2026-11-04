@@ -60,12 +60,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Publish as a single fresh commit (no history) so images that were
+          # dropped from the site don't keep growing the repository.
           if [ ! -d .git ] && [ ! -f .git ]; then
-            git init -q -b gh-pages
+            git init -q
             git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
-          else
-            git checkout -B gh-pages
           fi
+          git checkout -q --orphan publish
           git add -A
-          git commit -q -m "Scan results $(date -u +%Y-%m-%dT%H:%MZ)" || { echo "nothing to publish"; exit 0; }
-          for i in 1 2 3; do git push origin gh-pages && break; sleep $((i * 5)); done
+          git commit -q -m "Scan results $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do git push -f origin HEAD:gh-pages && break; sleep $((i * 5)); done

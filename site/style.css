@@ -112,3 +112,4 @@ dialog img { width: 100%; display: block; background: #000; image-rendering: pix
 .scan-dialog .hint, .small { font-size: .82rem; }
 .scan-dialog .check { display: flex; gap: 6px; align-items: center; color: var(--text); }
 .error { color: var(--danger); font-size: .88rem; }
+.full-note { margin: 0; padding: 6px 16px 0; font-size: .8rem; color: var(--muted); }
