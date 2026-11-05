@@ -41,21 +41,36 @@
     const r = await fetch(`${API}/actions/workflows/${WORKFLOW}/runs?per_page=5`, {
       headers: { Accept: "application/vnd.github+json" }, cache: "no-store",
     });
-    if (!r.ok) throw new Error(`GitHub API ${r.status}`);
+    if (!r.ok) {
+      const err = new Error(`GitHub API ${r.status}`);
+      // unauthenticated API: 60 requests/hour per visitor
+      if ((r.status === 403 || r.status === 429) && r.headers.get("x-ratelimit-remaining") === "0") {
+        err.resetAt = +r.headers.get("x-ratelimit-reset") * 1000;
+      }
+      throw err;
+    }
     return (await r.json()).workflow_runs || [];
   }
 
   async function refreshStatus() {
     let runs;
     try { runs = await latestRuns(); } catch (e) {
-      setStatus("scan status unavailable", "idle");
+      $("scan-run").hidden = true;
+      if (e.resetAt) {
+        const mins = Math.max(1, Math.ceil((e.resetAt - Date.now()) / 60000));
+        setStatus(`scan status paused: GitHub's hourly limit for this browser was reached; checking again in ${mins} min`, "idle");
+        return schedule(Math.max(60000, e.resetAt - Date.now() + 5000));
+      }
+      setStatus("couldn't reach GitHub to check scan status; trying again in 2 min", "idle");
       return schedule(120000);
     }
     const active = runs.find((r) => r.status !== "completed");
+    $("scan-run").hidden = !active;
     if (active) {
+      $("scan-run").href = active.html_url;
       const label = active.status === "in_progress"
-        ? `scanning: started ${fmtAgo(active.run_started_at || active.created_at)}`
-        : "scan queued";
+        ? `scanning since ${fmtAgo(active.run_started_at || active.created_at)}; results appear here when it finishes`
+        : "scan queued: it starts when the current one finishes";
       setStatus(label, "running");
       $("scan-btn").disabled = true;
       watching = true;
@@ -116,7 +131,22 @@
     throw err;
   }
 
+  // Say what will happen before it happens (error prevention).
+  function updateSummary() {
+    const m = parseInt($("scan-minutes").value, 10);
+    const frames = Math.round((m * 31) / 10) * 10;
+    const ready = m + 10;
+    const finds = frames / 2000;
+    $("scan-summary").textContent =
+      `Scans about ${frames.toLocaleString()} frames. Results appear here in about ` +
+      `${ready >= 90 ? Math.round(ready / 60 * 10) / 10 + " hours" : ready + " minutes"} ` +
+      `(the scan plus ~10 min to publish). Expect ${finds < 1 ? "probably no finds" : "about " + Math.round(finds) + " find" + (Math.round(finds) === 1 ? "" : "s")}. ` +
+      (m >= 60 ? "Scheduled scans wait until it finishes." : "");
+  }
+  $("scan-minutes").addEventListener("change", updateSummary);
+
   function openDialog() {
+    updateSummary();
     const hasToken = !!store.get();
     $("scan-token-row").hidden = hasToken;
     $("scan-forget").hidden = !hasToken;
@@ -150,7 +180,8 @@
     } catch (e) {
       if (e.status === 401 || e.status === 403 || e.status === 404) {
         if (!typed) store.clear();
-        showError(`GitHub refused the token (${e.message}). It needs "Actions: Read and write" on ${REPO}.`);
+        showError(`GitHub refused the token (${e.message}). Create a new fine-grained token for ${REPO} ` +
+          `with "Actions: Read and write" (link below), or use "start it on GitHub" instead.`);
         $("scan-token-row").hidden = false;
       } else {
         showError(`Couldn't start the scan: ${e.message}`);

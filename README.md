@@ -121,6 +121,12 @@ below 10¹⁶) never reaches them. The demos appear on the site, clearly labelle
   finds anything at **≥ 8σ**, the workflow opens a GitHub issue, which emails repository
   watchers. The ~8 daily 4–8σ anomalies go to the feed only, to avoid spam.
 
+## Usability
+
+The UI was reviewed against Nielsen's 10 usability heuristics; see
+[`docs/usability-review.md`](docs/usability-review.md) for every finding, its severity and what
+changed.
+
 ## Hosting
 
 The workflow `.github/workflows/scan-and-publish.yml` runs every 3 hours (and on pushes that
