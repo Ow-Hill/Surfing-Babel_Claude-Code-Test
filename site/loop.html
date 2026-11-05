@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How one request to Claude Code was processed: prompt, planning, execution, testing, retries and review.">
+<title>Anatomy of One Loop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: one reading column on a dark "whiteboard"; the redrawn diagram up top,
+     then the loop walked node by node, numbered in the order it ran. */
+  :root {
+    --board: #1f1f21;      /* the whiteboard */
+    --panel: #29292c;
+    --chalk: #ecebe6;      /* boxes and body text */
+    --dim: #a9a7a0;
+    --line: #3d3d42;
+    --model: #6fb3f2;      /* blue: the model, prompt + full context */
+    --ok: #6ee25c;         /* green: sub-goal / all goals done */
+    --fail: #ff4d6a;       /* red: fail, retry with error context */
+    --review: #ff6ad5;     /* pink: human review */
+    --harness: #e6b97a;    /* orange dashed: the harness, memory traffic */
+    --hand: "Kalam", "Comic Sans MS", cursive;
+    --body: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--board); color: var(--chalk); font: 16px/1.6 var(--body); }
+  .wrap { max-width: 1060px; margin: 0 auto; padding-block: 36px 56px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  h1 { font: 700 clamp(2rem, 5vw, 2.8rem)/1.1 var(--hand); margin: 0; text-wrap: balance; }
+  h2 { font: 700 1.45rem/1.2 var(--hand); margin: 0; text-wrap: balance; }
+  h3 { font: 600 .95rem/1.3 var(--body); margin: 0; }
+  p { margin: 0; max-width: 70ch; }
+  a { color: var(--model); }
+  code, .mono { font-family: var(--mono); font-size: .86em; }
+  .lede { color: var(--dim); margin-top: 10px; }
+  .prompt { margin-top: 18px; border-left: 3px solid var(--chalk); padding: 10px 14px; background: var(--panel);
+    font: 1.15rem/1.45 var(--hand); max-width: 70ch; border-radius: 0 8px 8px 0; }
+  .prompt small { display: block; font: .78rem var(--body); color: var(--dim); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 4px; }
+
+  .diagram { margin-top: 28px; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--board); }
+  .diagram svg { display: block; width: 100%; min-width: 760px; height: auto; }
+  .diagram text { font-family: var(--hand); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; font-size: .85rem; color: var(--dim); }
+  .legend i { display: inline-block; width: 18px; height: 3px; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+
+  .steps { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 30px; }
+  .step { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; }
+  .num { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--chalk); display: grid; place-items: center;
+    font: 700 1.05rem var(--hand); }
+  .step-body { display: grid; gap: 10px; min-width: 0; }
+  .kicker { font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+  .step.model .num { border-color: var(--model); color: var(--model); }
+  .step.fail .num { border-color: var(--fail); color: var(--fail); }
+  .step.ok .num { border-color: var(--ok); color: var(--ok); }
+  .step.review .num { border-color: var(--review); color: var(--review); }
+  .step.memory .num { border-color: var(--harness); color: var(--harness); }
+
+  ul.plain { margin: 0; padding-left: 20px; display: grid; gap: 4px; max-width: 72ch; }
+  .goals { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .goals li { display: grid; grid-template-columns: 2.2em minmax(0, 1fr); gap: 6px; padding: 8px 12px; background: var(--panel);
+    border-radius: 8px; border: 1px solid var(--line); }
+  .goals b { font-family: var(--mono); font-weight: 500; color: var(--dim); }
+  .tools { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tool { font: .82rem var(--mono); padding: 3px 9px; border: 1px solid var(--line); border-radius: 99px; background: var(--panel); }
+
+  .cycles { display: grid; gap: 10px; }
+  .cycle { display: grid; gap: 4px; padding: 12px 14px; background: var(--panel); border-radius: 10px;
+    border: 1px solid var(--line); border-left: 4px solid var(--fail); min-width: 0; }
+  .cycle.pass { border-left-color: var(--ok); }
+  .cycle .row { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 8px; font-size: .93rem; }
+  .cycle .row span:first-child { color: var(--dim); font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; padding-top: 3px; }
+  .cycle h3 { font-family: var(--hand); font-size: 1.1rem; font-weight: 700; }
+  .tag { font: .72rem var(--mono); padding: 1px 7px; border-radius: 99px; border: 1px solid currentColor; margin-left: 6px; vertical-align: 2px; }
+  .tag.fail { color: var(--fail); } .tag.ok { color: var(--ok); }
+
+  .order { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font: .9rem var(--mono); }
+  .order span { padding: 3px 9px; border-radius: 99px; border: 1px solid var(--ok); color: var(--ok); }
+  .order em { color: var(--dim); font-style: normal; }
+  .note { font-size: .92rem; color: var(--dim); border-top: 1px dashed var(--line); padding-top: 10px; max-width: 72ch; }
+  footer { margin-top: 44px; color: var(--dim); font-size: .85rem; border-top: 1px solid var(--line); padding-top: 14px; }
+  :focus-visible { outline: 2px solid var(--model); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p style="margin:0 0 10px;font-size:.9rem"><a href="agent.html">← How this was built</a></p>
+  <h1>Anatomy of one loop</h1>
+  <p class="lede">One request to Claude Code on Surfing Babel, traced through your harness diagram, box by box. This is
+    the loop that became pull request #11. It has explicit sub-goals and several real fail-and-retry cycles.</p>
+
+  <div class="prompt"><small>The prompt</small>build this plan and do a round of error fixing<br>make clicking off an image take you back to the home page</div>
+
+  <figure class="diagram" aria-label="The harness diagram, annotated with this loop's events">
+    <svg viewBox="0 0 1000 640" role="img">
+      <defs>
+        <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#ecebe6"/></marker>
+        <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6fb3f2"/></marker>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#ff4d6a"/></marker>
+        <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6ee25c"/></marker>
+        <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#e6b97a"/></marker>
+      </defs>
+
+      <!-- model, outside the harness -->
+      <rect x="250" y="18" width="430" height="80" rx="10" fill="none" stroke="#ecebe6" stroke-width="2"/>
+      <text x="270" y="50" fill="#ecebe6" font-size="22">Model (outside harness)</text>
+      <text x="270" y="82" fill="#6fb3f2" font-size="18">prompt + full context, every step</text>
+      <circle cx="660" cy="40" r="13" fill="#1f1f21" stroke="#6fb3f2" stroke-width="2"/><text x="660" y="46" fill="#6fb3f2" font-size="15" text-anchor="middle">4</text>
+
+      <!-- human review -->
+      <rect x="805" y="18" width="170" height="80" rx="10" fill="none" stroke="#ff6ad5" stroke-width="2.5"/>
+      <text x="890" y="52" fill="#ecebe6" font-size="21" text-anchor="middle">Human review</text>
+      <text x="890" y="80" fill="#ff6ad5" font-size="15" text-anchor="middle">PR #11 → your next prompt</text>
+      <circle cx="958" cy="18" r="13" fill="#1f1f21" stroke="#ff6ad5" stroke-width="2"/><text x="958" y="24" fill="#ff6ad5" font-size="15" text-anchor="middle">8</text>
+
+      <!-- harness -->
+      <rect x="18" y="130" width="964" height="494" rx="14" fill="none" stroke="#e6b97a" stroke-width="2" stroke-dasharray="18 12"/>
+      <text x="40" y="168" fill="#ecebe6" font-size="26">Harness (Claude Code)</text>
+
+      <!-- blue model traffic -->
+      <line x1="320" y1="104" x2="320" y2="262" stroke="#6fb3f2" stroke-width="2.5" marker-start="url(#ab)" marker-end="url(#ab)"/>
+      <line x1="520" y1="104" x2="520" y2="262" stroke="#6fb3f2" stroke-width="2.5" marker-start="url(#ab)" marker-end="url(#ab)"/>
+
+      <!-- prompt -->
+      <rect x="40" y="276" width="130" height="58" rx="8" fill="none" stroke="#ecebe6" stroke-width="2"/>
+      <text x="105" y="312" fill="#ecebe6" font-size="21" text-anchor="middle">Prompt</text>
+      <circle cx="40" cy="276" r="13" fill="#1f1f21" stroke="#ecebe6" stroke-width="2"/><text x="40" y="282" fill="#ecebe6" font-size="15" text-anchor="middle">1</text>
+      <line x1="174" y1="305" x2="236" y2="305" stroke="#ecebe6" stroke-width="2" marker-end="url(#aw)"/>
+
+      <!-- planning -->
+      <rect x="240" y="268" width="160" height="78" rx="8" fill="none" stroke="#ecebe6" stroke-width="2"/>
+      <text x="320" y="300" fill="#ecebe6" font-size="21" text-anchor="middle">Planning</text>
+      <text x="320" y="328" fill="#6fb3f2" font-size="16" text-anchor="middle">goal + 5 sub-goals</text>
+      <circle cx="400" cy="268" r="13" fill="#1f1f21" stroke="#ecebe6" stroke-width="2"/><text x="400" y="274" fill="#ecebe6" font-size="15" text-anchor="middle">3</text>
+      <line x1="404" y1="305" x2="446" y2="305" stroke="#ecebe6" stroke-width="2" marker-end="url(#aw)"/>
+
+      <!-- execution + tools -->
+      <rect x="450" y="268" width="150" height="70" rx="8" fill="none" stroke="#ecebe6" stroke-width="2"/>
+      <text x="525" y="310" fill="#ecebe6" font-size="21" text-anchor="middle">Execution</text>
+      <circle cx="600" cy="268" r="13" fill="#1f1f21" stroke="#ecebe6" stroke-width="2"/><text x="600" y="274" fill="#ecebe6" font-size="15" text-anchor="middle">5</text>
+      <line x1="525" y1="342" x2="525" y2="384" stroke="#ecebe6" stroke-width="2" marker-start="url(#aw)" marker-end="url(#aw)"/>
+      <rect x="455" y="388" width="140" height="58" rx="8" fill="none" stroke="#ecebe6" stroke-width="2"/>
+      <text x="525" y="414" fill="#ecebe6" font-size="20" text-anchor="middle">Tools</text>
+      <text x="525" y="436" fill="#a9a7a0" font-size="14" text-anchor="middle">edit · bash · git · browser</text>
+      <line x1="604" y1="305" x2="646" y2="305" stroke="#ecebe6" stroke-width="2" marker-end="url(#aw)"/>
+
+      <!-- result -->
+      <rect x="650" y="272" width="120" height="64" rx="8" fill="none" stroke="#ecebe6" stroke-width="2"/>
+      <text x="710" y="311" fill="#ecebe6" font-size="21" text-anchor="middle">Result</text>
+      <line x1="774" y1="305" x2="816" y2="305" stroke="#ecebe6" stroke-width="2" marker-end="url(#aw)"/>
+
+      <!-- testing -->
+      <rect x="820" y="268" width="140" height="72" rx="8" fill="none" stroke="#ecebe6" stroke-width="2"/>
+      <text x="890" y="311" fill="#ecebe6" font-size="21" text-anchor="middle">Testing</text>
+      <circle cx="960" cy="340" r="13" fill="#1f1f21" stroke="#ff4d6a" stroke-width="2"/><text x="960" y="346" fill="#ff4d6a" font-size="15" text-anchor="middle">6</text>
+
+      <!-- red: fail, retry with error context -->
+      <path d="M860 264 L860 228 L560 228 L560 262" fill="none" stroke="#ff4d6a" stroke-width="2.5" marker-end="url(#ar)"/>
+      <text x="600" y="218" fill="#ff4d6a" font-size="17">fail → retry with error context (4 real cycles)</text>
+
+      <!-- green: all goals done -->
+      <path d="M930 264 L930 104" fill="none" stroke="#6ee25c" stroke-width="2.5" marker-end="url(#ag)"/>
+      <text x="940" y="160" fill="#6ee25c" font-size="15">all 5</text>
+      <text x="940" y="178" fill="#6ee25c" font-size="15">done</text>
+
+      <!-- green: sub-goal complete back to planning -->
+      <path d="M890 344 L890 476 L340 476 L340 350" fill="none" stroke="#6ee25c" stroke-width="2.5" marker-end="url(#ag)"/>
+      <text x="610" y="468" fill="#6ee25c" font-size="17">sub-goal complete (×5)</text>
+      <circle cx="890" cy="476" r="13" fill="#1f1f21" stroke="#6ee25c" stroke-width="2"/><text x="890" y="482" fill="#6ee25c" font-size="15" text-anchor="middle">7</text>
+
+      <!-- project memory and context injection -->
+      <rect x="230" y="520" width="580" height="80" rx="10" fill="none" stroke="#ecebe6" stroke-width="2"/>
+      <text x="520" y="568" fill="#ecebe6" font-size="26" text-anchor="middle">Project memory</text>
+      <circle cx="230" cy="520" r="13" fill="#1f1f21" stroke="#e6b97a" stroke-width="2"/><text x="230" y="526" fill="#e6b97a" font-size="15" text-anchor="middle">2</text>
+      <line x1="290" y1="514" x2="290" y2="352" stroke="#e6b97a" stroke-width="2" marker-end="url(#ao)"/>
+      <line x1="305" y1="352" x2="305" y2="514" stroke="#e6b97a" stroke-width="2" marker-end="url(#ao)"/>
+      <text x="60" y="400" fill="#ecebe6" font-size="16">context injection</text>
+      <text x="60" y="424" fill="#6fb3f2" font-size="15">· code &amp; docs</text>
+      <text x="60" y="446" fill="#6fb3f2" font-size="15">· the plan from last loop</text>
+      <text x="60" y="468" fill="#6fb3f2" font-size="15">· measured data</text>
+      <text x="60" y="490" fill="#6fb3f2" font-size="15">· session rules</text>
+      <line x1="700" y1="514" x2="700" y2="342" stroke="#e6b97a" stroke-width="2" marker-start="url(#ao)" marker-end="url(#ao)"/>
+    </svg>
+  </figure>
+  <div class="legend">
+    <span><i style="background:var(--model)"></i>model calls</span>
+    <span><i style="background:var(--fail)"></i>fail, retry with error context</span>
+    <span><i style="background:var(--ok)"></i>sub-goal / all goals done</span>
+    <span><i style="background:var(--review)"></i>human review</span>
+    <span><i style="background:var(--harness)"></i>harness and memory traffic</span>
+  </div>
+
+  <ol class="steps">
+    <li class="step">
+      <span class="num">1</span>
+      <div class="step-body">
+        <span class="kicker">Prompt</span>
+        <h2>Three asks in two lines</h2>
+        <p>"Build this plan" pointed at a document from the previous loop rather than restating it.
+          "A round of error fixing" had no target at all: the harness had to decide what to look for. Only the
+          backdrop click was concrete.</p>
+      </div>
+    </li>
+
+    <li class="step memory">
+      <span class="num">2</span>
+      <div class="step-body">
+        <span class="kicker">Context injection from project memory</span>
+        <h2>What the short prompt was expanded with</h2>
+        <ul class="plain">
+          <li><b>Code and docs:</b> the repository, and above all <code>docs/search-optimization-plan.md</code>,
+            written in the previous loop. That's what "this plan" meant.</li>
+          <li><b>The conversation so far:</b> earlier decisions (the 4σ threshold, hourly politeness concerns) and
+            an open observation that all 12 finds came from one test.</li>
+          <li><b>Measured data on disk:</b> 147 real Babelia frames downloaded earlier for calibration.</li>
+          <li><b>Session rules:</b> develop on one named branch, commit format, open a pull request and merge.</li>
+        </ul>
+        <p class="note">No skills or rules files were loaded for this loop. In your diagram's terms, the
+          injection was code, docs and conversation history.</p>
+      </div>
+    </li>
+
+    <li class="step">
+      <span class="num">3</span>
+      <div class="step-body">
+        <span class="kicker">Planning: goal and sub-goals</span>
+        <h2>One goal, five tracked sub-goals</h2>
+        <p>The goal: implement the plan, harden the code, fix the UI ask. It was broken into a written task
+          list before any code was touched:</p>
+        <ol class="goals">
+          <li><b>#1</b><span>Close the image view on a backdrop click</span></li>
+          <li><b>#2</b><span>Detection: fix the colour-balance skew, log every score, per-test leaderboards, combined score, fingerprint monitor</span></li>
+          <li><b>#3</b><span>Throughput: adaptive concurrency, hourly scans, publish every 30 minutes</span></li>
+          <li><b>#4</b><span>Research spike: Babelia's location → image mapping (time-boxed)</span></li>
+          <li><b>#5</b><span>Error-fixing round across the codebase</span></li>
+        </ol>
+        <p class="note">The plan document had 14 items. Planning chose the ones worth building and skipped five,
+          with reasons. For example, parallel runners would multiply load on Babelia, and the gain from
+          persistent connections was under 5%.</p>
+      </div>
+    </li>
+
+    <li class="step model">
+      <span class="num">4</span>
+      <div class="step-body">
+        <span class="kicker">The model, outside the harness</span>
+        <h2>Called again at every step</h2>
+        <p>Each turn, the harness sends the model the prompt plus the full context: the conversation, every tool
+          result so far, the task list. The model replies with its next action. It never edits files or runs
+          commands itself; it asks the harness to, and reads what comes back. That's the two blue arrows: one
+          into planning, one into execution.</p>
+      </div>
+    </li>
+
+    <li class="step">
+      <span class="num">5</span>
+      <div class="step-body">
+        <span class="kicker">Execution ↔ tools</span>
+        <h2>The tools that did the work</h2>
+        <div class="tools">
+          <span class="tool">Read / Edit / Write</span><span class="tool">Bash + Python</span>
+          <span class="tool">curl → Babelia</span><span class="tool">pytest</span><span class="tool">pyflakes</span>
+          <span class="tool">Playwright browser</span><span class="tool">git</span><span class="tool">GitHub API</span>
+          <span class="tool">task list</span>
+        </div>
+        <p>Long jobs ran in the background while other sub-goals moved forward: an 8-minute recalibration on
+          1,000 simulated frames, and a live re-score of the site's data against Babelia.</p>
+      </div>
+    </li>
+
+    <li class="step fail">
+      <span class="num">6</span>
+      <div class="step-body">
+        <span class="kicker">Result → testing, and the red loop</span>
+        <h2>Where it failed and retried with the error</h2>
+        <div class="cycles">
+          <div class="cycle">
+            <h3>Leaderboards vs. the storage tests <span class="tag fail">2 failed</span></h3>
+            <div class="row"><span>Error</span><span>the image folder held 3 frames more than expected</span></div>
+            <div class="row"><span>Retry</span><span>Read the error: the new leaderboards correctly keep those frames. The tests'
+              expectation was outdated, so they now compare against everything still referenced.</span></div>
+          </div>
+          <div class="cycle">
+            <h3>The score log <span class="tag fail">1 failed</span></h3>
+            <div class="row"><span>Error</span><span><code>assert (0 == 8)</code>: the log was empty</span></div>
+            <div class="row"><span>Retry</span><span>A real bug: rows missing any test's score were silently dropped. Rows now use a
+              fixed column order, with blanks where a score is missing.</span></div>
+          </div>
+          <div class="cycle">
+            <h3>Live re-score on the real site data <span class="tag fail">unexpected result</span></h3>
+            <div class="row"><span>Error</span><span>after the skew fix, none of the 12 finds still reached 4σ</span></div>
+            <div class="row"><span>Retry</span><span>Treated as a finding, not a crash. It added automatic re-scoring and a
+              reconcile step, then rewrote the site text that still promised "1 in 2,000".</span></div>
+          </div>
+          <div class="cycle">
+            <h3>Static analysis <span class="tag fail">1 warning</span></h3>
+            <div class="row"><span>Error</span><span>pyflakes: <code>dictionary key 'description' repeated</code></span></div>
+            <div class="row"><span>Retry</span><span>Each demo's hand-written explanation had been silently overwritten. Kept both,
+              under separate names.</span></div>
+          </div>
+          <div class="cycle pass">
+            <h3>Checks that passed the first time <span class="tag ok">green</span></h3>
+            <div class="row"><span>Tested</span><span>Backdrop click in a browser (closes, clears the address; clicks inside don't close).
+              The publish loop, dry-run against a scratch git remote: 3 chunks, 1 commit. Recalibration: real static max 2.81σ.
+              The research result, against a control: unrelated frames scored 6.25%, which is chance.</span></div>
+          </div>
+        </div>
+      </div>
+    </li>
+
+    <li class="step ok">
+      <span class="num">7</span>
+      <div class="step-body">
+        <span class="kicker">Sub-goal complete → back to planning</span>
+        <h2>The order sub-goals closed</h2>
+        <div class="order"><span>#4 research</span><em>→</em><span>#2 detection</span><em>→</em><span>#1 backdrop</span><em>+</em><span>#3 throughput</span><em>→</em><span>#5 error fixing</span></div>
+        <p>Each green return re-entered planning with more context than before. The clearest case: the
+          live re-score in #2 changed the plan, so #5's error round also had to cover what happens to old finds
+          when the detector changes.</p>
+      </div>
+    </li>
+
+    <li class="step review">
+      <span class="num">8</span>
+      <div class="step-body">
+        <span class="kicker">All goals done → human review</span>
+        <h2>One commit, one pull request, then you</h2>
+        <p>All five sub-goals closed, so it committed, opened <a href="https://github.com/Ow-Hill/Surfing-Babel_Claude-Code-Test/pull/11">PR #11</a>,
+          merged it and watched the deploy publish. Your next message, "improve the demo feature",
+          was the human-review step, and it opened the next loop.</p>
+        <p class="note">One difference from your diagram: here the human review came after the merge, not before,
+          because earlier you had asked for changes to go straight to <code>main</code>. The next loop added CI on
+          pull requests, so a green check now stands in front of every merge.</p>
+      </div>
+    </li>
+  </ol>
+
+  <footer>Traced from the Claude Code session that built Surfing Babel. Every error, number and file above is from that session.</footer>
+</div>
+</body>
+</html>
