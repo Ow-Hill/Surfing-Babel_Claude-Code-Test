@@ -13,7 +13,7 @@ on:
         description: "Minutes to scan (max ~330; the job limit is 6 h)"
         default: "25"
   push:
-    branches: [main, claude/pensive-ritchie-hc4bfy]
+    branches: [main]
     paths: ["babel_surfer/**", "site/**", ".github/workflows/**"]
 
 permissions:

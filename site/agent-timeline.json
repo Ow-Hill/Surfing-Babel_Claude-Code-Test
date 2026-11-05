@@ -1,5 +1,5 @@
 {
-  "intro": "Every line of Surfing Babel (scanner, detector, calibration, website, automation) was written by Claude Code, an AI coding agent, working from short requests in a conversation. The agent read code and websites, ran experiments, wrote and ran tests, opened and merged pull requests and watched the deployments. The person directed it; the agent did the engineering. Below is how it went, including the mistakes the agent caught in its own work.",
+  "intro": "Every line of Surfing Babel (scanner, detector, calibration, website, automation) was written by an AI coding agent, working from short requests in a conversation. The agent read code and websites, ran experiments, wrote and ran tests, opened and merged pull requests and watched the deployments. The person directed it; the agent did the engineering. Below is how it went, including the mistakes the agent caught in its own work.",
   "stats": [
     {
       "value": "12",

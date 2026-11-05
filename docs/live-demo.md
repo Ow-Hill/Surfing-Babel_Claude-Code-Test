@@ -1,6 +1,6 @@
 # Live demo runbook: agentic coding on Surfing Babel
 
-**What the audience sees:** Claude Code takes a small, real task from a written spec. It
+**What the audience sees:** an AI coding agent takes a small, real task from a written spec. It
 writes (or debugs) the code, runs the tests, opens a pull request, waits for CI to go green and
 merges. The showcase page follows every step on its own: a six-step progress tracker, a
 stopwatch, and the spec as a checklist that turns green as the requirements pass.
@@ -41,12 +41,12 @@ stopwatch, and the spec as a checklist that turns green as the requirements pass
 3. **Check what's running:** in the "Scans & deploys" column, an hourly 45-minute scan may be in
    progress. They start at about :23 past the hour. A merge waits behind it, so plan the demo
    to start just after a scan finishes, or cancel the running scan from the Actions tab.
-4. Open a Claude Code session on the repository, starting from an up-to-date `main`.
+4. Open a coding-agent session on the repository, starting from an up-to-date `main`.
 
 ## On stage
 
 1. Click **Start the clock** on the page.
-2. Click **Copy prompt** and paste it into Claude Code.
+2. Click **Copy prompt** and paste it into the coding agent.
 3. Narrate as the tracker advances:
 
 | step | typical time | what to point out |

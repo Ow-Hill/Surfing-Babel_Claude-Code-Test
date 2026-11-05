@@ -146,7 +146,7 @@ every pull request, including the mistakes the agent caught in its own work. It 
 repository activity (pull requests, commits, scans and deploys; `?live=1` refreshes every 15 s)
 and a **live-coding slot**: `babel_surfer/demo_slot.py` holds an unimplemented
 `find_of_the_day()` whose docstring and tests (`tests/test_demo_slot.py`, skipped until it is
-implemented) are the spec. In a demo, Claude Code implements it (or debugs a deliberately buggy
+implemented) are the spec. In a demo, an AI coding agent implements it (or debugs a deliberately buggy
 version), CI runs on the PR, it merges, and the page follows along with a six-step progress
 tracker, a stopwatch and a live requirement checklist. Reset with
 `python -m babel_surfer.demo_kit reset --variant stub|buggy`, the **Reset live demo** workflow, or the
