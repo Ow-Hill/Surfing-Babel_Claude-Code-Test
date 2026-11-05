@@ -1,10 +1,12 @@
 name: Scan Babel and publish site
 
-# Every few hours: pull frames from the Babelia slideshow, classify them,
-# and publish the results to GitHub Pages (served from the gh-pages branch).
+# Every hour: pull frames from the Babelia slideshow, classify them, and
+# publish the results to GitHub Pages (served from the gh-pages branch).
+# Concurrency adapts to Babelia's response time (see babel_surfer/scan.py),
+# and long scans publish every 30 minutes instead of only at the end.
 on:
   schedule:
-    - cron: "23 */3 * * *"        # every 3 hours (runs from the default branch)
+    - cron: "23 * * * *"          # hourly (runs from the default branch)
   workflow_dispatch:
     inputs:
       minutes:
@@ -43,45 +45,60 @@ jobs:
             git worktree add public origin/gh-pages
           else
             mkdir -p public
+            git -C public init -q
+            git -C public remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
           fi
 
-      - name: Scan
-        run: |
-          MIN="${{ github.event.inputs.minutes }}"
-          if [ -z "$MIN" ]; then
-            if [ "${{ github.event_name }}" = "push" ]; then MIN=1; else MIN=25; fi   # push: publish code changes fast
-          fi
-          if [ "$MIN" -gt 330 ]; then MIN=330; fi
-          python -m babel_surfer.scan --out public/data --minutes "$MIN" --workers 3
-
-      - name: Build site
-        run: python -m babel_surfer.build_site --out public
-
-      - name: Alert on big finds (>= 8σ)
+      - name: Scan, build and publish (every 30 minutes)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          python -m babel_surfer.alerts --data public/data --feed public/feed.xml --alert alert.md
-          if [ -f alert.md ]; then
-            gh issue create --repo "${{ github.repository }}" \
-              --title "Surfing Babel: something reached 8σ" --body-file alert.md
+          MIN="${{ github.event.inputs.minutes }}"
+          if [ -z "$MIN" ]; then
+            case "${{ github.event_name }}" in
+              push) MIN=1 ;;       # publish code changes fast
+              schedule) MIN=45 ;;  # hourly: leaves time for re-scoring, build and publish
+              *) MIN=25 ;;
+            esac
           fi
+          if [ "$MIN" -gt 330 ]; then MIN=330; fi
+          CHUNK=30
 
-      - name: Publish to gh-pages
-        working-directory: public
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # Publish as a single fresh commit (no history) so images that were
-          # dropped from the site don't keep growing the repository.
-          if [ ! -d .git ] && [ ! -f .git ]; then
-            git init -q
-            git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
-          fi
-          git checkout -q --orphan publish
-          git add -A
-          git commit -q -m "Scan results $(date -u +%Y-%m-%dT%H:%MZ)"
-          for i in 1 2 3; do git push -f origin HEAD:gh-pages && break; sleep $((i * 5)); done
+          git -C public config user.name "github-actions[bot]"
+          git -C public config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          publish() {
+            # A single commit with no history, so images dropped from the site
+            # don't keep growing the repository. Later chunks amend it.
+            if [ "$(git -C public rev-parse --abbrev-ref HEAD 2>/dev/null)" = "publish" ]; then
+              git -C public add -A
+              git -C public commit -q --amend -m "Scan results $(date -u +%Y-%m-%dT%H:%MZ)" || true
+            else
+              git -C public checkout -q --orphan publish
+              git -C public add -A
+              git -C public commit -q -m "Scan results $(date -u +%Y-%m-%dT%H:%MZ)"
+            fi
+            for i in 1 2 3; do git -C public push -q -f origin HEAD:gh-pages && return 0; sleep $((i * 5)); done
+            return 1
+          }
+
+          remaining=$MIN
+          while :; do
+            this=$(( remaining < CHUNK ? remaining : CHUNK ))
+            echo "::group::scan $this min ($remaining min left)"
+            python -m babel_surfer.scan --out public/data --minutes "$this" --workers 3 --max-workers 5
+            echo "::endgroup::"
+            python -m babel_surfer.build_site --out public
+            python -m babel_surfer.alerts --data public/data --feed public/feed.xml --alert alert.md
+            if [ -f alert.md ]; then
+              gh issue create --repo "${{ github.repository }}" \
+                --title "Surfing Babel: something reached 8σ" --body-file alert.md
+              rm alert.md
+            fi
+            publish
+            remaining=$(( remaining - this ))
+            [ "$remaining" -gt 0 ] || break
+          done
 
       # GitHub disables scheduled workflows in public repos after 60 days
       # without repository activity. Re-enabling the workflow through the API

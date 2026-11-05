@@ -7,7 +7,7 @@
 | Babelia fetch time | 5–32 s per frame, almost all server-side render (a TLS handshake is 0.35 s) | the server is the bottleneck |
 | Our scoring | 0.6 s per frame (+0.4 s analysis, only for kept frames) | not a bottleneck at current rates |
 | Throughput | ~31 frames/min with 3 workers (~1,900/hour) | ~45,000 frames/day if scanning nonstop |
-| Locality | frames at N and N+1 share no structure (pixel correlation −0.0002) | Babelia scrambles locations, so no search can "move towards" a picture |
+| Locality | pixel values at N and N+1 are uncorrelated (−0.0002), **but** equally spaced locations share a partly affine structure (see [research-babelia-generator.md](research-babelia-generator.md)) | no search can "move towards" a picture today; the generator may be partly recoverable |
 | Find rate | ~1 in 1,700–2,100 frames at 4σ, all from the colour-balance test so far | anomalies are statistical, not pictures |
 | Odds of a picture | ~4096^−266,240 per frame | no throughput gain changes this: random search won't find a picture |
 
@@ -51,12 +51,31 @@ covers each:
 
 | # | Idea | Verdict |
 |---|---|---|
-| 3.1 | Hill-climbing or "nearby" search in location space | **Not possible.** Neighbouring locations are unrelated (measured). |
+| 3.1 | Hill-climbing or "nearby" search in location space | **Not possible today.** Frames at nearby locations are as unstructured as any others; the affine relation found in the 3.2 spike doesn't make a frame more picture-like. |
 | 3.2 | **Recover Babelia's location→image mapping.** The 156-row cross-channel fingerprint shows it isn't a perfect scramble. With (location, image) pairs, including the 961,760-digit demo locations, test hypotheses: base-4096 digits under a modular multiplication or permutation, channel interleaving at a stride of 1/8 of the values, LCG-style structure. | **The one real lead.** If recovered: local generation (1.6) and true directed search, i.e. computing the location of any image, or scanning structured neighbourhoods. High effort, uncertain. |
 | 3.3 | Search outward from known pictures (seeded demos) | Equivalent to 3.2: without the mapping, a picture's neighbours are random static. |
 | 3.4 | Bias the slideshow start range | No effect: every location is equally random. |
 
-## Suggested order
+## Status (2026-11-05)
+
+| item | status |
+|---|---|
+| 1.1 adaptive concurrency | **done.** Starts at 3, up to 5, backs off to 1. Live test: ramped 2→5 at 3.7 s responses, backed off to 1 at 15 s. |
+| 1.2 persistent connections | not done: under 5% gain, and it complicates proxy support |
+| 1.3 scan more often | **done.** Hourly 45-minute scans. |
+| 1.4 parallel runners | not done: multiplies load on Babelia; revisit only with a hard rate cap |
+| 1.5 incremental publishing | **done.** Publishes every 30 minutes; `gh-pages` stays a single commit. |
+| 1.6 local generation | blocked on 3.2 |
+| 2.1 log every frame's scores | **done.** `stats.test_hist` (forever) and `data/scores.npy` (last 100k frames). |
+| 2.2 per-test calibration | **done in spirit.** Fixed the chi-square skew (Wilson–Hilferty) that made colour balance dominate; real-data rates per test are shown on the site. |
+| 2.3 combined score | **done.** Calibrated separately; shown in the detail view and as a leaderboard. |
+| 2.4 cascade | not done: CPU isn't the bottleneck |
+| 2.5 learned detector | not done: needs a training setup; next candidate |
+| 2.6 per-test leaderboards | **done** (top 3 each) |
+| 2.7 fingerprint monitor | **done** |
+| 3.2 generator research | **spike done.** Partly affine structure found between equally spaced locations; see `research-babelia-generator.md`. |
+
+## Suggested order (original)
 
 1. **2.1** log all scores, then **2.2** per-test thresholds and **2.6** per-test leaderboards: quick, improves the site.
 2. **1.1 + 1.3** adaptive politeness and more frequent scans: about 6–10× more frames.

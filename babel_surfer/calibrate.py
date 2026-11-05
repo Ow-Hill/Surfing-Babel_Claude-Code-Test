@@ -112,6 +112,15 @@ def main(argv=None) -> int:
                          "std": max(statistics.pstdev(loo), 1.0), "max": max(loo)}
         tone_source = f"real Babelia frames (n={len(real_rgb)}, leave-one-out)"
 
+    # Combined score: the per-test calibrated z summed (Stouffer). Tests are
+    # correlated, so its own null mean/std are measured on the same frames.
+    comb = []
+    for i in range(len(samples[TESTS[0]])):
+        zs = {t: (samples[t][i] - tests[t]["mean"]) / tests[t]["std"] for t in TESTS}
+        comb.append(classifier.combined_raw(zs))
+    tests["combined"] = {"mean": statistics.fmean(comb), "std": max(statistics.pstdev(comb), 1e-6),
+                         "max": max(comb)}
+
     result = {"frames": args.frames, "model": "uniform 16-level RGB, JPEG with Babelia qtables, 4:4:4",
               "tone_source": tone_source,
               "tests": tests, "tone_expected": tone_expected.round(6).tolist()}

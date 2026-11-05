@@ -23,6 +23,7 @@
   let pollTimer = null;
   let watching = false;          // true while a run we know about is active
   let lastUpdated = null;        // stats.json updated_at, to spot new data
+  let busy = false;              // a scan is already running
 
   const fmtAgo = (iso) => {
     const s = (Date.now() - new Date(iso).getTime()) / 1000;
@@ -64,19 +65,24 @@
       setStatus("couldn't reach GitHub to check scan status; trying again in 2 min", "idle");
       return schedule(120000);
     }
-    const active = runs.find((r) => r.status !== "completed");
+    const active = runs.find((r) => r.status === "in_progress") || runs.find((r) => r.status !== "completed");
+    const waiting = runs.some((r) => r.status === "queued" || r.status === "pending" || r.status === "waiting");
     $("scan-run").hidden = !active;
+    // Hourly scans run most of the time, so the button queues a scan instead
+    // of being disabled; GitHub keeps only one queued run, so it is disabled
+    // only while one is already waiting.
+    busy = !!active;
+    $("scan-btn").disabled = waiting;
+    $("scan-btn").textContent = waiting ? "Scan queued" : active ? "Queue a scan" : "Scan now";
     if (active) {
       $("scan-run").href = active.html_url;
       const label = active.status === "in_progress"
-        ? `scanning since ${fmtAgo(active.run_started_at || active.created_at)}; results appear here when it finishes`
+        ? `scanning since ${fmtAgo(active.run_started_at || active.created_at)}; new results publish every 30 min`
         : "scan queued: it starts when the current one finishes";
       setStatus(label, "running");
-      $("scan-btn").disabled = true;
       watching = true;
       return schedule(30000);
     }
-    $("scan-btn").disabled = false;
     const last = runs[0];
     if (watching && last) {
       watching = false;
@@ -136,11 +142,13 @@
     const m = parseInt($("scan-minutes").value, 10);
     const frames = Math.round((m * 31) / 10) * 10;
     const ready = m + 10;
-    const finds = frames / 2000;
-    $("scan-summary").textContent =
+    const perFind = window.SB_FRAMES_PER_FIND;
+    const finds = perFind ? frames / perFind : 0;
+    $("scan-summary").textContent = (busy ? "A scan is running now; yours starts when it finishes. " : "") +
       `Scans about ${frames.toLocaleString()} frames. Results appear here in about ` +
       `${ready >= 90 ? Math.round(ready / 60 * 10) / 10 + " hours" : ready + " minutes"} ` +
-      `(the scan plus ~10 min to publish). Expect ${finds < 1 ? "probably no finds" : "about " + Math.round(finds) + " find" + (Math.round(finds) === 1 ? "" : "s")}. ` +
+      `(the scan plus ~10 min to publish; long scans publish every 30 min). ` +
+      (perFind ? `Expect ${finds < 1 ? "probably no finds" : "about " + Math.round(finds) + " find" + (Math.round(finds) === 1 ? "" : "s")}. ` : "Finds are rare. ") +
       (m >= 60 ? "Scheduled scans wait until it finishes." : "");
   }
   $("scan-minutes").addEventListener("change", updateSummary);
@@ -169,7 +177,7 @@
       if (typed && $("scan-remember").checked) store.set(typed);
       $("scan-token").value = "";
       $("scan-dialog").close();
-      setStatus("scan requested…", "running");
+      setStatus(busy ? "scan queued: it starts when the current one finishes" : "scan requested…", "running");
       $("scan-btn").disabled = true;
       watching = true;
       try {

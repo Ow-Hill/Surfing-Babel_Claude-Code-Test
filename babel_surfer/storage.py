@@ -26,8 +26,14 @@ from pathlib import Path
 from PIL import Image
 
 from . import analysis
+from .classifier import detector_id
 
 NEAR_MISS_KEEP = 12
+LEADERS_KEEP = 3                 # top frames kept per test (and for "combined")
+SCORE_LOG_KEEP = 100_000         # rolling log of every frame's scores
+# per-test score histograms: 0.25-sigma bins from -5 to 20, plus under/overflow
+TEST_HIST_LO, TEST_HIST_HI, TEST_HIST_STEP = -5.0, 20.0, 0.25
+TEST_HIST_BINS = int((TEST_HIST_HI - TEST_HIST_LO) / TEST_HIST_STEP) + 2
 MAX_FINDS = 100
 THUMB_SIZE = (320, 208)
 THUMB_QUALITY = 75
@@ -60,6 +66,14 @@ def make_thumb(image: bytes) -> bytes:
     return buf.getvalue()
 
 
+def test_hist_bin(z: float) -> int:
+    if z < TEST_HIST_LO:
+        return 0
+    if z >= TEST_HIST_HI:
+        return TEST_HIST_BINS - 1
+    return 1 + int((z - TEST_HIST_LO) / TEST_HIST_STEP)
+
+
 def hist_bin(sigma: float) -> int:
     for i in range(len(HIST_EDGES) - 1, -1, -1):
         if sigma >= HIST_EDGES[i]:
@@ -73,6 +87,7 @@ class Store:
         self.image_dir = self.dir / "images"
         self.image_dir.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
+        self._save_lock = threading.Lock()      # one save at a time (score log is read-modify-write)
         self.stats = _read(self.dir / "stats.json", {})
         self.stats.setdefault("scanned", 0)
         self.stats.setdefault("errors", 0)
@@ -81,7 +96,11 @@ class Store:
         self.stats.setdefault("runs", [])
         self.finds = _read(self.dir / "finds.json", [])
         self.near = _read(self.dir / "near_misses.json", [])
+        self.leaders = _read(self.dir / "leaders.json", {})
         self.stats.setdefault("finds_total", len(self.finds))
+        self.stats.setdefault("test_hist", {"lo": TEST_HIST_LO, "step": TEST_HIST_STEP, "counts": {}})
+        self.stats.setdefault("fingerprint", {"n": 0, "sum": 0.0, "sumsq": 0.0, "min": None})
+        self._score_log: list[tuple] = []
         self._tidy()
 
     # ------------------------------------------------------------------
@@ -102,7 +121,8 @@ class Store:
         maps = analysis.analyze(image)
         self._maps(location).write_text(json.dumps(maps, separators=(",", ":")))
         fields = {"maps": f"images/{location}.maps.json", "mask": None,
-                  "description": analysis.describe(result.tests, maps, result.sigma)}
+                  "description": analysis.describe(result.tests, maps, result.sigma),
+                  "detector": detector_id()}
         if result.reason == "tone" or result.tests.get("tone", 0) >= 3:
             self._mask(location).write_bytes(analysis.tone_mask_png(image, maps))
             fields["mask"] = f"images/{location}.mask.png"
@@ -114,19 +134,66 @@ class Store:
             p.unlink(missing_ok=True)
 
     def missing_assets(self) -> list[dict]:
-        """Entries saved before evidence maps existed (they need the full
-        frame again, which Babelia regenerates from the location)."""
-        return [e for e in self.finds + self.near if not self._maps(e["location"]).exists()]
+        """Entries that need their full frame again (Babelia regenerates it
+        from the location): saved before evidence maps existed, or scored by
+        a different detector version."""
+        current = detector_id()
+        seen, out = set(), []
+        for e in self._all_entries():
+            stale = not self._maps(e["location"]).exists() or e.get("detector") != current
+            if e["location"] not in seen and stale:
+                seen.add(e["location"])
+                out.append(e)
+        return out
+
+    def reconcile(self, threshold: float) -> int:
+        """After re-scoring: drop finds that no longer reach the threshold,
+        re-rank near misses and leaderboards, delete files nothing uses.
+        Returns how many finds were dropped."""
+        from .classifier import tier_for
+        with self._lock:
+            keep = [f for f in self.finds if f["sigma"] >= threshold]
+            dropped = len(self.finds) - len(keep)
+            # a near miss whose new score reaches the threshold becomes a find
+            for n in self.near:
+                if n["sigma"] >= threshold and not any(f["location"] == n["location"] for f in keep):
+                    n["tier"] = tier_for(n["sigma"])
+                    keep.append(n)
+                    self.stats["finds_total"] = self.stats.get("finds_total", 0) + 1
+            self.finds = keep
+            self.stats["finds_total"] = max(len(keep), self.stats.get("finds_total", 0) - dropped)
+            self.near = sorted([n for n in self.near if n["sigma"] < threshold],
+                               key=lambda n: n["sigma"], reverse=True)[:NEAR_MISS_KEEP]
+            for t, board in self.leaders.items():
+                key = (lambda e, t=t: e["tests"].get(t, 0) if t != "combined" else e.get("combined", 0))
+                board.sort(key=key, reverse=True)
+                del board[LEADERS_KEEP:]
+            refs = self._referenced()
+            for p in list(self.image_dir.iterdir()):
+                if p.name.split(".", 1)[0] not in refs:
+                    p.unlink()
+        return dropped
 
     def enrich(self, entry: dict, image: bytes, result) -> None:
         """Rebuild an entry's assets and scores from its full frame."""
         fields = self._write_assets(entry["location"], image, result)
         with self._lock:
-            entry.update(fields, sigma=result.sigma, tests=result.tests, reason=result.reason,
-                         tier=result.label)
+            for e in self._all_entries():          # the same frame may sit on several lists
+                if e["location"] == entry["location"]:
+                    e.update(fields, sigma=result.sigma, tests=result.tests, reason=result.reason,
+                             tier=result.label, combined=result.combined)
 
     def _referenced(self) -> set[str]:
-        return {e["location"] for e in self.finds} | {e["location"] for e in self.near}
+        refs = {e["location"] for e in self.finds} | {e["location"] for e in self.near}
+        for board in self.leaders.values():
+            refs |= {e["location"] for e in board}
+        return refs
+
+    def _all_entries(self) -> list[dict]:
+        out = self.finds + self.near
+        for board in self.leaders.values():
+            out += board
+        return out
 
     def _cap_finds(self) -> None:
         if len(self.finds) <= MAX_FINDS:
@@ -152,7 +219,7 @@ class Store:
                 p.unlink()
             elif p.suffix == ".jpg" and p.stat().st_size > THUMB_MAX_BYTES:
                 p.write_bytes(make_thumb(p.read_bytes()))   # old full-size frame
-        for e in self.finds + self.near:
+        for e in self._all_entries():
             e.pop("heat", None)
             if not self._maps(e["location"]).exists():
                 e["maps"] = None
@@ -162,20 +229,70 @@ class Store:
         """Account for one classified frame. Returns 'find', 'near' or None."""
         entry = {"location": location, "sigma": result.sigma, "tier": result.label,
                  "reason": result.reason, "tests": result.tests,
+                 "combined": getattr(result, "combined", 0.0),
                  "found_at": time.time(), "image": f"images/{location}.jpg",
                  "maps": None, "mask": None, "description": None}
         kind = self._account(location, entry, result, run)
-        if kind:
+        leader = self._board(location, entry, result)
+        if kind or leader:
             fields = self._write_assets(location, image, result)
             with self._lock:
                 entry.update(fields)
-        return kind
+                # pushed off every list while its assets were being written?
+                if location not in self._referenced():
+                    self._drop_image(location)
+        return kind or ("leader" if leader else None)
+
+    def _board(self, location: str, entry: dict, result) -> bool:
+        """Per-test leaderboards: the top frames for each test (and for the
+        combined score), so the site shows every kind of anomaly, not just
+        the test that fires most."""
+        scores = dict(result.tests)
+        scores["combined"] = getattr(result, "combined", 0.0)
+        placed = False
+        with self._lock:
+            for test, z in scores.items():
+                board = self.leaders.setdefault(test, [])
+                key = (lambda e, t=test: e["tests"].get(t, 0) if t != "combined" else e.get("combined", 0))
+                if len(board) >= LEADERS_KEEP and z <= min(key(e) for e in board):
+                    continue
+                if any(e["location"] == location for e in board):
+                    continue
+                board.append(entry)
+                board.sort(key=key, reverse=True)
+                gone = board[LEADERS_KEEP:]
+                del board[LEADERS_KEEP:]
+                placed = placed or entry in board
+                refs = self._referenced()
+                for g in gone:
+                    if g["location"] not in refs:
+                        self._drop_image(g["location"])
+        return placed
 
     def _account(self, location: str, entry: dict, result, run: dict) -> str | None:
         """Bookkeeping under the lock; decides whether the frame is kept."""
         with self._lock:
             self.stats["scanned"] += 1
             self.stats["hist"][hist_bin(result.sigma)] += 1
+            # every frame's scores: per-test histograms (kept forever, tiny) and a
+            # rolling raw log (for recalibration and research)
+            counts = self.stats["test_hist"]["counts"]
+            combined = getattr(result, "combined", 0.0)
+            fp = getattr(result, "fingerprint", 0.0)
+            for t, z in list(result.tests.items()) + [("combined", combined)]:
+                counts.setdefault(t, [0] * TEST_HIST_BINS)[test_hist_bin(z)] += 1
+            f = self.stats["fingerprint"]
+            f["n"] += 1
+            f["sum"] += fp
+            f["sumsq"] += fp * fp
+            if f["min"] is None or fp < f["min"]["value"]:
+                f["min"] = {"value": fp, "location": location}
+            try:
+                self._score_log.append((int(location),
+                                        *[result.tests.get(t, float("nan")) for t in self.SCORE_COLUMNS[1:-2]],
+                                        combined, fp))
+            except ValueError:
+                pass                                   # non-numeric location (tests)
             run["scanned"] += 1
             run["max_sigma"] = max(run.get("max_sigma", float("-inf")), result.sigma)
             best = self.stats.get("best")
@@ -201,11 +318,13 @@ class Store:
                     return None
                 self.near.append(entry)
                 self.near.sort(key=lambda n: n["sigma"], reverse=True)
-                for gone in self.near[NEAR_MISS_KEEP:]:
-                    if not any(f["location"] == gone["location"] for f in self.finds):
-                        self._drop_image(gone["location"])
+                gone = self.near[NEAR_MISS_KEEP:]
                 del self.near[NEAR_MISS_KEEP:]
-                return "near"
+                refs = self._referenced()
+                for g in gone:
+                    if g["location"] not in refs:      # may still be a find or a leader
+                        self._drop_image(g["location"])
+                return "near" if entry in self.near else None
         return None
 
     def promote(self, threshold: float) -> int:
@@ -233,13 +352,45 @@ class Store:
 
     def add_run(self, run: dict) -> None:
         with self._lock:
+            # keep run history small: summaries of new finds, not full entries
+            run["new_finds"] = [{k: f.get(k) for k in ("location", "sigma", "tier", "reason", "description")}
+                                for f in run.get("new_finds", [])]
             self.stats["runs"] = (self.stats["runs"] + [run])[-RUN_HISTORY:]
             self.stats["last_run"] = run
 
     def save(self) -> None:
+        with self._save_lock:
+            self._save()
+
+    def _save(self) -> None:
         with self._lock:
             self.stats["updated_at"] = time.time()
             _write(self.dir / "stats.json", self.stats)
             _write(self.dir / "finds.json",
                    sorted(self.finds, key=lambda f: f["found_at"], reverse=True))
             _write(self.dir / "near_misses.json", self.near)
+            _write(self.dir / "leaders.json", self.leaders)
+            log, self._score_log = self._score_log, []
+        if log:
+            self._append_score_log(log)
+
+    SCORE_COLUMNS = ["location", *sorted(["shape", "blob", "lines", "texture", "palette", "tone",
+                                           "contrast", "angled", "repetition", "symmetry"]),
+                     "combined", "fingerprint"]
+
+    def _append_score_log(self, rows: list[tuple]) -> None:
+        """Rolling binary log of the last SCORE_LOG_KEEP frames' scores
+        (location as uint64, scores as float16: 32 bytes per frame)."""
+        import numpy as np
+        dtype = [("location", "<u8")] + [(c, "<f2") for c in self.SCORE_COLUMNS[1:]]
+        new = np.array(rows, dtype=dtype)
+        path = self.dir / "scores.npy"
+        try:
+            old = np.load(path)
+            if old.dtype == new.dtype:
+                new = np.concatenate([old, new])
+        except (FileNotFoundError, ValueError, OSError):
+            pass
+        tmp = self.dir / "scores.tmp.npy"
+        np.save(tmp, new[-SCORE_LOG_KEEP:])
+        os.replace(tmp, path)
