@@ -16,7 +16,7 @@ import shutil
 from datetime import date, datetime, timezone
 from pathlib import Path
 
-from . import alerts, benchmark, demo_slot, seeded
+from . import alerts, benchmark, demo_kit, demo_slot, seeded
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
@@ -68,6 +68,12 @@ def build(out: Path, trials: int = 8, null_frames: int = 500, force_bench: bool 
     # live-coding demo slot (site/agent.html shows the spec until it's implemented)
     (out / "agent").mkdir(exist_ok=True)
     (out / "agent" / "find_of_the_day.json").write_text(json.dumps(demo_slot_result(finds)))
+    # the spec as a live checklist (passed / failed / waiting per requirement)
+    spec = demo_kit.spec_results()
+    spec["built_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    (out / "agent" / "spec_results.json").write_text(json.dumps(spec, ensure_ascii=False))
+    print(f"demo slot: {spec['variant']}, spec {spec['status']} "
+          f"({spec.get('passed', 0)}/{spec.get('total', 0)})")
 
 
 def demo_slot_result(finds: list[dict], day: date | None = None) -> dict:

@@ -16,12 +16,44 @@
 
   <section class="wrap stats" id="a-stats" aria-label="Project in numbers"></section>
 
-  <section class="wrap card" id="slot" aria-labelledby="slot-h">
+  <section class="wrap card" id="demo" aria-labelledby="demo-h">
     <div class="card-head">
-      <h2 id="slot-h">Live-coding slot: Find of the day</h2>
+      <h2 id="demo-h">Live demo: watch the agent work</h2>
       <span id="slot-state" class="tag"></span>
+      <span id="clock" class="clock mono" aria-live="off">0:00</span>
     </div>
-    <div id="slot-body"></div>
+
+    <ol id="stepper" class="stepper" aria-label="Demo progress"></ol>
+
+    <div class="demo-grid">
+      <div>
+        <h3>The spec <span class="muted small" id="spec-meta"></span></h3>
+        <ul id="checklist" class="checklist" aria-live="polite"></ul>
+        <div id="fotd-box"></div>
+      </div>
+      <div>
+        <h3>The prompt</h3>
+        <p class="muted small">Paste this into Claude Code with this repository open:</p>
+        <pre id="prompt" class="code prompt"></pre>
+        <div class="actions">
+          <button id="copy-prompt" class="btn ghost" type="button">Copy prompt</button>
+          <button id="start" class="btn" type="button">Start the clock</button>
+        </div>
+        <details class="presenter-tools">
+          <summary>Presenter tools</summary>
+          <p class="muted small">Reset the slot between demos. <b>Unimplemented</b>: the agent writes the
+            function. <b>Buggy</b>: it runs but breaks two requirements, and the agent has to find out why.
+            Needs the same GitHub token as the scanner's Scan now button; without one, use the
+            <a id="reset-link" target="_blank" rel="noopener">Reset live demo</a> workflow on GitHub.</p>
+          <div class="actions">
+            <button class="btn ghost reset" data-variant="stub" type="button">Reset: unimplemented</button>
+            <button class="btn ghost reset" data-variant="buggy" type="button">Reset: buggy</button>
+          </div>
+          <p id="reset-status" class="muted small" aria-live="polite"></p>
+          <p class="muted small">Big screen: open this page with <code>?present=1</code>.</p>
+        </details>
+      </div>
+    </div>
   </section>
 
   <section class="wrap card" id="activity" aria-labelledby="act-h">

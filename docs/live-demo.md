@@ -1,90 +1,98 @@
 # Live demo runbook: agentic coding on Surfing Babel
 
-**Duration:** about 10 minutes on stage, about 5 of them waiting while the agent works.
-**What the audience sees:** Claude Code implements a small, real feature from a spec. It runs
-the tests, opens and merges a pull request, and the feature appears on the live website, which
-updates by itself.
+**What the audience sees:** Claude Code takes a small, real task from a written spec. It
+writes (or debugs) the code, runs the tests, opens a pull request, waits for CI to go green and
+merges. The showcase page follows every step on its own: a six-step progress tracker, a
+stopwatch, and the spec as a checklist that turns green as the requirements pass.
+
+**Duration:** about 6–10 minutes from prompt to live page; the agent works for about 2–4 of them.
 
 ## The pieces
 
 | piece | where | role |
 |---|---|---|
-| Showcase page | `site/agent.html` → `…/agent.html` | the project story, the demo slot and live repository activity |
-| Demo slot | `babel_surfer/demo_slot.py` | `find_of_the_day()`: an unimplemented function whose docstring is the spec |
-| Spec tests | `tests/test_demo_slot.py` | 6 tests; **skipped** until the function exists, then they run automatically |
-| Safe build hook | `build_site.demo_slot_result()` | calls the slot on every build; a broken implementation shows "implementation error" on the page instead of breaking the site |
-| Fast publish | push-triggered runs scan for 1 minute | a merged change is live in about 3–4 minutes |
+| Showcase page | `…/agent.html` (`?present=1` for a big screen) | progress tracker, stopwatch, live checklist, the prompt, reset buttons, repo activity |
+| Demo slot | `babel_surfer/demo_slot.py` | `find_of_the_day()`; its docstring is the spec |
+| Spec tests | `tests/test_demo_slot.py` | 6 tests, one per requirement. Skipped while the slot is unimplemented. |
+| Templates | `babel_surfer/demo_templates/{stub,buggy}.py` | **stub**: unimplemented; **buggy**: runs, but breaks two requirements |
+| Demo kit | `python -m babel_surfer.demo_kit reset --variant stub\|buggy` / `check` | reset the slot; print the checklist |
+| CI | `.github/workflows/tests.yml` | runs the spec and the full suite on every pull request; the PR shows a check |
+| Reset workflow | `.github/workflows/demo-reset.yml` | resets the slot on `main` and republishes the site (about 3 min) |
+| Fast publish | `scan-and-publish.yml` | a merge that changes only the demo slot, site, docs or tests publishes **without scanning** |
+| Safe build | `build_site` | runs the spec in a separate process; a broken implementation shows failing checks, never a broken site |
 
-The task is deliberately one function in one file, so it is quick, safe and repeatable.
+## Two demo variants
+
+| variant | prompt (shown on the page, with a Copy button) | shows off |
+|---|---|---|
+| **Unimplemented** (`stub`) | implement it from the docstring and tests, run the tests, PR, merge once green | writing code from a spec |
+| **Buggy** (`buggy`) | some spec tests fail: explain which requirements are broken and why, fix, PR, merge | reading failures and diagnosing two subtle bugs: an order-dependent pick and a pick that ignores score |
 
 ## Before the demo (T−10 min)
 
-1. Open `https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/agent.html?live=1` on the
-   presenter screen. `?live=1` turns on live mode, which refreshes every 15 s.
-2. Check the slot badge reads **"waiting for the agent"**. If it shows "implemented" from a
-   previous demo, reset first (see below) and wait about 4 minutes for the site to update.
-3. Make sure no long scan is running: the "Scans & deploys" column must not show
-   "in progress" for a 330-minute batch. A merge during a long scan publishes only after the
-   scan ends. If one is running, cancel it from the Actions tab.
-   Scheduled 25-minute scans start at about :23 past every third hour UTC (00:23, 03:23, …),
-   often 10–40 minutes late. Avoid those windows, or cancel the scheduled run if one is in
-   progress.
-4. Open a Claude Code session on this repository on the `main`-tracking working branch.
+1. **Reset the slot** to the variant you want. On the showcase page, open **Presenter tools**
+   and click **Reset: unimplemented** or **Reset: buggy**. This needs the same fine-grained token
+   as the scanner's Scan now button (Actions: Read and write), saved in that browser. Without a
+   token, the button opens the **Reset live demo** workflow on GitHub; choose the variant and run
+   it. About 3 minutes later the badge reads "waiting for the agent" (unimplemented) or
+   "4 of 6 checks pass" (buggy).
+2. Open `https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/agent.html?present=1` on the
+   presenter screen. Presenter mode hides the story, enlarges the tracker and turns live mode on.
+3. **Check what's running:** in the "Scans & deploys" column, an hourly 45-minute scan may be in
+   progress. They start at about :23 past the hour. A merge waits behind it, so plan the demo
+   to start just after a scan finishes, or cancel the running scan from the Actions tab.
+4. Open a Claude Code session on the repository, starting from an up-to-date `main`.
 
 ## On stage
 
-Paste this prompt (it also says what to show and narrate):
-
-> Implement `find_of_the_day` in `babel_surfer/demo_slot.py`. The module docstring and
-> `tests/test_demo_slot.py` are the spec. Run the tests until they pass, run the full test suite,
-> then commit, open a pull request to main, and merge it. Keep the change to that one file.
-
-What to expect and narrate:
+1. Click **Start the clock** on the page.
+2. Click **Copy prompt** and paste it into Claude Code.
+3. Narrate as the tracker advances:
 
 | step | typical time | what to point out |
 |---|---|---|
-| Reads the docstring and tests | ~30 s | it works out the requirements: deterministic, order-independent, weighted by score |
-| Writes the function | ~1 min | typically hashes the day and the sorted locations into a seed, then makes a weighted pick |
-| Runs `pytest tests/test_demo_slot.py` | ~10 s | the 6 tests go from *skipped* to *passed*; if one fails, watch it read the error and fix it |
-| Runs the full suite | ~30 s | nothing else broke |
-| Commit → PR → merge | ~1 min | the PR appears in the "Pull requests" column within ~15 s |
-| Actions run, then Pages deploy | ~3–4 min | watch "Scans & deploys": queued → in progress → success → deploy |
-| Page updates by itself | — | the badge turns **implemented** and the featured find appears |
+| 1 Prompt given | 0:00 | — |
+| *(agent reads, writes and tests locally)* | 1–3 min | it reads the docstring and tests first; for **buggy** it explains each failure before touching code |
+| 2 Pull request opened | ~2–3 min | appears in the tracker and the "Pull requests" column within 15 s |
+| 3 Tests pass on the PR | ~1–2 min | GitHub's own CI, separate from the agent's local run; if it fails, the agent should read the log and fix it |
+| 4 Merged to main | seconds | the agent merges only once the check is green |
+| 5 Building and publishing | ~2–3 min | no scan (only the demo slot changed): build, then GitHub Pages deploy |
+| 6 Live on this page | — | the checklist turns green, the Find of the day appears, the **clock stops** |
 
-**Fill the wait** by scrolling the timeline. The "moments" are where the agent caught its own
-bugs, for example the 14σ calibration error and the Babelia fingerprint discovery.
+**Fill the wait** by scrolling to the timeline (outside presenter mode), where the "moments" show
+the agent catching its own bugs.
 
 ## If something goes wrong
 
-- **Tests fail and the agent keeps iterating:** that's a good moment to show; let it run.
-- **The page shows "implementation error":** the build caught an exception from the new code.
-  The rest of the site is unaffected. Ask the agent to read `agent/find_of_the_day.json` on the
-  site, or the Actions log, and fix it.
-- **The deploy is slow:** show the merged PR and the green test run instead. The page catches up
-  in a few minutes.
-- **GitHub rate limit on the page:** live mode uses conditional requests, which are normally free.
-  If the status says the limit was reached, refresh on another network or wait for the time shown.
+- **The agent's first attempt fails a test:** good. Let it iterate; it's the most convincing
+  part.
+- **CI fails on the PR:** the tracker turns step 3 red, with a link to the log. Ask the agent to
+  fix it.
+- **Pages deploy is slow or times out:** GitHub Pages occasionally stalls; this happened once
+  during development. Show the merged PR and the green CI check. The next publish catches up.
+- **The page says the GitHub limit was reached:** live mode uses conditional requests, which
+  are normally free. Wait until the time shown, or use another network.
+- **The checklist shows "checks couldn't run":** the published build couldn't run pytest. Check
+  the Scan & publish log.
 
-## Reset for the next demo
+## After the demo
 
-Restore the stub from the commit that introduced it, then publish:
+Reset the slot (Presenter tools, or the **Reset live demo** workflow), or from a terminal:
 
 ```bash
-git checkout "$(git log --diff-filter=A --format=%h -- babel_surfer/demo_slot.py | tail -1)" -- babel_surfer/demo_slot.py
+python -m babel_surfer.demo_kit reset --variant stub
 ```
 
 ```bash
 git commit -am "Reset live demo slot" && git push
 ```
 
-Merge that to `main` (or ask Claude Code to "reset the demo slot and merge"). The badge returns
-to "waiting for the agent" after the next publish.
-
-## Variations (to show other capabilities)
+## Variations
 
 - **"…and make the caption use the find's description."** The agent reads `analysis.py` to learn
   the description format.
 - **"…and add a test that a find featured yesterday isn't featured again today."** The agent
-  extends the spec itself.
-- **Start from a bug:** before the demo, commit an implementation that ignores `sigma`. Ask the
-  agent why the strongest find never wins, and let it diagnose and fix the bug.
+  extends the spec itself; the new test appears in CI, but not in the page's checklist, which
+  lists the six original requirements.
+- **Two-act demo:** run **buggy** first (diagnosis), then reset to **stub** and run it again
+  (creation), and compare the two times on the clock.

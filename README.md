@@ -146,8 +146,11 @@ every pull request, including the mistakes the agent caught in its own work. It 
 repository activity (pull requests, commits, scans and deploys; `?live=1` refreshes every 15 s)
 and a **live-coding slot**: `babel_surfer/demo_slot.py` holds an unimplemented
 `find_of_the_day()` whose docstring and tests (`tests/test_demo_slot.py`, skipped until it is
-implemented) are the spec. In a demo, Claude Code implements it, the PR merges and the page
-updates by itself. See [`docs/live-demo.md`](docs/live-demo.md) for the runbook, and
+implemented) are the spec. In a demo, Claude Code implements it (or debugs a deliberately buggy
+version), CI runs on the PR, it merges, and the page follows along with a six-step progress
+tracker, a stopwatch and a live requirement checklist. Reset with
+`python -m babel_surfer.demo_kit reset --variant stub|buggy`, the **Reset live demo** workflow, or the
+button on the page. See [`docs/live-demo.md`](docs/live-demo.md) for the runbook, and
 [`docs/search-optimization-plan.md`](docs/search-optimization-plan.md) for how the search could be
 made faster and smarter.
 
