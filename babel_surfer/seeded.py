@@ -31,7 +31,8 @@ from PIL import Image
 
 from . import benchmark
 from .calibrate import LEVELS
-from .classifier import classify, heatmap_png
+from . import analysis
+from .classifier import classify
 from .scan import BASE, USER_AGENT, fetch
 
 SEARCH = BASE + "/imagesearch.cgi"
@@ -110,11 +111,18 @@ def ensure(out: Path, network: bool = True) -> list[dict]:
         frame = jpg.read_bytes()
         loc = loc_file.read_text().strip()
         c = classify(frame)
-        (out / f"{demo['slug']}.heat.png").write_bytes(heatmap_png(frame))
+        maps = analysis.analyze(frame)
+        (out / f"{demo['slug']}.heat.png").unlink(missing_ok=True)     # superseded
+        (out / f"{demo['slug']}.maps.json").write_text(json.dumps(maps, separators=(",", ":")))
+        mask = None
+        if c.reason == "tone" or c.tests.get("tone", 0) >= 3:
+            (out / f"{demo['slug']}.mask.png").write_bytes(analysis.tone_mask_png(frame, maps))
+            mask = f"demo/{demo['slug']}.mask.png"
         entries.append({
             "slug": demo["slug"], "title": demo["title"], "description": demo["description"],
             "sigma": c.sigma, "tier": c.label, "reason": c.reason, "tests": c.tests,
-            "image": f"demo/{demo['slug']}.jpg", "heat": f"demo/{demo['slug']}.heat.png",
+            "image": f"demo/{demo['slug']}.jpg", "maps": f"demo/{demo['slug']}.maps.json",
+            "mask": mask, "description": analysis.describe(c.tests, maps, c.sigma),
             "location_file": f"demo/{demo['slug']}.location.txt",
             "location_digits": len(loc), "location_preview": f"{loc[:12]}…{loc[-12:]}",
         })

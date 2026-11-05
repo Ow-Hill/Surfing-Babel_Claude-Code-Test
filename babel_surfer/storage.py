@@ -4,7 +4,9 @@
     <data_dir>/finds.json        the top MAX_FINDS frames at/above the threshold
     <data_dir>/near_misses.json  the highest-scoring frames below the threshold
     <data_dir>/images/<location>.jpg       320x208 previews (~28 KB)
-    <data_dir>/images/<location>.heat.png  where the structure is (~200 B)
+    <data_dir>/images/<location>.maps.json evidence maps for the overlay (~16 KB)
+    <data_dir>/images/<location>.mask.png  pixels in the most deviant colour
+                                           range (colour-balance finds only)
 
 Only small previews are stored: a full Babelia frame is ~460 KB, and the
 location (seed) regenerates it exactly at babelia.cgi?location=N, which the
@@ -23,7 +25,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from .classifier import heatmap_png
+from . import analysis
 
 NEAR_MISS_KEEP = 12
 MAX_FINDS = 100
@@ -86,17 +88,42 @@ class Store:
     def _img(self, location: str) -> Path:
         return self.image_dir / f"{location}.jpg"
 
-    def _heat(self, location: str) -> Path:
-        return self.image_dir / f"{location}.heat.png"
+    def _maps(self, location: str) -> Path:
+        return self.image_dir / f"{location}.maps.json"
 
-    def _save_image(self, location: str, image: bytes) -> None:
+    def _mask(self, location: str) -> Path:
+        return self.image_dir / f"{location}.mask.png"
+
+    def _write_assets(self, location: str, image: bytes, result) -> dict:
+        """Preview, evidence maps (from the full frame: previews lose
+        static's statistics), tone mask and description. Slow (~1.5 s), so
+        callers run it outside the lock."""
         self._img(location).write_bytes(make_thumb(image))
-        # computed from the full frame: previews lose static's statistics
-        self._heat(location).write_bytes(heatmap_png(image))
+        maps = analysis.analyze(image)
+        self._maps(location).write_text(json.dumps(maps, separators=(",", ":")))
+        fields = {"maps": f"images/{location}.maps.json", "mask": None,
+                  "description": analysis.describe(result.tests, maps, result.sigma)}
+        if result.reason == "tone" or result.tests.get("tone", 0) >= 3:
+            self._mask(location).write_bytes(analysis.tone_mask_png(image, maps))
+            fields["mask"] = f"images/{location}.mask.png"
+        return fields
 
     def _drop_image(self, location: str) -> None:
-        self._img(location).unlink(missing_ok=True)
-        self._heat(location).unlink(missing_ok=True)
+        for p in (self._img(location), self._maps(location), self._mask(location),
+                  self.image_dir / f"{location}.heat.png"):
+            p.unlink(missing_ok=True)
+
+    def missing_assets(self) -> list[dict]:
+        """Entries saved before evidence maps existed (they need the full
+        frame again, which Babelia regenerates from the location)."""
+        return [e for e in self.finds + self.near if not self._maps(e["location"]).exists()]
+
+    def enrich(self, entry: dict, image: bytes, result) -> None:
+        """Rebuild an entry's assets and scores from its full frame."""
+        fields = self._write_assets(entry["location"], image, result)
+        with self._lock:
+            entry.update(fields, sigma=result.sigma, tests=result.tests, reason=result.reason,
+                         tier=result.label)
 
     def _referenced(self) -> set[str]:
         return {e["location"] for e in self.finds} | {e["location"] for e in self.near}
@@ -117,21 +144,18 @@ class Store:
         and delete images nothing refers to."""
         self._cap_finds()
         keep = self._referenced()
-        for p in self.image_dir.glob("*.heat.png"):
-            if p.name[: -len(".heat.png")] not in keep:
+        for p in self.image_dir.glob("*.heat.png"):      # replaced by maps.json
+            p.unlink()
+        for p in self.image_dir.iterdir():
+            loc = p.name.split(".", 1)[0]
+            if loc not in keep:
                 p.unlink()
-        for p in self.image_dir.glob("*.jpg"):
-            if p.stem not in keep:
-                p.unlink()
-            elif p.stat().st_size > THUMB_MAX_BYTES:
-                # an old full-size frame: make its heatmap before shrinking it
-                full = p.read_bytes()
-                if not self._heat(p.stem).exists():
-                    self._heat(p.stem).write_bytes(heatmap_png(full))
-                p.write_bytes(make_thumb(full))
+            elif p.suffix == ".jpg" and p.stat().st_size > THUMB_MAX_BYTES:
+                p.write_bytes(make_thumb(p.read_bytes()))   # old full-size frame
         for e in self.finds + self.near:
-            e["heat"] = (f"images/{e['location']}.heat.png"
-                         if self._heat(e["location"]).exists() else None)
+            e.pop("heat", None)
+            if not self._maps(e["location"]).exists():
+                e["maps"] = None
 
     # ------------------------------------------------------------------
     def record(self, location: str, image: bytes, result, run: dict) -> str | None:
@@ -139,7 +163,16 @@ class Store:
         entry = {"location": location, "sigma": result.sigma, "tier": result.label,
                  "reason": result.reason, "tests": result.tests,
                  "found_at": time.time(), "image": f"images/{location}.jpg",
-                 "heat": f"images/{location}.heat.png"}
+                 "maps": None, "mask": None, "description": None}
+        kind = self._account(location, entry, result, run)
+        if kind:
+            fields = self._write_assets(location, image, result)
+            with self._lock:
+                entry.update(fields)
+        return kind
+
+    def _account(self, location: str, entry: dict, result, run: dict) -> str | None:
+        """Bookkeeping under the lock; decides whether the frame is kept."""
         with self._lock:
             self.stats["scanned"] += 1
             self.stats["hist"][hist_bin(result.sigma)] += 1
@@ -156,11 +189,8 @@ class Store:
                     lowest = min((f["sigma"] for f in self.finds), default=float("-inf"))
                     if len(self.finds) >= MAX_FINDS and result.sigma <= lowest:
                         return "find"      # counted, but not in the top MAX_FINDS
-                    self._save_image(location, image)
                     self.finds.append(entry)
-                    run.setdefault("new_finds", []).append(
-                        {"location": location, "sigma": result.sigma, "tier": result.label,
-                         "reason": result.reason})
+                    run.setdefault("new_finds", []).append(entry)
                     self._cap_finds()
                     return "find"
                 return None
@@ -169,7 +199,6 @@ class Store:
             if len(self.near) < NEAR_MISS_KEEP or result.sigma > lowest:
                 if any(n["location"] == location for n in self.near):
                     return None
-                self._save_image(location, image)
                 self.near.append(entry)
                 self.near.sort(key=lambda n: n["sigma"], reverse=True)
                 for gone in self.near[NEAR_MISS_KEEP:]:

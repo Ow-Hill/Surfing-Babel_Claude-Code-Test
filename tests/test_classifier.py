@@ -52,10 +52,29 @@ def test_flat_image_and_tiers():
     assert tier_for(9) == "faint" and tier_for(20) == "clear" and tier_for(50) == "striking"
 
 
-def test_heatmap_marks_the_object_not_the_static(rng):
-    from babel_surfer.classifier import HEAT_FLOOR, heat_grid
-    assert heat_grid(babel_static(rng)).max() < HEAT_FLOOR + 1
+def test_maps_locate_the_object_and_describe_it(rng):
+    from babel_surfer import analysis
     picture, mask = benchmark.SIGNALS["small square (24px)"][0]()
-    z = heat_grid(benchmark._blend(rng, picture, mask, 1.0))
-    y, x = np.unravel_index(z.argmax(), z.shape)
-    assert z.max() > 15 and 17 <= x <= 21 and 11 <= y <= 14   # square at (300-324, 196-220)
+    frame = benchmark._blend(rng, picture, mask, 1.0)
+    maps = analysis.analyze(frame)
+    gw, gh = maps["grid"]
+    m = np.abs(np.asarray(maps["mean"])).reshape(gh, gw)
+    y, x = np.unravel_index(m.argmax(), m.shape)
+    assert m.max() > 15 and 17 <= x <= 21 and 11 <= y <= 14     # square at (300-324, 196-220)
+    c = classify(frame)
+    text = analysis.describe(c.tests, maps, c.sigma)
+    assert "darker" in text and "centre" in text
+
+
+@pytest.mark.parametrize("maker,alpha,reason", [
+    ("_grey_patch", 1.0, "contrast"), ("_diagonal_line", 1.0, "angled"),
+    ("_tiled", 0.4, "repetition"), ("_mirrored", 0.4, "symmetry")])
+def test_new_tests_catch_their_signal(rng, maker, alpha, reason):
+    c = classify(getattr(benchmark, maker)(rng, alpha))
+    assert c.is_interesting and c.tests[reason] >= 8, c
+
+
+def test_angled_line_geometry(rng):
+    from babel_surfer import analysis
+    maps = analysis.analyze(benchmark._diagonal_line(rng, 1.0))
+    assert maps["angled"]["line"] and abs(analysis.line_angle(maps["angled"]["line"]) - 30) <= 8

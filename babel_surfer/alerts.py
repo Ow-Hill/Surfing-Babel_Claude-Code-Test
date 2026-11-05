@@ -35,7 +35,7 @@ def build_feed(finds: list[dict], site_url: str = SITE_URL) -> str:
     for f in finds:
         link = f"{site_url}#{f['location']}"
         title = f"{f['tier']} · {f['sigma']:.1f}σ · location {f['location']}"
-        summary = (f"Strongest signal: {f['reason']}. "
+        summary = (f"{f.get('description') or 'Strongest signal: ' + f['reason'] + '.'} "
                    f"Full image: {image_url(f['location'])}")
         items.append(f"""  <entry>
     <id>{escape(link)}</id>
@@ -71,6 +71,8 @@ def build_alert(stats: dict, site_url: str = SITE_URL) -> str | None:
         lines.append(f"- **{f['tier']} · {f['sigma']:.1f}σ** (strongest signal: {f['reason']}): "
                      f"[on the site]({site_url}#{f['location']}) · "
                      f"[full image]({image_url(f['location'])}) · location `{f['location']}`")
+        if f.get("description"):
+            lines.append(f"  {f['description']}")
     lines += ["", f"Frames scanned in this run: {run.get('scanned', 0):,}."]
     return "\n".join(lines)
 

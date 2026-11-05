@@ -12,8 +12,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import statistics
 import sys
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import numpy as np
@@ -106,15 +108,104 @@ def _special(rng, kind: str) -> bytes:
     raise KeyError(kind)
 
 
+def _snap(mixed: np.ndarray) -> bytes:
+    return encode_like_babelia(LEVELS[np.clip(np.rint(mixed / 17), 0, 15).astype(int)])
+
+
+def _noise(rng) -> np.ndarray:
+    return LEVELS[rng.integers(0, 16, (H, W, 3))].astype(float)
+
+
+def _grey_patch(rng, alpha: float) -> bytes:
+    """A 64 px patch pulled toward mid-grey: its average matches the frame,
+    so only its lack of contrast gives it away."""
+    x = _noise(rng)
+    sl = (slice(176, 240), slice(288, 352))
+    x[sl] = (1 - alpha) * x[sl] + alpha * 127.5
+    return _snap(x)
+
+
+def _diagonal_line(rng, alpha: float) -> bytes:
+    pic = Image.new("RGB", (W, H), (128, 128, 128))
+    mask = Image.new("L", (W, H), 0)
+    for im, fill in ((pic, (255, 255, 255)), (mask, 255)):
+        ImageDraw.Draw(im).line((40, 400, 600, 77), fill=fill, width=2)   # ~30 degrees
+    return _blend(rng, pic, mask, alpha)
+
+
+def _pick(rng, alpha: float, a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Each pixel from ``b`` with probability alpha, else from ``a``. Unlike
+    blending, this keeps static's flat colour histogram, so only the
+    structure being tested is present."""
+    take = rng.random((H, W, 1)) < alpha
+    return np.where(take, b, a)
+
+
+def _tiled(rng, alpha: float) -> bytes:
+    """Static in which a share of pixels repeats every 160 x 104 px."""
+    tiled = np.tile(_noise(rng)[:104, :160], (4, 4, 1))
+    return _snap(_pick(rng, alpha, _noise(rng), tiled))
+
+
+def _mirrored(rng, alpha: float) -> bytes:
+    """Static in which a share of pixels mirrors the left half."""
+    x = _noise(rng)
+    m = x.copy()
+    m[:, W // 2:] = x[:, : W // 2][:, ::-1]
+    return _snap(_pick(rng, alpha, _noise(rng), m))
+
+
+NEW_SIGNALS = {
+    "grey patch (64px)": (_grey_patch, (0.25, 0.5, 1.0)),
+    "diagonal line (2px, 30°)": (_diagonal_line, (0.25, 0.5, 1.0)),
+    "tiled static": (_tiled, (0.1, 0.2, 0.4)),
+    "mirror-symmetric static": (_mirrored, (0.1, 0.2, 0.4)),
+}
 SPECIALS = ("greyscale static", "dark static (half palette)", "1px checkerboard + static")
 
 
-def run(trials: int, null_frames: int, out: Path | None, seed: int = 7) -> dict:
-    rng = np.random.default_rng(seed)
-    rows = []
+def _classify_many(frames: list[bytes]) -> list:
+    workers = max(1, os.cpu_count() or 1)
+    if workers == 1 or len(frames) < 4:
+        return [classify(f) for f in frames]
+    with ProcessPoolExecutor(max_workers=workers) as ex:
+        return list(ex.map(classify, frames, chunksize=4))
 
-    def record(name, strength, makers):
-        res = [classify(m()) for m in makers]
+
+def run(trials: int, null_frames: int, out: Path | None, seed: int = 7) -> dict:
+    from .calibrate import babel_static
+    rng = np.random.default_rng(seed)
+
+    # 1. build every frame (cheap), 2. classify them all in parallel
+    cases = []          # (name, strength, [frames])
+    examples = []
+    for name, (maker, alphas) in SIGNALS.items():
+        picture, mask = maker()
+        for a in alphas:
+            frames = [_blend(rng, picture, mask, a) for _ in range(trials)]
+            cases.append((name, a, frames))
+            if out is not None and a in (alphas[1], alphas[-1]):
+                examples.append((f"{name} @ {a:g}", frames[0]))
+    for name, (maker, alphas) in NEW_SIGNALS.items():
+        for a in alphas:
+            frames = [maker(rng, a) for _ in range(trials)]
+            cases.append((name, a, frames))
+            if out is not None and a == alphas[-1]:
+                examples.append((f"{name} @ {a:g}", frames[0]))
+    for kind in SPECIALS:
+        frames = [_special(rng, kind) for _ in range(trials)]
+        cases.append((kind, "-", frames))
+        if out is not None:
+            examples.append((kind, frames[0]))
+    null_frames_b = [babel_static(rng) for _ in range(null_frames)]
+
+    flat = [f for _, _, fr in cases for f in fr] + null_frames_b + [d for _, d in examples]
+    results = _classify_many(flat)
+    pos = 0
+    rows = []
+    for name, strength, frames in cases:
+        res = results[pos:pos + len(frames)]
+        pos += len(frames)
         sig = [r.sigma for r in res]
         rows.append({
             "signal": name, "strength": strength,
@@ -123,22 +214,11 @@ def run(trials: int, null_frames: int, out: Path | None, seed: int = 7) -> dict:
             "reason": statistics.mode(r.reason for r in res),
         })
         print(f"  {name:28s} {strength!s:>6}  min {min(sig):8.1f}σ  "
-              f"detected {rows[-1]['detected']}/{len(res)}", file=sys.stderr)
+              f"detected {rows[-1]['detected']}/{len(res)}  ({rows[-1]['reason']})", file=sys.stderr)
+    null = results[pos:pos + null_frames]
+    pos += null_frames
+    ex_res = results[pos:]
 
-    examples = []
-    for name, (maker, alphas) in SIGNALS.items():
-        picture, mask = maker()
-        for a in alphas:
-            record(name, a, [lambda: _blend(rng, picture, mask, a)] * trials)
-            if out is not None and a in (alphas[1], alphas[-1]):
-                examples.append((f"{name} @ {a:g}", _blend(rng, picture, mask, a)))
-    for kind in SPECIALS:
-        record(kind, "-", [lambda: _special(rng, kind)] * trials)
-        if out is not None:
-            examples.append((kind, _special(rng, kind)))
-
-    from .calibrate import babel_static
-    null = [classify(babel_static(rng)) for _ in range(null_frames)]
     null_sig = [c.sigma for c in null]
     result = {
         "threshold_sigma": INTERESTING_SIGMA,
@@ -154,10 +234,9 @@ def run(trials: int, null_frames: int, out: Path | None, seed: int = 7) -> dict:
     if out is not None:
         out.mkdir(parents=True, exist_ok=True)
         ex = []
-        for i, (label, data) in enumerate(examples):
+        for i, ((label, data), c) in enumerate(zip(examples, ex_res)):
             fn = f"example_{i:02d}.jpg"
             (out / fn).write_bytes(data)
-            c = classify(data)
             ex.append({"label": label, "file": fn, "sigma": c.sigma,
                        "tier": c.label, "reason": c.reason})
         result["examples"] = ex

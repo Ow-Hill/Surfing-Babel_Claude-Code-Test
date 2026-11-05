@@ -127,7 +127,22 @@ dialog img { width: 100%; display: block; background: #000; image-rendering: pix
 .gallery.mini .meta { padding: 4px 6px; }
 .gallery.mini .loc { font-size: .68rem; }
 .frame { position: relative; }
-.frame .heat { position: absolute; inset: 0; width: 100%; height: 100%; background: transparent; image-rendering: auto; pointer-events: none; }
+.frame .overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .d-note { margin: 0; font-size: .88rem; padding: 8px 10px; border-radius: 8px; background: var(--accent-soft); }
-.heat-row { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; font-size: .9rem; }
-.heat-row .check { display: flex; gap: 6px; align-items: center; }
+.d-desc { margin: 0; font-size: .95rem; }
+.ov { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 10px; }
+.ov-top { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.ov .check { display: flex; gap: 6px; align-items: center; font-size: .9rem; }
+.seg { display: flex; flex-wrap: wrap; gap: 4px; }
+.seg button { font: inherit; font-size: .8rem; padding: 4px 10px; border-radius: 99px; cursor: pointer;
+  border: 1px solid var(--line); background: transparent; color: var(--text); }
+.seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.ov-thr { display: flex; align-items: center; gap: 10px; font-size: .85rem; color: var(--muted); }
+.ov-thr input { flex: 1; max-width: 320px; accent-color: var(--accent); }
+.ov p { margin: 0; }
+.tone-chart { width: 100%; height: 90px; display: block; }
+.tone-chart .axis { stroke: var(--line); }
+.tone-chart .thr { stroke: var(--danger); stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+.tone-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: .75rem; }
+.tone-legend span:nth-child(1) { color: #e5484d; } .tone-legend span:nth-child(2) { color: #30a46c; }
+.tone-legend span:nth-child(3) { color: #3e63dd; }

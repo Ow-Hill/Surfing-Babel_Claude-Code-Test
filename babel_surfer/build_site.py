@@ -29,7 +29,7 @@ def detector_fingerprint() -> str:
     return h.hexdigest()[:16]
 
 
-def build(out: Path, trials: int = 8, null_frames: int = 1000, force_bench: bool = False,
+def build(out: Path, trials: int = 8, null_frames: int = 500, force_bench: bool = False,
           network: bool = True) -> None:
     out.mkdir(parents=True, exist_ok=True)
     for f in SITE.iterdir():
@@ -70,7 +70,7 @@ def main(argv=None) -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", type=Path, default=Path("public"))
     ap.add_argument("--trials", type=int, default=8)
-    ap.add_argument("--null", type=int, default=1000)
+    ap.add_argument("--null", type=int, default=500)
     ap.add_argument("--force-bench", action="store_true")
     ap.add_argument("--offline", action="store_true", help="don't fetch seeded demos")
     args = ap.parse_args(argv)

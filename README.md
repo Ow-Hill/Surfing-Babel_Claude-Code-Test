@@ -22,7 +22,7 @@ GitHub Actions (every 3 h) ─► scan.py ─► POST babelia.cgi location=N, N+
   `/babelia.cgi`. Each frame is a 640×416 JPEG, and the location number *is* its seed
   (`https://babelia.libraryofbabel.info/babelia.cgi?location=N` shows it again). It uses 3
   parallel requests to stay polite: the server takes 5 to 25 s per frame.
-* **Classifier** (`babel_surfer/classifier.py`): six statistical tests, each run on brightness and both colour
+* **Classifier** (`babel_surfer/classifier.py`): ten statistical tests, each run on brightness and both colour
   channels, each expressed in **σ** (standard deviations away from what static produces):
 
   | test | catches |
@@ -33,12 +33,24 @@ GitHub Actions (every 3 h) ─► scan.py ─► POST babelia.cgi location=N, N+
   | texture | smooth surfaces or fine checkerboards (neighbour correlation) |
   | palette | greyscale or limited palettes (cross-channel correlation) |
   | tone | too dark, too bright, too few colours (histogram vs. static's) |
+  | contrast | patches flatter or noisier than static, even ones whose average colour blends in (8–32 px local variance) |
+  | angled | lines and bands at 15° steps between rows and columns |
+  | repetition | any part of the frame recurring at an offset: tiles, repeated motifs (2-D autocorrelation) |
+  | symmetry | mirror symmetry about any vertical or horizontal axis |
 
 * **Calibration** (`babel_surfer/calibrate.py`): every test is re-centred on its null
   distribution, measured on simulated Babel static. The simulation uses 16 levels per channel
   and is JPEG-encoded with **Babelia's own quantization tables**, read from real frames. The
   tone baseline comes from 48 real Babelia frames (leave-one-out). With Pillow's generic
   quality-90 encoder instead, real static scored up to 14σ on the tone test.
+
+## Babelia's fingerprint
+
+Real frames are not perfectly random. In every frame, **red at row y correlates with green at row
+y + 156, and green with blue** (about +10σ per frame, r ≈ 0.025). 156 rows is exactly 1/8 of the
+frame's 798,720 colour values. The correlation is the same in every frame tested (147 real
+frames), so it comes from the archive's generator, not from any one image. The repetition test
+ignores that one offset; otherwise every frame would look like an anomaly.
 
 ## Threshold for interesting images
 
@@ -89,10 +101,17 @@ below 10¹⁶) never reaches them. The demos appear on the site, clearly labelle
 
 ## Site features
 
-- **Heatmap:** "Show where the structure is" overlays a map of which 16–64 px areas depart from
-  static. It's computed from the full frame at scan time, because previews no longer have
-  static's statistics. Global signals (tone, palette, texture) are labelled as spread across the
-  whole frame.
+- **Evidence overlay:** each kept frame stores a small `maps.json`, computed from the full frame at
+  scan time, because previews lose static's statistics. The detail view draws it as five layers:
+  brightness and colour, contrast, rows and columns, lines/repeats/symmetry, and colour balance
+  (a mask of the pixels in the most deviant colour range, plus a histogram chart). Each layer has
+  a threshold slider. The default threshold is where static rarely reaches, lowered per frame
+  when needed so the frame's strongest evidence is always visible.
+- **Descriptions:** every find, near miss and demo gets one or two sentences generated from its
+  maps, for example "a darker spot around the centre, roughly 40 px across" or "slightly more very
+  dark red values (0–15) than static produces". They appear in the detail view, as tile
+  captions and in the feed. Finds saved before this existed are backfilled at the start of the next scan, by
+  re-fetching their full frames from Babelia.
 - **Share links:** `…/#<location>` opens a find. `#demo-landscape` opens a demo. Any other number
   opens that location straight from Babelia, unscored.
 - **Live from Babelia:** frames stream from the archive in your browser, walking locations like

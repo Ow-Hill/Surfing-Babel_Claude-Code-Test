@@ -12,6 +12,14 @@ const fmtSigma = (s) => {
   return `${s >= 100 ? Math.round(s).toLocaleString() : s.toFixed(1)}σ`;
 };
 const shortLoc = (l) => (l.length > 16 ? `#${l.slice(0, 6)}…${l.slice(-6)}` : `#${l}`);
+// "Statistically unusual static, not a picture: a darker spot ... (4.6σ). Also ..."
+// -> "A darker spot ..." for tile captions
+const shortDesc = (d) => {
+  if (!d) return "";
+  let s = d.replace(/^[^:]*:\s*/, "").split(/\.\s/)[0].replace(/\s*\([\d.,]+σ\)\.?$/, "");
+  s = s.charAt(0).toUpperCase() + s.slice(1);
+  return s.length > 110 ? s.slice(0, 107) + "…" : s;
+};
 const tierClass = (t) => ({ "near miss": "near" }[t] || t);
 const ago = (t) => {
   if (!t) return "–";
@@ -52,7 +60,7 @@ function tile({ img, loc, label, sigma, tier, caption, onClick }) {
 }
 
 // ---------------------------------------------------------------- detail view
-// item: { key, location?, locationFile?, locationPreview?, preview, full?, heat?,
+// item: { key, location?, locationFile?, locationPreview?, preview, full?, maps?, mask?, description?,
 //         sigma?, tier?, reason?, tests?, note? }
 let current = null;
 
@@ -65,19 +73,6 @@ async function fullLocation(item) {
   if (item.location) return item.location;
   if (!item._loc) item._loc = (await (await fetch(item.locationFile)).text()).trim();
   return item._loc;
-}
-
-// Does the heatmap have any marked cells? (same-origin PNG, so readable)
-function heatHasSignal(img) {
-  try {
-    const c = document.createElement("canvas");
-    c.width = img.naturalWidth; c.height = img.naturalHeight;
-    const ctx = c.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-    const a = ctx.getImageData(0, 0, c.width, c.height).data;
-    for (let i = 3; i < a.length; i += 4) if (a[i] > 0) return true;
-  } catch {}
-  return false;
 }
 
 function openDetail(item) {
@@ -101,20 +96,10 @@ function openDetail(item) {
     full.src = item.full;
   }
 
-  // heatmap overlay
-  const heat = $("d-heat");
-  $("d-heat-row").hidden = !item.heat;
-  $("d-heat-toggle").checked = false;
-  heat.hidden = true;
-  $("d-heat-note").textContent = "";
-  if (item.heat) {
-    heat.onload = () => {
-      if (current !== item) return;
-      $("d-heat-note").textContent = heatHasSignal(heat) ? ""
-        : `nothing local: the signal (${item.reason}) is spread across the whole frame`;
-    };
-    heat.src = item.heat;
-  }
+  // description + evidence overlay
+  $("d-desc").textContent = item.description || "";
+  $("d-desc").hidden = !item.description;
+  Overlay.show(item);
 
   // score
   $("d-score").hidden = item.sigma == null;
@@ -149,14 +134,16 @@ function openDetail(item) {
 
 const findItem = (f) => ({
   key: f.location, location: f.location, preview: `data/${f.image}`, full: BABELIA + f.location,
-  heat: f.heat ? `data/${f.heat}` : null, sigma: f.sigma, tier: f.tier, reason: f.reason, tests: f.tests,
+  maps: f.maps ? `data/${f.maps}` : null, mask: f.mask ? `data/${f.mask}` : null,
+  description: f.description, sigma: f.sigma, tier: f.tier, reason: f.reason, tests: f.tests,
   download: `data/${f.image}`, downloadName: `babel-${f.location}-preview.jpg`,
 });
 
 const demoItem = (d) => ({
   key: `demo-${d.slug}`, locationFile: d.locationFile || d.location_file,
   locationPreview: `${d.location_preview} (${fmtInt(d.location_digits)} digits)`,
-  preview: d.image, heat: d.heat, sigma: d.sigma, tier: d.tier, reason: d.reason, tests: d.tests,
+  preview: d.image, maps: d.maps, mask: d.mask, description: d.description,
+  sigma: d.sigma, tier: d.tier, reason: d.reason, tests: d.tests,
   download: d.image, downloadName: `babel-demo-${d.slug}.jpg`,
   note: `Seeded demo: we drew this picture, got its location from Babelia's image search, then fetched it back from that location with the scanner. It was not found by scanning.`,
 });
@@ -198,8 +185,8 @@ async function copyText(text, btn) {
 $("d-copy").onclick = async () => copyText(await fullLocation(current), $("d-copy"));
 $("d-link").onclick = () => copyText(location.href, $("d-link"));
 $("d-open").onclick = openInBabelia;
-$("d-heat-toggle").onchange = (e) => ($("d-heat").hidden = !e.target.checked);
-$("detail").addEventListener("close", () => { current = null; setHash(null); });
+$("detail").addEventListener("close", () => { current = null; Overlay.reset(); setHash(null); });
+Overlay.init();
 window.addEventListener("hashchange", openFromHash);
 
 // ---------------------------------------------------------------- histogram
@@ -308,7 +295,8 @@ async function load() {
 
   const byScore = [...finds].sort((a, b) => b.sigma - a.sigma);
   $("finds").replaceChildren(...byScore.map((f) =>
-    tile({ img: `data/${f.image}`, loc: f.location, sigma: f.sigma, tier: f.tier, onClick: () => openDetail(findItem(f)) })));
+    tile({ img: `data/${f.image}`, loc: f.location, sigma: f.sigma, tier: f.tier,
+           caption: shortDesc(f.description), onClick: () => openDetail(findItem(f)) })));
   $("finds-empty").hidden = finds.length > 0;
   $("finds-note").textContent = !finds.length ? ""
     : totalFinds > finds.length ? `top ${finds.length} of ${fmtInt(totalFinds)} by score`
