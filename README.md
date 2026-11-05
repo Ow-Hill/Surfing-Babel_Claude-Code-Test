@@ -121,6 +121,18 @@ below 10¹⁶) never reaches them. The demos appear on the site, clearly labelle
   finds anything at **≥ 8σ**, the workflow opens a GitHub issue, which emails repository
   watchers. The ~8 daily 4–8σ anomalies go to the feed only, to avoid spam.
 
+## Showcase and live demo
+
+`agent.html` on the site tells how the project was built by an AI coding agent: a timeline of
+every pull request, including the mistakes the agent caught in its own work. It also shows live
+repository activity (pull requests, commits, scans and deploys; `?live=1` refreshes every 15 s)
+and a **live-coding slot**: `babel_surfer/demo_slot.py` holds an unimplemented
+`find_of_the_day()` whose docstring and tests (`tests/test_demo_slot.py`, skipped until it is
+implemented) are the spec. In a demo, Claude Code implements it, the PR merges and the page
+updates by itself. See [`docs/live-demo.md`](docs/live-demo.md) for the runbook, and
+[`docs/search-optimization-plan.md`](docs/search-optimization-plan.md) for how the search could be
+made faster and smarter.
+
 ## Usability
 
 The UI was reviewed against Nielsen's 10 usability heuristics; see

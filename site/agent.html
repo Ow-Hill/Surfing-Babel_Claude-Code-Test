@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How Surfing Babel Was Built</title>
+  <meta name="description" content="How an AI coding agent built Surfing Babel, with a live-coding demo slot and live repository activity.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="wrap">
+    <p class="crumb"><a href="./">← Surfing Babel</a></p>
+    <h1>How this was built</h1>
+    <p class="lede" id="intro"></p>
+  </header>
+
+  <section class="wrap stats" id="a-stats" aria-label="Project in numbers"></section>
+
+  <section class="wrap card" id="slot" aria-labelledby="slot-h">
+    <div class="card-head">
+      <h2 id="slot-h">Live-coding slot: Find of the day</h2>
+      <span id="slot-state" class="tag"></span>
+    </div>
+    <div id="slot-body"></div>
+  </section>
+
+  <section class="wrap card" id="activity" aria-labelledby="act-h">
+    <div class="card-head">
+      <h2 id="act-h">Repository activity</h2>
+      <label class="check live-toggle"><input id="live-mode" type="checkbox"> Live mode (refresh every 15 s)</label>
+      <span id="act-status" class="muted small" aria-live="polite"></span>
+    </div>
+    <div class="act-grid">
+      <div><h3>Pull requests</h3><ol id="act-prs" class="feed-list"></ol></div>
+      <div><h3>Commits on main</h3><ol id="act-commits" class="feed-list"></ol></div>
+      <div><h3>Scans &amp; deploys</h3><ol id="act-runs" class="feed-list"></ol></div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <section aria-labelledby="tl-h">
+      <h2 id="tl-h">Timeline</h2>
+      <p class="muted narrow">Each step was one request from the person; the rest (research, code, tests,
+        pull request, deployment) was the agent. “Moments” are where it caught its own mistakes or found
+        something unexpected.</p>
+      <ol id="timeline" class="timeline"></ol>
+    </section>
+  </main>
+
+  <footer class="wrap muted">
+    Built with <a href="https://claude.com/claude-code">Claude Code</a>.
+    Source and every pull request: <a href="https://github.com/Ow-Hill/Surfing-Babel_Claude-Code-Test/pulls?q=is%3Apr">GitHub</a> ·
+    <a href="./">back to the scanner</a>
+  </footer>
+
+  <script src="agent.js"></script>
+</body>
+</html>

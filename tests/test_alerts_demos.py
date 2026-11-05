@@ -35,3 +35,15 @@ def test_demos_offline_rescore(tmp_path):
     assert entries[0]["location_digits"] == 29 and (tmp_path / "landscape.maps.json").exists()
     assert entries[0]["description"]
     assert json.loads((tmp_path / "demo.json").read_text())[0]["tier"] in ("static", "near miss", "anomaly")
+
+
+def test_demo_slot_result_is_safe(monkeypatch):
+    from babel_surfer import build_site, demo_slot
+    assert build_site.demo_slot_result([])["status"] in ("not_implemented", "no_finds", "ok")
+    monkeypatch.setattr(demo_slot, "find_of_the_day", lambda finds, day: 1 / 0)
+    r = build_site.demo_slot_result([{"location": "1", "sigma": 5}])
+    assert r["status"] == "error" and "ZeroDivisionError" in r["message"]
+    monkeypatch.setattr(demo_slot, "find_of_the_day", lambda finds, day: {
+        "location": "1", "sigma": 5.0, "tier": "anomaly", "reason": "tone", "caption": "c"})
+    r = build_site.demo_slot_result([{"location": "1", "sigma": 5.0, "image": "images/1.jpg"}])
+    assert r["status"] == "ok" and r["pick"]["image"] == "images/1.jpg"

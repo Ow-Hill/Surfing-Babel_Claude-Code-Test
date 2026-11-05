@@ -49,7 +49,7 @@ jobs:
         run: |
           MIN="${{ github.event.inputs.minutes }}"
           if [ -z "$MIN" ]; then
-            if [ "${{ github.event_name }}" = "push" ]; then MIN=5; else MIN=25; fi
+            if [ "${{ github.event_name }}" = "push" ]; then MIN=1; else MIN=25; fi   # push: publish code changes fast
           fi
           if [ "$MIN" -gt 330 ]; then MIN=330; fi
           python -m babel_surfer.scan --out public/data --minutes "$MIN" --workers 3
