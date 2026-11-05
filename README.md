@@ -10,7 +10,7 @@ like *something*, along with its location (the seed that regenerates it).
 ## How it works
 
 ```
-GitHub Actions (every 3 h) ─► scan.py ─► POST babelia.cgi location=N, N+1, … ─► classifier
+GitHub Actions (hourly) ─► scan.py ─► POST babelia.cgi location=N, N+1, … ─► classifier
                                                                                     │
                     gh-pages branch ◄─ build_site.py ◄─ data/*.json + images ◄──────┘
                          │
@@ -20,8 +20,10 @@ GitHub Actions (every 3 h) ─► scan.py ─► POST babelia.cgi location=N, N+
 * **Scanner** (`babel_surfer/scan.py`) does what the slideshow's own `/js/slideshow.js` does: it
   picks a random location below 9,007,199,250,000,000, then requests `location=N, N+1, …` from
   `/babelia.cgi`. Each frame is a 640×416 JPEG, and the location number *is* its seed
-  (`https://babelia.libraryofbabel.info/babelia.cgi?location=N` shows it again). It uses 3
-  parallel requests to stay polite: the server takes 5 to 25 s per frame.
+  (`https://babelia.libraryofbabel.info/babelia.cgi?location=N` shows it again). Babelia takes
+  5–30 s to render a frame, so concurrency is **adaptive**: it starts at 3 parallel requests,
+  opens up to 5 while response time stays near its best, and backs off (down to 1) as soon as
+  responses slow or fail.
 * **Classifier** (`babel_surfer/classifier.py`): ten statistical tests, each run on brightness and both colour
   channels, each expressed in **σ** (standard deviations away from what static produces):
 
@@ -60,13 +62,18 @@ ignores that one offset; otherwise every frame would look like an anomaly.
 | 3–4σ | near miss | top 12 kept as "closest calls" |
 | **≥ 4σ** | **anomaly** (4–8), **faint** (8–16), **clear** (16–40), **striking** (≥ 40) | **saved as a find** with seed and image |
 
-The find threshold is **4σ**, chosen so the scanner actually finds things. In a 4,000-frame
-simulation of Babel static, about 1 in 400 frames reached 4σ, so expect 2–3 finds per hour of
-scanning (about 1 per scheduled run). These **anomalies** are the strangest static, not pictures.
+The find threshold is **4σ**. Finds between 4σ and 8σ are **anomalies**: the strangest static, not
+pictures. **8σ** is the line for a genuine pattern; the benchmark shows shapes far too faint to see
+still scoring well above it. Change the threshold with `scan --threshold`.
 
-**8σ** is the line for a genuine pattern. Pure static never got there: the maximum was 5.45σ over
-4,000 simulated frames and 2.88σ over 48 real Babelia frames. The benchmark shows shapes far too
-faint to see still scoring well above it. Change the threshold with `scan --threshold`.
+**Honest note on the rate.** The first version of the colour-balance test converted a
+chi-square statistic to σ with the naive (χ² − df)/√(2·df), which ignores the skew and overstated
+the upper tail. All 12 early finds came from that test. It now uses the Wilson–Hilferty
+transform (as do the variance-based tests), and after re-scoring none of the 12 still reaches 4σ.
+With the corrected scale, real static maxed at 2.8σ over 147 frames and simulated static at 3.8σ
+over 1,000. Every frame's scores are now logged (`data/scores.npy`, `stats.test_hist`), so the true
+4σ rate per test is measured from real scans; the leaderboards show the top frames per test in
+the meantime.
 
 ## Benchmark (`python -m babel_surfer.benchmark`)
 
@@ -121,6 +128,17 @@ below 10¹⁶) never reaches them. The demos appear on the site, clearly labelle
   finds anything at **≥ 8σ**, the workflow opens a GitHub issue, which emails repository
   watchers. The ~8 daily 4–8σ anomalies go to the feed only, to avoid spam.
 
+## Per-test leaderboards, combined score and fingerprint monitor
+
+- **Leaderboards:** the top 3 frames for each of the ten tests and for the combined score, with
+  each test's measured 4σ rate on real frames.
+- **Combined score:** a Stouffer sum of the ten calibrated tests, calibrated separately, which
+  catches weak evidence spread across several tests.
+- **Fingerprint monitor:** the strength of Babelia's 156-row red→green / green→blue correlation
+  in every frame (about +14 so far; simulated static is about 0).
+- **Research:** a time-boxed spike on Babelia's generator found partly affine structure between
+  equally spaced locations; see [`docs/research-babelia-generator.md`](docs/research-babelia-generator.md).
+
 ## Showcase and live demo
 
 `agent.html` on the site tells how the project was built by an AI coding agent: a timeline of
@@ -141,9 +159,14 @@ changed.
 
 ## Hosting
 
-The workflow `.github/workflows/scan-and-publish.yml` runs every 3 hours (and on pushes that
-change the code). It scans for 25 minutes, adds the results to the data already on the
-`gh-pages` branch, rebuilds the site and pushes it. GitHub Pages serves that branch.
+The workflow `.github/workflows/scan-and-publish.yml` runs **hourly** (45-minute scans), on
+pushes that change the code (1-minute scan, so changes go live in a few minutes) and on demand.
+It adds results to the data already on the `gh-pages` branch, rebuilds the site and pushes it,
+**every 30 minutes** during long scans, so results appear sooner and a failed run loses at most
+one chunk. GitHub Pages serves that branch.
+
+Frames scored by an older detector version are re-fetched and re-scored automatically at the start
+of the next scan. Each saved frame records its `detector` id.
 
 **Keep-alive:** GitHub turns off scheduled workflows in public repos after 60 days without
 activity. The last step of every run re-enables the workflow through GitHub's API, which resets

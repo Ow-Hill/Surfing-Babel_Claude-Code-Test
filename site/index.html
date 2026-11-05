@@ -16,8 +16,8 @@
       contains every possible 640×416 image, which means it is almost entirely static. A scanner runs on a schedule,
       pulls frames from the archive's slideshow and keeps any that look like <em>something</em>.</p>
     <p class="howto"><b>How to read this page:</b> every frame gets a score in <b>σ</b>, meaning how unusual it is
-      compared with random static. Frames at <span class="thr">4</span>σ or more are kept as <b>finds</b>. So far they're
-      all unusually patterned static, not pictures; a real picture would score far higher.
+      compared with random static. Frames at <span class="thr">4</span>σ or more are kept as <b>finds</b>. Expect
+      unusually patterned static, not pictures; a real picture would score far higher.
       <a href="#how">How detection works</a></p>
     <div class="scan-bar">
       <button id="scan-btn" class="btn">Scan now</button>
@@ -96,6 +96,12 @@
       <div id="near" class="gallery"></div>
     </section>
 
+    <section id="leaders-section" hidden aria-labelledby="leaders-h">
+      <div class="sec-head"><h2 id="leaders-h">Leaderboards by test</h2>
+        <span class="muted">the strongest frames for each kind of anomaly, and how often each test reaches 4σ on real Babel static</span></div>
+      <div id="leaders" class="boards"></div>
+    </section>
+
     <section id="demo-section" hidden aria-labelledby="demo-h">
       <div class="sec-head"><h2 id="demo-h">Proof it works</h2><span class="muted">real pictures, located in Babel and fetched back</span></div>
       <p class="muted narrow">A random frame almost never contains a picture, so we ran the pipeline backwards: we drew
@@ -112,6 +118,7 @@
         score in <b>σ</b>: how many standard deviations the frame is from what static produces. 0σ is typical
         static, 4σ happens by chance in about <span class="rate-text">1 in 2,000</span> frames, and real static has never reached 8σ.</p>
 
+      <p class="muted" id="fp-note"></p>
       <details>
         <summary>The ten tests</summary>
         <div class="tests" id="tests-list"></div>

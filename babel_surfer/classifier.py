@@ -88,6 +88,16 @@ TIERS = (            # (minimum sigma, label)
 CALIBRATION_FILE = Path(__file__).with_name("calibration.json")
 
 
+def detector_id() -> str:
+    """Short hash of the detector code and calibration: saved frames record
+    it, so frames scored by an older detector can be re-scored."""
+    import hashlib
+    h = hashlib.sha256(Path(__file__).read_bytes())
+    if CALIBRATION_FILE.exists():
+        h.update(CALIBRATION_FILE.read_bytes())
+    return h.hexdigest()[:12]
+
+
 def tier_for(sigma: float) -> str:
     for lo, label in TIERS:
         if sigma >= lo:
@@ -102,6 +112,8 @@ class Classification:
     is_interesting: bool          # sigma >= threshold
     reason: str                   # which test fired hardest
     tests: dict = field(default_factory=dict)   # test -> calibrated z
+    combined: float = 0.0         # evidence summed over all tests, calibrated
+    fingerprint: float = 0.0      # strength of Babelia's 156-row fingerprint (z)
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -152,12 +164,32 @@ def _bonferroni_max_z(zs: np.ndarray) -> float:
     return _z_from_upper_p(min(0.0, log10_p))
 
 
+def _wh_z(chi2, df):
+    """Wilson-Hilferty: a chi-square(df) value as a standard normal z.
+
+    The cube root of chi2/df is very nearly normal. The naive
+    (chi2 - df) / sqrt(2 df) is right-skewed, which overstated the upper
+    tail and made colour-balance (tone) and small-sample variance tests fire
+    more often than their sigma claimed."""
+    a = 2.0 / (9.0 * df)
+    return (np.cbrt(np.asarray(chi2, dtype=np.float64) / df) - (1.0 - a)) / math.sqrt(a)
+
+
+def _upper_max_z(zs) -> float:
+    """z for 'the largest of m one-sided normals is this big' (Bonferroni)."""
+    zs = np.asarray(zs, dtype=np.float64)
+    top = float(zs.max())
+    if top <= 0:
+        return 0.0
+    log10_p = math.log10(0.5) + _log10_two_sided_p(top) + math.log10(zs.size)
+    return _z_from_upper_p(min(0.0, log10_p))
+
+
 def _var_ratio_z(observed: float, expected: float, m: int) -> float:
     """Variance of m i.i.d. means vs. its expectation, as a z-score."""
     if expected <= 0 or m < 3:
         return 0.0
-    r = observed / expected
-    return (r - 1.0) / math.sqrt(2.0 / (m - 1))
+    return float(_wh_z((observed / expected) * (m - 1), m - 1))
 
 
 def _corr(x: np.ndarray, y: np.ndarray) -> float:
@@ -241,16 +273,16 @@ def _test_tone(rgb: np.ndarray, expected_frac: np.ndarray | None) -> float:
     """Chi-square of a 16-bin histogram vs. what static looks like, per RGB
     channel. ``expected_frac`` is the null histogram from calibration (JPEG
     clipping makes static's histogram slightly non-flat at 0 and 255)."""
-    best = 0.0
     hists = tone_histogram(rgb)
+    zs = []
     for c in range(3):
         counts = hists[c]
         frac = expected_frac[c] if expected_frac is not None else np.full(16, 1 / 16)
         exp = counts.sum() * frac
         chi2 = float(((counts - exp) ** 2 / exp).sum())
-        df = 15
-        best = max(best, (chi2 - df) / math.sqrt(2 * df))
-    return best
+        zs.append(float(_wh_z(chi2, 15)))
+    # only too-uneven histograms count (one-sided), worst of three channels
+    return _upper_max_z(zs)
 
 
 def _test_contrast(ch: np.ndarray, sigma2: float) -> float:
@@ -260,8 +292,8 @@ def _test_contrast(ch: np.ndarray, sigma2: float) -> float:
         n = k * k
         s1 = _window_sums(ch, k, k, max(1, k // 2))
         s2 = _window_sums(ch * ch, k, k, max(1, k // 2))
-        var = (s2 - s1 * s1 / n) / (n - 1)
-        zs = (var / sigma2 - 1.0) / math.sqrt(2.0 / (n - 1))
+        var = np.maximum((s2 - s1 * s1 / n) / (n - 1), 0.0)
+        zs = _wh_z(var / sigma2 * (n - 1), n - 1)
         best = max(best, _bonferroni_max_z(zs))
     return best
 
@@ -375,8 +407,25 @@ def load_calibration(path: Path = CALIBRATION_FILE) -> dict:
     return _calibration_cache
 
 
+FINGERPRINT_ROWS = 156
+
+
+def fingerprint_z(rgb: np.ndarray) -> float:
+    """Strength of Babelia's fingerprint: red at row y vs. green at y+156,
+    and green vs. blue, combined (about +14 in every real frame so far; ~0 in
+    simulated static). A frame without it would be a discovery in itself."""
+    def z(a, b):
+        a = (a - a.mean()) / max(a.std(), 1e-9)
+        b = (b - b.mean()) / max(b.std(), 1e-9)
+        p, q = a[:-FINGERPRINT_ROWS], b[FINGERPRINT_ROWS:]
+        return float((p * q).sum() / math.sqrt(p.size))
+    if rgb.shape[0] <= FINGERPRINT_ROWS:
+        return 0.0
+    return (z(rgb[..., 0], rgb[..., 1]) + z(rgb[..., 1], rgb[..., 2])) / math.sqrt(2)
+
+
 def raw_scores(image: Image.Image | bytes | str | Path,
-               tone_expected: np.ndarray | None = None) -> dict:
+               tone_expected: np.ndarray | None = None, extras: dict | None = None) -> dict:
     """Uncalibrated z-score for every test (max over channels)."""
     if isinstance(image, (bytes, bytearray)):
         image = Image.open(io.BytesIO(image))
@@ -408,22 +457,34 @@ def raw_scores(image: Image.Image | bytes | str | Path,
     out["tone"] = _test_tone(rgb, tone_expected)
     if flat:  # a perfectly flat channel is the opposite of static
         out["shape"] = max(out["shape"], 1e6)
+    if extras is not None:
+        extras["fingerprint"] = fingerprint_z(rgb)
     return out
+
+
+def combined_raw(tests: dict) -> float:
+    """Stouffer-style sum of the per-test calibrated z (before its own
+    calibration): catches weak structure spread across several tests."""
+    return sum(tests[t] for t in TESTS) / math.sqrt(len(TESTS))
 
 
 def classify(image: Image.Image | bytes | str | Path,
              threshold: float = INTERESTING_SIGMA) -> Classification:
     cal = load_calibration()["tests"]
-    raw = raw_scores(image)
+    extras: dict = {}
+    raw = raw_scores(image, extras=extras)
     tests = {}
     for t, z in raw.items():
         c = cal.get(t, {"mean": 0.0, "std": 1.0})
         tests[t] = round((z - c["mean"]) / max(c["std"], 1e-9), 3)
     reason = max(tests, key=tests.get)
     sigma = tests[reason]
+    cc = cal.get("combined", {"mean": 0.0, "std": 1.0})
+    combined = (combined_raw(tests) - cc["mean"]) / max(cc["std"], 1e-9)
     return Classification(sigma=round(sigma, 3), label=tier_for(sigma),
                           is_interesting=sigma >= threshold, reason=reason,
-                          tests=tests)
+                          tests=tests, combined=round(combined, 3),
+                          fingerprint=round(extras.get("fingerprint", 0.0), 2))
 
 
 # --------------------------------------------------------------------------

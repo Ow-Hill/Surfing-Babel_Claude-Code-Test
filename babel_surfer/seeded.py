@@ -119,8 +119,9 @@ def ensure(out: Path, network: bool = True) -> list[dict]:
             (out / f"{demo['slug']}.mask.png").write_bytes(analysis.tone_mask_png(frame, maps))
             mask = f"demo/{demo['slug']}.mask.png"
         entries.append({
-            "slug": demo["slug"], "title": demo["title"], "description": demo["description"],
+            "slug": demo["slug"], "title": demo["title"], "blurb": demo["description"],
             "sigma": c.sigma, "tier": c.label, "reason": c.reason, "tests": c.tests,
+            "combined": c.combined,
             "image": f"demo/{demo['slug']}.jpg", "maps": f"demo/{demo['slug']}.maps.json",
             "mask": mask, "description": analysis.describe(c.tests, maps, c.sigma),
             "location_file": f"demo/{demo['slug']}.location.txt",

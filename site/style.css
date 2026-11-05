@@ -220,3 +220,10 @@ kbd { font-family: var(--mono); font-size: .75rem; padding: 0 5px; border: 1px s
 .fotd-cap { font-size: 1.1rem; margin: 0 0 6px; }
 @media (max-width: 640px) { .fotd { grid-template-columns: 1fr; } }
 .site-nav { margin: 10px 0 0; font-size: .9rem; }
+
+/* leaderboards */
+.boards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.board { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 8px; }
+.board-head { display: grid; gap: 2px; }
+.board-head .rate { font-family: var(--mono); font-size: .75rem; }
+.board .gallery.mini { grid-template-columns: repeat(3, minmax(0, 1fr)); }

@@ -136,7 +136,8 @@ function openDetail(item, list = null, label = "") {
     $("d-tier").textContent = item.tier;
     $("d-tier").className = `tag ${tierClass(item.tier)}`;
     $("d-sigma").textContent = fmtSigma(item.sigma);
-    $("d-reason").textContent = `strongest test: ${testName(item.reason)}`;
+    $("d-reason").textContent = `strongest test: ${testName(item.reason)}` +
+      (item.combined != null ? ` · all tests combined: ${fmtSigma(item.combined)}` : "");
   }
 
   $("d-loc").value = item.location || item.locationPreview;
@@ -175,6 +176,7 @@ const findItem = (f, kind = "Find") => ({
   key: f.location, kind, location: f.location, preview: `data/${f.image}`, full: BABELIA + f.location,
   maps: f.maps ? `data/${f.maps}` : null, mask: f.mask ? `data/${f.mask}` : null,
   description: f.description, sigma: f.sigma, tier: f.tier, reason: f.reason, tests: f.tests,
+  combined: f.combined,
   download: `data/${f.image}`, downloadName: `babel-${f.location}-preview.jpg`,
 });
 
@@ -184,7 +186,8 @@ const demoItem = (d) => ({
   preview: d.image, maps: d.maps, mask: d.mask, description: d.description,
   sigma: d.sigma, tier: d.tier, reason: d.reason, tests: d.tests,
   download: d.image, downloadName: `babel-demo-${d.slug}.jpg`,
-  note: "Seeded demo: we drew this picture, got its location from Babelia's image search, then fetched it back from that location with the scanner. It was not found by scanning.",
+  combined: d.combined,
+  note: `${d.blurb ? d.blurb + " " : ""}Seeded demo: we drew this picture, got its location from Babelia's image search, then fetched it back from that location with the scanner. It was not found by scanning.`,
 });
 
 const lookupItem = (loc) => ({
@@ -196,9 +199,17 @@ function openFromHash() {
   const key = decodeURIComponent(location.hash.slice(1));
   if (!key || key === "how") return;
   const fi = DATA.finds.find((x) => x.location === key);
-  if (fi) return openDetail(findItem(fi), visibleFinds().map((f) => findItem(f)), "Find");
+  if (fi) {
+    // the current filter may hide it: then step through all finds
+    const list = visibleFinds().some((f) => f.location === key) ? visibleFinds() : DATA.finds;
+    return openDetail(findItem(fi), list.map((f) => findItem(f)), "Find");
+  }
   const ni = DATA.near.find((x) => x.location === key);
   if (ni) return openDetail(findItem(ni, "Near miss"), DATA.near.map((f) => findItem(f, "Near miss")), "Near miss");
+  for (const [t, board] of Object.entries(DATA.leaders || {})) {
+    const li = board.find((x) => x.location === key);
+    if (li) return openDetail(findItem(li, testName(t)), board.map((f) => findItem(f, testName(t))), `${testName(t)} leader`);
+  }
   const d = DATA.demos.find((x) => `demo-${x.slug}` === key);
   if (d) return openDetail(demoItem(d), DATA.demos.map(demoItem), "Demo");
   if (/^\d{1,4000}$/.test(key)) openDetail(lookupItem(key.replace(/^0+(?=\d)/, "")), null, "Location");
@@ -233,6 +244,19 @@ $("d-prev").onclick = () => step(-1);
 $("d-next").onclick = () => step(1);
 $("d-close").onclick = () => $("detail").close();
 $("detail").addEventListener("close", () => { current = null; Overlay.reset(); setHash(null); });
+// Clicking outside a dialog (on the dimmed backdrop) closes it and returns
+// to the home page. Uses the click position, since a click on the backdrop
+// and on the dialog's own padding both report the dialog as the target.
+function closeOnBackdrop(dialog) {
+  dialog.addEventListener("click", (e) => {
+    if (e.target !== dialog) return;
+    const r = dialog.getBoundingClientRect();
+    const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    if (!inside) dialog.close();
+  });
+}
+closeOnBackdrop($("detail"));
+closeOnBackdrop($("scan-dialog"));
 $("detail").addEventListener("keydown", (e) => {
   if (e.target.matches("input[type=range], textarea, select")) return;
   if (e.key === "ArrowLeft") { step(-1); e.preventDefault(); }
@@ -360,6 +384,7 @@ function visibleFinds() {
 
 function renderFinds(totalFinds) {
   const finds = DATA.finds;
+  if (view.filter !== "all" && !finds.some((f) => f.reason === view.filter)) view.filter = "all";
   const list = visibleFinds();
   const items = list.map((f) => findItem(f));
   $("finds").replaceChildren(...list.map((f, i) =>
@@ -385,16 +410,72 @@ function renderFinds(totalFinds) {
 }
 $("finds-sort").onchange = (e) => { view.sort = e.target.value; renderFinds(DATA.totalFinds); };
 
+// ---------------------------------------------------------------- leaderboards
+// share of frames at or above `z` for one test, from its histogram
+function rateAtLeast(th, test, z) {
+  const counts = th && th.counts && th.counts[test];
+  if (!counts) return null;
+  const n = counts.reduce((a, b) => a + b, 0);
+  if (!n) return null;
+  const from = 1 + Math.floor((z - th.lo) / th.step);
+  const k = counts.slice(from).reduce((a, b) => a + b, 0);
+  return { k, n };
+}
+
+function renderLeaders(leaders, stats) {
+  const order = [...Object.keys(TEST_INFO), "combined"].filter((t) => (leaders[t] || []).length);
+  $("leaders-section").hidden = !order.length;
+  $("leaders").replaceChildren(...order.map((t) => {
+    const board = leaders[t];
+    const name = t === "combined" ? "All tests combined" : testName(t);
+    const about = t === "combined" ? "weak evidence spread across several tests, summed" : TEST_INFO[t].about;
+    const r = rateAtLeast(stats.test_hist, t, THRESHOLD);
+    const rate = !r ? "" : r.k ? `${fmtInt(r.k)} of ${fmtInt(r.n)} frames reached ${THRESHOLD}σ`
+      : `none of ${fmtInt(r.n)} frames reached ${THRESHOLD}σ`;
+    const items = board.map((f) => findItem(f, name));
+    const box = document.createElement("div");
+    box.className = "board";
+    const head = document.createElement("div");
+    head.className = "board-head";
+    head.innerHTML = "<b></b><span class='muted small'></span><span class='muted small rate'></span>";
+    head.children[0].textContent = name;
+    head.children[1].textContent = about;
+    head.children[2].textContent = rate;
+    const row = document.createElement("div");
+    row.className = "gallery mini";
+    row.append(...board.map((f, i) => {
+      const score = t === "combined" ? f.combined : (f.tests || {})[t];
+      return tile({ img: `data/${f.image}`, loc: f.location, sigma: score, tier: tierOf(score),
+                    onClick: () => openDetail(items[i], items, `${name} leader`) });
+    }));
+    box.append(head, row);
+    return box;
+  }));
+}
+const tierOf = (s) => s >= 40 ? "striking" : s >= 16 ? "clear" : s >= 8 ? "faint" : s >= THRESHOLD ? "anomaly" : s >= 3 ? "near miss" : "static";
+
+function renderFingerprint(stats) {
+  const f = stats.fingerprint;
+  if (!f || !f.n) { $("fp-note").textContent = ""; return; }
+  const mean = f.sum / f.n, sd = Math.sqrt(Math.max(0, f.sumsq / f.n - mean * mean));
+  $("fp-note").textContent =
+    `Babelia's fingerprint (red ↔ green and green ↔ blue, 156 rows apart) averaged +${mean.toFixed(1)} ` +
+    `(spread ${sd.toFixed(1)}) over ${fmtInt(f.n)} frames; the weakest was +${f.min.value.toFixed(1)}. ` +
+    `Simulated static scores about 0, so a real frame without it would be news.`;
+}
+
 // ---------------------------------------------------------------- data
 async function load() {
   loadFailed = false;
-  const [stats, finds, near, bench, demos] = await Promise.all([
+  const [stats, finds, near, bench, demos, leaders] = await Promise.all([
     getJSON("data/stats.json", {}), getJSON("data/finds.json", []),
     getJSON("data/near_misses.json", []), getJSON("benchmark/benchmark.json", null, false),
-    getJSON("demo/demo.json", [], false),
+    getJSON("demo/demo.json", [], false), getJSON("data/leaders.json", {}, false),
   ]);
   $("load-error").hidden = !loadFailed;
-  DATA = { finds, near, demos };
+  DATA = { finds, near, demos, leaders };
+  renderLeaders(leaders, stats);
+  renderFingerprint(stats);
   if (bench) THRESHOLD = bench.threshold_sigma;
   document.querySelectorAll(".thr").forEach((e) => (e.textContent = THRESHOLD));
 
@@ -403,16 +484,18 @@ async function load() {
   DATA.totalFinds = totalFinds;
   $("s-finds").textContent = fmtInt(totalFinds);
   // measured rate, not a promise
-  const rate = totalFinds && stats.scanned ? `1 in ${fmtInt(Math.round(stats.scanned / totalFinds / 100) * 100 || 1)} frames` : "rate not known yet";
+  const rate = totalFinds && stats.scanned ? `1 in ${fmtInt(Math.round(stats.scanned / totalFinds / 100) * 100 || 1)} frames` : "rate still being measured";
+  window.SB_FRAMES_PER_FIND = totalFinds && stats.scanned ? stats.scanned / totalFinds : null;
   $("s-rate").textContent = rate;
-  document.querySelectorAll(".rate-text").forEach((e) => (e.textContent = totalFinds ? `about ${rate}` : "about 1 in 2,000"));
+  document.querySelectorAll(".rate-text").forEach((e) => (e.textContent = totalFinds ? `about ${rate}` : "very rarely (the exact rate is still being measured)"));
   $("s-best").textContent = stats.best ? fmtSigma(stats.best.sigma) : "–";
   $("s-last").textContent = ago(stats.last_run && stats.last_run.finished_at);
   renderHist(stats);
 
   renderFinds(totalFinds);
   $("finds-empty").textContent = loadFailed ? "Finds couldn't be loaded (see the message above)."
-    : `Nothing yet. Finds are rare: ${totalFinds ? rate : "roughly 1 in 2,000 frames"} so far. Check back after the next scan.`;
+    : `None yet under the current detector. Real Babel static very rarely reaches ${THRESHOLD}σ; every frame's scores ` +
+      `are logged, so the true rate will appear here as scans run. Meanwhile, the leaderboards below show the strangest frames for each test.`;
 
   const nearItems = near.map((f) => findItem(f, "Near miss"));
   $("near").replaceChildren(...near.map((f, i) =>
