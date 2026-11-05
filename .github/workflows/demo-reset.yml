@@ -1,0 +1,51 @@
+name: Reset live demo
+
+# Put babel_surfer/demo_slot.py back to a template and republish the site,
+# so the live-coding demo can run again. Start it from the Actions tab or
+# from the "Reset demo" button on the showcase page.
+on:
+  workflow_dispatch:
+    inputs:
+      variant:
+        description: "stub = unimplemented (the agent writes it); buggy = runs but breaks two requirements (the agent debugs it)"
+        type: choice
+        options: [stub, buggy]
+        default: stub
+
+permissions:
+  contents: write
+  actions: write        # to start the publish run
+
+concurrency:
+  group: demo-reset
+  cancel-in-progress: false
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Reset the slot
+        run: python -m babel_surfer.demo_kit reset --variant "${{ github.event.inputs.variant }}"
+      - name: Commit to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- babel_surfer/demo_slot.py; then
+            echo "slot already matches '${{ github.event.inputs.variant }}'"
+          else
+            git commit -q -am "Reset live demo slot (${{ github.event.inputs.variant }})"
+            git push -q origin HEAD:main
+          fi
+      # Commits made with the workflow token don't trigger other workflows,
+      # but an explicit dispatch does: publish without scanning (minutes = 0).
+      - name: Republish the site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run scan-and-publish.yml --ref main -f minutes=0

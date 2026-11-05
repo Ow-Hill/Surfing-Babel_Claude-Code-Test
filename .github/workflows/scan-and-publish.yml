@@ -31,12 +31,14 @@ jobs:
     timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # to see which files a push changed
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - run: pip install numpy pillow
+      - run: pip install numpy pillow pytest   # pytest: the demo slot's live checklist
 
       - name: Check out existing site data (gh-pages)
         run: |
@@ -56,7 +58,21 @@ jobs:
           MIN="${{ github.event.inputs.minutes }}"
           if [ -z "$MIN" ]; then
             case "${{ github.event_name }}" in
-              push) MIN=1 ;;       # publish code changes fast
+              push)
+                MIN=1                # publish code changes fast
+                # Only the demo slot, site, docs or tests changed (e.g. the live
+                # demo's merge): skip scanning entirely and just republish.
+                BEFORE="${{ github.event.before }}"
+                if [ -n "$BEFORE" ] && ! echo "$BEFORE" | grep -q '^0*$' && \
+                   git cat-file -e "$BEFORE" 2>/dev/null; then
+                  CHANGED=$(git diff --name-only "$BEFORE" "${{ github.sha }}")
+                  echo "changed files:"; echo "$CHANGED"
+                  if [ -n "$CHANGED" ] && ! echo "$CHANGED" | grep -qvE '^(babel_surfer/demo_slot\.py|site/|docs/|tests/|README\.md)'; then
+                    MIN=0
+                    echo "only demo/site/docs files changed: publishing without scanning"
+                  fi
+                fi
+                ;;
               schedule) MIN=45 ;;  # hourly: leaves time for re-scoring, build and publish
               *) MIN=25 ;;
             esac

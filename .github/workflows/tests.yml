@@ -1,0 +1,27 @@
+name: Tests
+
+# Run the test suite on every pull request (so a PR shows a green or red
+# check, also during the live demo) and on pushes to main.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install numpy pillow pytest
+      - name: Demo slot spec
+        run: python -m pytest -q tests/test_demo_slot.py
+      - name: Full suite
+        run: python -m pytest -q

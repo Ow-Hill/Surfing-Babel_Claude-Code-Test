@@ -2,16 +2,16 @@
   "intro": "Every line of Surfing Babel (scanner, detector, calibration, website, automation) was written by Claude Code, an AI coding agent, working from short requests in a conversation. The agent read code and websites, ran experiments, wrote and ran tests, opened and merged pull requests and watched the deployments. The person directed it; the agent did the engineering. Below is how it went, including the mistakes the agent caught in its own work.",
   "stats": [
     {
-      "value": "11",
-      "label": "pull requests merged in ~26 h"
+      "value": "12",
+      "label": "pull requests merged in ~27 h"
     },
     {
       "value": "~3,600",
       "label": "lines of Python, JavaScript, HTML and CSS"
     },
     {
-      "value": "37",
-      "label": "automated tests"
+      "value": "39",
+      "label": "automated tests, run on every pull request"
     },
     {
       "value": "10",
@@ -138,6 +138,19 @@
         {
           "kind": "improvement",
           "text": "Live test of adaptive politeness: it ramped from 2 to 5 parallel requests while Babelia answered in 3.7 s, then backed off to 1 as responses slowed to 15 s."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-05",
+      "pr": 12,
+      "title": "A better live demo",
+      "request": "Improve the demo feature.",
+      "did": "Added CI on every pull request, a live checklist of the spec's requirements, a six-step progress tracker with a stopwatch, a 'buggy' variant for a debugging demo, one-click reset, publishing without a scan when only the demo changes, and a presenter mode.",
+      "moments": [
+        {
+          "kind": "bug caught",
+          "text": "Its first test for the demo kit asserted that the repository always ships the unimplemented stub, which would have failed in the middle of every live demo. Rewritten so it checks consistency, whatever is in the slot."
         }
       ]
     }

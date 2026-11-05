@@ -47,3 +47,27 @@ def test_demo_slot_result_is_safe(monkeypatch):
         "location": "1", "sigma": 5.0, "tier": "anomaly", "reason": "tone", "caption": "c"})
     r = build_site.demo_slot_result([{"location": "1", "sigma": 5.0, "image": "images/1.jpg"}])
     assert r["status"] == "ok" and r["pick"]["image"] == "images/1.jpg"
+
+
+def test_demo_kit_reset_and_spec(tmp_path, monkeypatch):
+    from babel_surfer import demo_kit
+    slot = tmp_path / "demo_slot.py"
+    monkeypatch.setattr(demo_kit, "SLOT", slot)
+    demo_kit.reset("buggy")
+    assert demo_kit.current_variant() == "buggy"
+    demo_kit.reset("stub")
+    assert demo_kit.current_variant() == "stub"
+    slot.write_text(slot.read_text() + "\n# edited\n")
+    assert demo_kit.current_variant() == "custom"
+
+
+def test_spec_results_are_consistent():
+    from babel_surfer import demo_kit
+    r = demo_kit.spec_results()
+    # Works whatever is in the slot right now (during a live demo it is the
+    # agent's own code), so this test never gets in the demo's way.
+    assert r["total"] == 6 and [q["test"] for q in r["requirements"]] == list(demo_kit.REQUIREMENTS)
+    if r["variant"] == "stub":
+        assert r["status"] == "waiting"
+    if r["variant"] == "buggy":
+        assert r["status"] == "failed" and r["passed"] == 4
