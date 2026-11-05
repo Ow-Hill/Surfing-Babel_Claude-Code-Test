@@ -77,6 +77,16 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
     if promoted:
         log.info("promoted %d earlier near misses to finds (threshold %.1fσ)",
                  promoted, threshold)
+    # Entries saved before evidence maps existed: re-fetch their full frames
+    # (Babelia regenerates them from the location) and rebuild their assets.
+    for entry in store.missing_assets():
+        try:
+            data = fetch(entry["location"])
+            store.enrich(entry, data, classify(data, threshold=threshold))
+            log.info("enriched %s", entry["location"])
+        except Exception as e:
+            log.warning("could not enrich %s: %s", entry["location"], e)
+    store.save()
     start = random.randrange(SLIDESHOW_MAX) if start is None else start
     counter = Location(start)
     run = {"started_at": time.time(), "start_location": str(start + 1),

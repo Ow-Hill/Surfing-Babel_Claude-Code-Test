@@ -13,9 +13,12 @@ from __future__ import annotations
 
 import argparse
 import io
+import functools
 import json
+import os
 import statistics
 import sys
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import numpy as np
@@ -70,13 +73,16 @@ def main(argv=None) -> int:
         hist += tone_histogram(rgb)
     tone_expected = hist / hist.sum(axis=1, keepdims=True)
 
-    # Pass 2: null distribution of every raw test statistic.
+    # Pass 2: null distribution of every raw test statistic (in parallel).
+    frames = [babel_static(rng) for _ in range(args.frames)]
     samples = {t: [] for t in TESTS}
-    for i in range(args.frames):
-        for t, z in raw_scores(babel_static(rng), tone_expected).items():
-            samples[t].append(z)
-        if (i + 1) % 50 == 0:
-            print(f"  simulated {i + 1}/{args.frames}", file=sys.stderr)
+    with ProcessPoolExecutor(max_workers=os.cpu_count() or 1) as ex:
+        for i, raw in enumerate(ex.map(functools.partial(raw_scores, tone_expected=tone_expected),
+                                       frames, chunksize=8)):
+            for t, z in raw.items():
+                samples[t].append(z)
+            if (i + 1) % 100 == 0:
+                print(f"  simulated {i + 1}/{args.frames}", file=sys.stderr)
 
     tests = {t: {"mean": statistics.fmean(v), "std": max(statistics.pstdev(v), 1.0),
                  "max": max(v)} for t, v in samples.items()}
@@ -116,8 +122,11 @@ def main(argv=None) -> int:
 
     # Null distribution of the final headline sigma on fresh simulated frames.
     rng2 = np.random.default_rng(args.seed + 1)
-    sim_sigmas = [classifier.classify(babel_static(rng2)).sigma
-                  for _ in range(max(100, args.frames // 2))]
+    with ProcessPoolExecutor(max_workers=os.cpu_count() or 1) as ex:
+        sim = list(ex.map(classifier.classify,
+                          [babel_static(rng2) for _ in range(max(100, args.frames // 2))],
+                          chunksize=8))
+    sim_sigmas = [c.sigma for c in sim]
     print(f"simulated static: max sigma {max(sim_sigmas):.2f}, "
           f"mean {statistics.fmean(sim_sigmas):.2f} (n={len(sim_sigmas)})")
     result["null_sigma"] = {"simulated_max": max(sim_sigmas),

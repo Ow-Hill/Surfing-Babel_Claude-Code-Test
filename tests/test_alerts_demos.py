@@ -32,5 +32,6 @@ def test_demos_offline_rescore(tmp_path):
     (tmp_path / "landscape.location.txt").write_text("12345678901234567890123456789")
     entries = seeded.ensure(tmp_path, network=False)        # faint-disc missing: skipped
     assert [e["slug"] for e in entries] == ["landscape"]
-    assert entries[0]["location_digits"] == 29 and (tmp_path / "landscape.heat.png").exists()
+    assert entries[0]["location_digits"] == 29 and (tmp_path / "landscape.maps.json").exists()
+    assert entries[0]["description"]
     assert json.loads((tmp_path / "demo.json").read_text())[0]["tier"] in ("static", "near miss", "anomaly")

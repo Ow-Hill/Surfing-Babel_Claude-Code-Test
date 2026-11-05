@@ -20,6 +20,12 @@ palette    correlation between colour channels: greyscale or limited-palette
            images.
 tone       histogram flatness per channel: images too dark, too bright or
            using few colours.
+contrast   local variance in 8-32 px windows: flat patches (even ones whose
+           average colour matches the frame) and unusually noisy patches.
+angled     lines and bands at 15-165 degrees (rows/columns are "lines").
+repetition 2-D autocorrelation at every offset: tiles, repeated motifs,
+           periodic patterns.
+symmetry   mirror correlation about every vertical and horizontal axis.
 =========  ==============================================================
 
 Each test is run on luma (Y) and both chroma channels (Cb, Cr), so a shape
@@ -48,7 +54,20 @@ CHANNELS = ("Y", "Cb", "Cr")
 SHAPE_SCALES = (4, 8, 16, 32, 64)
 BLOB_SCALES = (8, 12, 16, 24, 32, 48)
 LINE_BANDS = (1, 2, 4, 8)
-TESTS = ("shape", "blob", "lines", "texture", "palette", "tone")
+TESTS = ("shape", "blob", "lines", "texture", "palette", "tone",
+         "contrast", "angled", "repetition", "symmetry")
+CONTRAST_SCALES = (8, 16, 32)
+ANGLES = (15, 30, 45, 60, 75, 105, 120, 135, 150, 165)
+ANGLE_BANDS = (2, 4, 8)
+REPEAT_MIN_LAG = 3          # smaller lags are neighbour correlation ("texture")
+REPEAT_MIN_OVERLAP = 0.25   # only offsets where >= 25% of the frame overlaps
+SYMMETRY_MIN_OVERLAP = 0.5
+#: Babelia's fingerprint: in every real frame, red at row y correlates with
+#: green at row y+156, and green with blue (about +10 sigma per frame,
+#: r ~ 0.025; 156 rows is exactly 1/8 of the frame's colour values). It is a
+#: property of the archive's generator, not of any one image, so the
+#: repetition test ignores offsets within 1 px of it.
+BABELIA_FINGERPRINT_LAGS = ((156, 0),)
 
 #: Sigma tiers. A frame is saved as a find at ``INTERESTING_SIGMA`` or above.
 #: About 1 in 400 frames of pure static reaches 4 sigma (4,000-frame
@@ -234,6 +253,109 @@ def _test_tone(rgb: np.ndarray, expected_frac: np.ndarray | None) -> float:
     return best
 
 
+def _test_contrast(ch: np.ndarray, sigma2: float) -> float:
+    """Most extreme local variance (flat or noisy patch) vs. static."""
+    best = 0.0
+    for k in CONTRAST_SCALES:
+        n = k * k
+        s1 = _window_sums(ch, k, k, max(1, k // 2))
+        s2 = _window_sums(ch * ch, k, k, max(1, k // 2))
+        var = (s2 - s1 * s1 / n) / (n - 1)
+        zs = (var / sigma2 - 1.0) / math.sqrt(2.0 / (n - 1))
+        best = max(best, _bonferroni_max_z(zs))
+    return best
+
+
+def _rotated(ch: np.ndarray, angle: float) -> tuple[np.ndarray, np.ndarray]:
+    """Zero-mean channel and its validity mask, rotated (nearest neighbour,
+    which keeps static's per-pixel statistics)."""
+    img = Image.fromarray(ch.astype(np.float32), "F").rotate(
+        angle, resample=Image.NEAREST, expand=True)
+    mask = Image.fromarray(np.ones(ch.shape, np.float32), "F").rotate(
+        angle, resample=Image.NEAREST, expand=True)
+    return np.asarray(img, dtype=np.float64), np.asarray(mask, dtype=np.float64)
+
+
+def angled_profiles(ch: np.ndarray, sigma: float, angle: float) -> dict:
+    """For the frame rotated by ``angle``: {band: (z of every band of rows,
+    usable mask)}. Bands with too few pixels are ignored."""
+    r, m = _rotated(ch - ch.mean(), angle)
+    rows, cnt = r.sum(axis=1), m.sum(axis=1)
+    ii, ic = np.concatenate([[0], np.cumsum(rows)]), np.concatenate([[0], np.cumsum(cnt)])
+    out = {}
+    for band in ANGLE_BANDS:
+        s, c = ii[band:] - ii[:-band], ic[band:] - ic[:-band]
+        ok = c >= 200 * band
+        z = np.zeros_like(s)
+        z[ok] = s[ok] / (sigma * np.sqrt(c[ok]))
+        out[band] = (z, ok)
+    return out
+
+
+def _test_angled(ch: np.ndarray, sigma: float) -> float:
+    best = 0.0
+    for a in ANGLES:
+        for z, ok in angled_profiles(ch, sigma, a).values():
+            best = max(best, _bonferroni_max_z(z[ok]))
+    return best
+
+
+def autocorr_z(ch: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """z-score of the correlation between the frame and itself shifted by
+    every (dy, dx), via FFT; and a mask of offsets that count (overlap large
+    enough, not a tiny neighbour lag). Index [H-1+dy, W-1+dx]."""
+    h, w = ch.shape
+    x = (ch - ch.mean()) / max(ch.std(), 1e-9)
+    fh, fw = 2 * h, 2 * w
+    f = np.fft.rfft2(x, (fh, fw))
+    ac = np.fft.irfft2(f * np.conj(f), (fh, fw))
+    ac = np.fft.fftshift(ac)[1:, 1:]                      # lags -(h-1)..(h-1)
+    oy = h - np.abs(np.arange(-(h - 1), h))
+    ox = w - np.abs(np.arange(-(w - 1), w))
+    overlap = np.outer(oy, ox).astype(np.float64)
+    z = ac / np.sqrt(overlap)                              # r * sqrt(n)
+    dy = np.abs(np.arange(-(h - 1), h))[:, None]
+    dx = np.abs(np.arange(-(w - 1), w))[None, :]
+    use = (overlap >= REPEAT_MIN_OVERLAP * h * w) & ((dy >= REPEAT_MIN_LAG) | (dx >= REPEAT_MIN_LAG))
+    use[: h - 1, :] = False                               # each lag pair once (dy >= 0)
+    use[h - 1, : w - 1] = False
+    for fy, fx in BABELIA_FINGERPRINT_LAGS:
+        if fy < h and abs(fx) < w:
+            use[h - 2 + fy: h + 1 + fy, w - 2 + fx: w + 1 + fx] = False
+    return z, use
+
+
+def _test_repetition(ch: np.ndarray) -> float:
+    z, use = autocorr_z(ch)
+    return _bonferroni_max_z(z[use])
+
+
+def mirror_z(ch: np.ndarray, axis: int) -> tuple[np.ndarray, np.ndarray]:
+    """z of mirror correlation for every axis position along ``axis``
+    (1 = vertical mirror line, i.e. left/right flip). Returns (z, positions
+    in pixels of the mirror line)."""
+    x = (ch - ch.mean()) / max(ch.std(), 1e-9)
+    if axis == 0:
+        x = x.T
+    h, w = x.shape
+    f = np.fft.rfft(x, 2 * w, axis=1)
+    g = np.fft.rfft(x[:, ::-1], 2 * w, axis=1)
+    cc = np.fft.irfft(f * np.conj(g), 2 * w, axis=1).sum(axis=0)
+    # cc[s] pairs x[c] with x[w-1-c+s]... mirror line at (w - 1 + s) / 2
+    shifts = np.concatenate([np.arange(0, w), np.arange(-w, 0)])
+    pairs = h * (w - np.abs(shifts))
+    pos = (w - 1 + shifts) / 2.0
+    ok = (w - np.abs(shifts)) >= SYMMETRY_MIN_OVERLAP * w
+    z = np.zeros_like(cc)
+    # every pair is counted twice in cc; independent pairs = pairs / 2
+    z[ok] = (cc[ok] / pairs[ok]) * np.sqrt(pairs[ok] / 2.0)
+    return z[ok], pos[ok]
+
+
+def _test_symmetry(ch: np.ndarray) -> float:
+    return max(_bonferroni_max_z(mirror_z(ch, 1)[0]), _bonferroni_max_z(mirror_z(ch, 0)[0]))
+
+
 # --------------------------------------------------------------------------
 # calibration
 # --------------------------------------------------------------------------
@@ -276,6 +398,10 @@ def raw_scores(image: Image.Image | bytes | str | Path,
         out["blob"] = max(out["blob"], _test_blob(ch, mu, math.sqrt(sigma2)))
         out["lines"] = max(out["lines"], _test_lines(ch, mu, sigma2))
         out["texture"] = max(out["texture"], _test_texture(ch))
+        out["contrast"] = max(out["contrast"], _test_contrast(ch, sigma2))
+        out["angled"] = max(out["angled"], _test_angled(ch, math.sqrt(sigma2)))
+        out["repetition"] = max(out["repetition"], _test_repetition(ch))
+        out["symmetry"] = max(out["symmetry"], _test_symmetry(ch))
     out["palette"] = _test_palette(rgb) if not flat else 1e6
     if tone_expected is None:
         tone_expected = load_calibration()["tone_expected"]
@@ -301,14 +427,8 @@ def classify(image: Image.Image | bytes | str | Path,
 
 
 # --------------------------------------------------------------------------
-# heatmap: where in the frame is the structure?
+# helpers shared with analysis.py
 # --------------------------------------------------------------------------
-HEAT_GRID = 40            # cells across; 640 px frames -> 16 px cells
-HEAT_SCALES = (1, 2, 4)   # neighbourhoods of 1x1, 2x2, 4x4 cells (16-64 px)
-HEAT_FLOOR = 4.5          # static never exceeded ~4.5 in tests: transparent below
-HEAT_CEIL = 14.0          # |z| at or above this: fully opaque red
-
-
 def _box_sum_same(a: np.ndarray, s: int) -> tuple[np.ndarray, np.ndarray]:
     """Sum over the s x s neighbourhood around each cell, clipped at the
     edges, and how many cells each sum covered."""
@@ -320,48 +440,3 @@ def _box_sum_same(a: np.ndarray, s: int) -> tuple[np.ndarray, np.ndarray]:
     Y0, X0 = np.meshgrid(y0, x0, indexing="ij"); Y1, X1 = np.meshgrid(y1, x1, indexing="ij")
     total = ii[Y1, X1] - ii[Y0, X1] - ii[Y1, X0] + ii[Y0, X0]
     return total, (Y1 - Y0) * (X1 - X0)
-
-
-def heat_grid(image: Image.Image | bytes | str | Path) -> np.ndarray:
-    """Per-cell evidence of structure, as |z|: for each 16 px cell, the most
-    extreme neighbourhood (1x1, 2x2 or 4x4 cells) around it, max over Y, Cb
-    and Cr. Needs the full-resolution frame: downscaled, re-compressed
-    previews no longer have static's statistics."""
-    if isinstance(image, (bytes, bytearray)):
-        image = Image.open(io.BytesIO(image))
-    elif not isinstance(image, Image.Image):
-        image = Image.open(image)
-    ycc = np.asarray(image.convert("YCbCr"), dtype=np.float64)
-    h, w = ycc.shape[:2]
-    k = max(2, w // HEAT_GRID)
-    bh, bw = h // k, w // k
-    best = np.zeros((bh, bw))
-    for i in range(3):
-        ch = ycc[..., i]
-        sd = ch.std()
-        if sd < 1e-6:
-            continue
-        means = ch[: bh * k, : bw * k].reshape(bh, k, bw, k).mean(axis=(1, 3))
-        z = (means - ch.mean()) / (sd / k)           # per-cell z under static
-        for sc in HEAT_SCALES:
-            # the sum of n independent unit normals, divided by sqrt(n), is
-            # again a unit normal under static
-            total, n = _box_sum_same(z, sc)
-            best = np.maximum(best, np.abs(total) / np.sqrt(n))
-    return best
-
-
-def heatmap_png(image: Image.Image | bytes | str | Path) -> bytes:
-    """A small RGBA PNG (one pixel per cell) to overlay on the image:
-    transparent where the frame looks like static, yellow to red where it
-    doesn't. The browser scales it up."""
-    z = heat_grid(image)
-    t = np.clip((z - HEAT_FLOOR) / (HEAT_CEIL - HEAT_FLOOR), 0, 1)
-    rgba = np.zeros(z.shape + (4,), dtype=np.uint8)
-    rgba[..., 0] = 255
-    rgba[..., 1] = (220 * (1 - t)).astype(np.uint8)        # yellow -> red
-    rgba[..., 2] = 40
-    rgba[..., 3] = np.where(z >= HEAT_FLOOR, (70 + 100 * t), 0).astype(np.uint8)   # max ~67% opaque
-    buf = io.BytesIO()
-    Image.fromarray(rgba, "RGBA").save(buf, "PNG", optimize=True)
-    return buf.getvalue()

@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 import numpy as np
 
 from babel_surfer import scan as scan_mod
@@ -9,6 +11,17 @@ from babel_surfer import storage
 from babel_surfer.storage import NEAR_MISS_KEEP, Store, hist_bin
 
 FRAME = babel_static(np.random.default_rng(5))     # a real ~460 KB Babel-like JPEG
+
+
+@pytest.fixture(autouse=True)
+def fast_analysis(request, monkeypatch):
+    """The real analysis takes ~1.5 s per frame; most storage tests only
+    need its outputs to exist."""
+    if "real_analysis" in request.keywords:
+        return
+    monkeypatch.setattr(storage.analysis, "analyze", lambda img: {"stub": True})
+    monkeypatch.setattr(storage.analysis, "describe", lambda tests, maps, sigma: "desc")
+    monkeypatch.setattr(storage.analysis, "tone_mask_png", lambda img, maps: b"png")
 
 
 def fake(sigma, interesting=False):
@@ -30,8 +43,9 @@ def test_store_finds_near_misses_and_persistence(tmp_path):
     assert s.near[0]["sigma"] == NEAR_MISS_KEEP + 4
     imgs = {p.name for p in (tmp_path / "images").glob("*.jpg")}
     assert imgs == {f"{n['location']}.jpg" for n in s.near} | {"42.jpg"}
-    heats = {p.name for p in (tmp_path / "images").glob("*.heat.png")}
-    assert heats == {f"{n['location']}.heat.png" for n in s.near} | {"42.heat.png"}
+    maps = {p.name for p in (tmp_path / "images").glob("*.maps.json")}
+    assert maps == {f"{n['location']}.maps.json" for n in s.near} | {"42.maps.json"}
+    assert all(e["description"] == "desc" for e in s.near + s.finds)
 
     s2 = Store(tmp_path)
     assert s2.stats["scanned"] == NEAR_MISS_KEEP + 7
@@ -66,7 +80,7 @@ def test_finds_capped_to_top_n(tmp_path, monkeypatch):
     assert sorted(f["sigma"] for f in s.finds) == [6, 7, 9]
     assert s.stats["finds_total"] == 5 and run["finds"] == 5
     assert {p.stem for p in (tmp_path / "images").glob("*.jpg")} == {"101", "103", "104"}
-    assert len(list((tmp_path / "images").glob("*.heat.png"))) == 3
+    assert len(list((tmp_path / "images").glob("*.maps.json"))) == 3
     assert [f["location"] for f in run["new_finds"]] == ["100", "101", "102", "103", "104"]
 
 
@@ -79,7 +93,7 @@ def test_migrates_full_size_images(tmp_path):
         "found_at": 0, "image": "images/1.jpg"}]))
     s = Store(tmp_path)
     assert (tmp_path / "images" / "1.jpg").stat().st_size < 60_000
-    assert (tmp_path / "images" / "1.heat.png").exists() and s.finds[0]["heat"]
+    assert s.missing_assets() == s.finds and s.finds[0]["maps"] is None
     assert not (tmp_path / "images" / "orphan.jpg").exists()
     assert s.stats["finds_total"] == 1
 
@@ -101,3 +115,17 @@ def test_scan_end_to_end_with_stubbed_network(tmp_path, monkeypatch):
     assert run["scanned"] >= 6 and run["finds"] == 0
     assert sorted(seen)[:6] == list(range(501, 507))     # sequential, like the slideshow
     assert json.loads((tmp_path / "stats.json").read_text())["scanned"] == run["scanned"]
+
+
+@pytest.mark.real_analysis
+def test_real_assets_and_enrich(tmp_path):
+    from babel_surfer.classifier import classify
+    s = Store(tmp_path)
+    c = classify(FRAME)
+    entry = {"location": "5", "sigma": 0, "tier": "static", "reason": "shape", "tests": {},
+             "found_at": 0, "image": "images/5.jpg", "maps": None}
+    s.near.append(entry)
+    s.enrich(entry, FRAME, c)
+    assert entry["maps"] == "images/5.maps.json" and entry["description"].startswith("Statistically")
+    maps = json.loads((tmp_path / "images" / "5.maps.json").read_text())
+    assert len(maps["mean"]) == 40 * 26 and len(maps["tone"]) == 3 and entry["sigma"] == c.sigma
