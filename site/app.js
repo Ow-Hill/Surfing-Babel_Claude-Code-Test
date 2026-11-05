@@ -268,41 +268,141 @@ Overlay.init(testName);
 window.addEventListener("hashchange", openFromHash);
 
 // ---------------------------------------------------------------- histogram
-function renderHist(stats) {
+let histView = "all";
+let HIST_DATA = null;
+
+// Bars: real frames scored by the current detector. Dots: what pure static
+// should give (the benchmark's simulated frames), scaled to the same total.
+function renderHist(stats, bench) {
+  HIST_DATA = { stats, bench };
+  const all = histView === "all";
+  // SVG elements ignore the .hidden property: toggle the attribute itself
+  $("hist-scroll").toggleAttribute("hidden", !all);
+  $("hist-tests").toggleAttribute("hidden", all);
+  document.querySelectorAll("#hist-view button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === histView)));
+  if (all) renderOverall(stats, bench); else renderPerTest(stats);
+}
+
+function renderOverall(stats, bench) {
   const svg = $("hist");
-  const edges = stats.hist_edges || [];
-  const counts = stats.hist || [];
-  if (!counts.length || !stats.scanned) {
-    svg.innerHTML = `<text x="0" y="20">No frames scanned yet.</text>`;
+  const cur = stats.hist_current;
+  const edges = (cur && cur.edges) || stats.hist_edges || [];
+  const counts = (cur && cur.counts) || stats.hist || [];
+  const n = counts.reduce((a, b) => a + b, 0);
+  const total = stats.scanned || 0;
+  if (!n) {
+    svg.innerHTML = `<text x="0" y="20">No frames scored by the current detector yet.</text>`;
+    $("hist-caption").textContent = "";
+    $("hist-legend").textContent = "";
     return;
   }
-  // bin i covers [edges[i-1], edges[i]); label as ranges
-  const num = (v) => String(v).replace("-", "−");   // proper minus sign
+  const since = cur && cur.since ? ` since ${new Date(cur.since * 1000).toLocaleDateString(undefined, { month: "short", day: "numeric" })}` : "";
+  $("hist-caption").textContent =
+    `${fmtInt(n)} frames scored by the current detector${since}, each counted by its strongest test.` +
+    (total > n ? ` Frames scored by an older version of the detector (${fmtInt(total - n)}) aren't shown.` : "") +
+    (n < 1000 ? " A small sample so far; it fills in as the hourly scans run." : "");
+
+  // expected for pure static, from the benchmark's simulated frames
+  const nullHist = bench && bench.null && bench.null.hist && JSON.stringify(bench.null.hist_edges) === JSON.stringify(edges)
+    ? bench.null.hist : null;
+  const nullN = nullHist ? nullHist.reduce((a, b) => a + b, 0) : 0;
+  const expected = nullHist && nullN ? nullHist.map((c) => (c / nullN) * n) : null;
+
+  const num = (v) => String(v).replace("-", "−");
   const labels = counts.map((_, i) => i === 0 ? `<${num(edges[0])}` : i === counts.length - 1 ? `≥${num(edges[i - 1])}`
     : `${num(edges[i - 1])} to ${num(edges[i])}`);
-  const W = 1000, H = 220, padB = 44, padT = 22;
+  const W = 1000, H = 230, padB = 44, padT = 24;
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.setAttribute("preserveAspectRatio", "none");
-  const n = counts.length, bw = W / n;
-  const maxLog = Math.log10(Math.max(...counts) + 1);
+  const k = counts.length, bw = W / k;
+  const maxLog = Math.log10(Math.max(...counts, ...(expected || [0])) + 1);
+  const y = (c) => H - padB - (maxLog ? (Math.log10(c + 1) / maxLog) * (H - padB - padT) : 0);
   let out = `<line class="axis" x1="0" x2="${W}" y1="${H - padB}" y2="${H - padB}"/>`;
   counts.forEach((c, i) => {
-    const h = maxLog ? (Math.log10(c + 1) / maxLog) * (H - padB - padT) : 0;
-    const x = i * bw + 3, y = H - padB - h;
+    const x = i * bw + 3, top = y(c);
     const over = i > 0 && edges[i - 1] >= THRESHOLD;
-    out += `<rect class="bar${over ? " over" : ""}" x="${x}" y="${y}" width="${bw - 6}" height="${h}"><title>${labels[i]}σ: ${fmtInt(c)} frames</title></rect>`;
-    if (c) out += `<text x="${x + (bw - 6) / 2}" y="${y - 4}" text-anchor="middle">${fmtInt(c)}</text>`;
+    out += `<rect class="bar${over ? " over" : ""}" x="${x}" y="${top}" width="${bw - 6}" height="${H - padB - top}">` +
+      `<title>${labels[i]}σ: ${fmtInt(c)} frames${expected ? `; pure static would give about ${expected[i] < 1 && expected[i] > 0 ? expected[i].toFixed(2) : fmtInt(Math.round(expected[i]))}` : ""}</title></rect>`;
+    // count above whichever is higher, the bar or the expected-static dot
+    const labelY = Math.min(top, expected ? y(expected[i]) - 6 : top) - 5;
+    if (c) out += `<text x="${x + (bw - 6) / 2}" y="${labelY}" text-anchor="middle">${fmtInt(c)}</text>`;
     out += `<text x="${x + (bw - 6) / 2}" y="${H - padB + 16}" text-anchor="middle">${labels[i]}</text>`;
   });
-  out += `<text x="${W / 2}" y="${H - 4}" text-anchor="middle" class="axis-title">score (σ): how unusual vs. random static · bar heights on a log scale</text>`;
+  if (expected) {
+    const pts = expected.map((e, i) => [i * bw + bw / 2, y(e)]);
+    out += `<polyline class="expect" points="${pts.map((p) => p.join(",")).join(" ")}"/>`;
+    out += pts.map(([px, py], i) => expected[i] > 0.05 ? `<circle class="expect-dot" cx="${px}" cy="${py}" r="4"/>` : "").join("");
+  }
+  out += `<text x="${W / 2}" y="${H - 4}" text-anchor="middle" class="axis-title">score (σ) of each frame's strongest test · bar heights on a log scale</text>`;
   const ti = edges.indexOf(THRESHOLD);
   if (ti >= 0) {
     const x = (ti + 1) * bw;
-    out += `<line class="thr" x1="${x}" x2="${x}" y1="${padT - 14}" y2="${H - padB}"/>` +
-           `<text x="${x + 6}" y="${padT - 6}" class="thr-label">find threshold (${THRESHOLD}σ) →</text>`;
+    out += `<line class="thr" x1="${x}" x2="${x}" y1="${padT - 16}" y2="${H - padB}"/>` +
+           `<text x="${x + 6}" y="${padT - 8}" class="thr-label">find threshold (${THRESHOLD}σ) →</text>`;
   }
   svg.innerHTML = out;
+  $("hist-legend").innerHTML = `<span class="key-bar"></span>real Babel frames` +
+    (expected ? ` <span class="key-dot"></span>what pure static gives (${fmtInt(nullN)} simulated frames, scaled to the same total)` : "") +
+    ` <span class="key-thr"></span>find threshold`;
 }
+
+// One small chart per test, from the per-test score histograms (0.25σ bins,
+// regrouped into 1σ bins for readability).
+function renderPerTest(stats) {
+  const th = stats.test_hist;
+  const box = $("hist-tests");
+  if (!th || !th.counts || !Object.keys(th.counts).length) {
+    box.innerHTML = "<p class='muted'>Per-test scores are recorded from the next scan on.</p>";
+    $("hist-caption").textContent = ""; $("hist-legend").textContent = "";
+    return;
+  }
+  const LO = -3, HI = 10;                       // 1σ bins: <−3, −3..−2, …, 9..10, ≥10
+  const regroup = (c) => {
+    const out = new Array(HI - LO + 2).fill(0);
+    c.forEach((v, i) => {
+      if (!v) return;
+      const z = i === 0 ? -Infinity : i === c.length - 1 ? Infinity : th.lo + (i - 1) * th.step;
+      const b = z < LO ? 0 : z >= HI ? out.length - 1 : 1 + Math.floor(z - LO);
+      out[b] += v;
+    });
+    return out;
+  };
+  const order = [...Object.keys(TEST_INFO), "combined"].filter((t) => th.counts[t]);
+  const n = th.counts[order[0]].reduce((a, b) => a + b, 0);
+  $("hist-caption").textContent = `${fmtInt(n)} frames, each scored by all ten tests. Every test should look like ` +
+    `the same narrow hump near 0; one that reaches further right is noisier on real Babel frames.`;
+  $("hist-legend").innerHTML = `<span class="key-bar"></span>frames per 1σ band (log scale) <span class="key-thr"></span>${THRESHOLD}σ`;
+  box.replaceChildren(...order.map((t) => {
+    const raw = th.counts[t], bins = regroup(raw), total = raw.reduce((a, b) => a + b, 0);
+    const over = rateAtLeast(th, t, THRESHOLD);
+    const W = 300, H = 96, padB = 16, bw = W / bins.length;
+    const maxLog = Math.log10(Math.max(...bins) + 1) || 1;
+    let svg = `<line class="axis" x1="0" x2="${W}" y1="${H - padB}" y2="${H - padB}"/>`;
+    bins.forEach((c, i) => {
+      const h = (Math.log10(c + 1) / maxLog) * (H - padB - 6);
+      const lo = LO + i - 1;
+      const isOver = i > 0 && lo >= THRESHOLD;
+      svg += `<rect class="bar${isOver ? " over" : ""}" x="${i * bw + 1}" y="${H - padB - h}" width="${bw - 2}" height="${h}">` +
+        `<title>${i === 0 ? `<${LO}` : i === bins.length - 1 ? `≥${HI}` : `${lo} to ${lo + 1}`}σ: ${fmtInt(c)}</title></rect>`;
+    });
+    const tx = (THRESHOLD - LO + 1) * bw;
+    svg += `<line class="thr" x1="${tx}" x2="${tx}" y1="0" y2="${H - padB}"/>`;
+    [0, 4, 8].forEach((z) => (svg += `<text x="${(z - LO + 1) * bw}" y="${H - 3}" text-anchor="start">${z}</text>`));
+    const fig = document.createElement("figure");
+    fig.className = "mini-hist";
+    fig.innerHTML = `<figcaption><b></b><span class="muted small"></span></figcaption><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img"></svg>`;
+    fig.querySelector("b").textContent = t === "combined" ? "All tests combined" : testName(t);
+    fig.querySelector(".muted").textContent = over && over.k ? `${fmtInt(over.k)} of ${fmtInt(total)} at ${THRESHOLD}σ+` : `none of ${fmtInt(total)} at ${THRESHOLD}σ+`;
+    fig.querySelector("svg").setAttribute("aria-label", `${fig.querySelector("b").textContent}: score distribution`);
+    fig.querySelector("svg").innerHTML = svg;
+    return fig;
+  }));
+}
+
+document.querySelectorAll("#hist-view button").forEach((b) => (b.onclick = () => {
+  histView = b.dataset.view;
+  if (HIST_DATA) renderHist(HIST_DATA.stats, HIST_DATA.bench);
+}));
 
 // ---------------------------------------------------------------- live strip
 // Frames straight from Babelia, walking locations like its slideshow does.
@@ -490,7 +590,7 @@ async function load() {
   document.querySelectorAll(".rate-text").forEach((e) => (e.textContent = totalFinds ? `about ${rate}` : "very rarely (the exact rate is still being measured)"));
   $("s-best").textContent = stats.best ? fmtSigma(stats.best.sigma) : "–";
   $("s-last").textContent = ago(stats.last_run && stats.last_run.finished_at);
-  renderHist(stats);
+  renderHist(stats, bench);
 
   renderFinds(totalFinds);
   $("finds-empty").textContent = loadFailed ? "Finds couldn't be loaded (see the message above)."

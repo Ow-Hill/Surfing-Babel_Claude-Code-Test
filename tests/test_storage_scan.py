@@ -210,3 +210,31 @@ def test_reconcile_after_rescoring(tmp_path):
     assert [f["location"] for f in s.finds] == ["2"] and s.finds[0]["tier"] == "anomaly"
     assert all(n["sigma"] < 4.0 for n in s.near)
     assert {p.stem for p in (tmp_path / "images").glob("*.jpg")} == s._referenced()
+
+
+def test_current_detector_histogram(tmp_path, monkeypatch):
+    s = Store(tmp_path)
+    run = {"scanned": 0, "finds": 0, "errors": 0}
+    for i in range(5):
+        s.record(str(900 + i), FRAME, fake(1.5), run)
+    s.save()
+    cur = s.stats["hist_current"]
+    assert sum(cur["counts"]) == 5 and cur["detector"] == storage.detector_id()
+    # a new detector version starts a fresh histogram; the all-time one keeps counting
+    monkeypatch.setattr(storage, "detector_id", lambda: "something-new")
+    s2 = Store(tmp_path)
+    assert sum(s2.stats["hist_current"]["counts"]) == 0 and sum(s2.stats["hist"]) == 5
+    assert s2.stats["hist_current"]["since"] is not None
+
+
+def test_current_histogram_backfills_from_score_log(tmp_path):
+    s = Store(tmp_path)
+    run = {"scanned": 0, "finds": 0, "errors": 0}
+    for i in range(4):
+        s.record(str(800 + i), FRAME, fake(2.5), run)
+    s.save()
+    stats = json.loads((tmp_path / "stats.json").read_text())
+    del stats["hist_current"]                       # data from before this feature
+    (tmp_path / "stats.json").write_text(json.dumps(stats))
+    s2 = Store(tmp_path)
+    assert sum(s2.stats["hist_current"]["counts"]) == 4 and s2.stats["hist_current"]["since"] is None

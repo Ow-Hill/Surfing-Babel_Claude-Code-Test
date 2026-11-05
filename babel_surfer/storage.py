@@ -101,6 +101,8 @@ class Store:
         self.stats.setdefault("test_hist", {"lo": TEST_HIST_LO, "step": TEST_HIST_STEP, "counts": {}})
         self.stats.setdefault("fingerprint", {"n": 0, "sum": 0.0, "sumsq": 0.0, "min": None})
         self._score_log: list[tuple] = []
+        self._detector = detector_id()
+        self._init_current_hist()
         self._tidy()
 
     # ------------------------------------------------------------------
@@ -206,6 +208,31 @@ class Store:
             if f["location"] not in keep:
                 self._drop_image(f["location"])
 
+    def _init_current_hist(self) -> None:
+        """Histogram of frame scores under the *current* detector only. The
+        all-time ``hist`` mixes frames scored by older detector versions;
+        this one restarts whenever the detector changes. First time: rebuilt
+        from the score log (which only ever held current-format scores)."""
+        cur = self.stats.get("hist_current")
+        if cur and cur.get("detector") == self._detector:
+            return
+        counts = [0] * (len(HIST_EDGES) + 1)
+        since = time.time()
+        if cur is None:                                  # migration: backfill from the log
+            try:
+                import numpy as np
+                log = np.load(self.dir / "scores.npy")
+                cols = [c for c in self.SCORE_COLUMNS[1:-2] if c in log.dtype.names]
+                if len(log) and cols:
+                    peak = np.nanmax(np.stack([log[c].astype(float) for c in cols]), axis=0)
+                    for v in peak:
+                        counts[hist_bin(float(v))] += 1
+                    since = None                         # unknown: "since the score log began"
+            except (FileNotFoundError, ValueError, OSError):
+                pass
+        self.stats["hist_current"] = {"detector": self._detector, "since": since,
+                                      "edges": HIST_EDGES, "counts": counts}
+
     def _tidy(self) -> None:
         """Migrate older data: shrink full-size images, apply the finds cap
         and delete images nothing refers to."""
@@ -274,6 +301,7 @@ class Store:
         with self._lock:
             self.stats["scanned"] += 1
             self.stats["hist"][hist_bin(result.sigma)] += 1
+            self.stats["hist_current"]["counts"][hist_bin(result.sigma)] += 1
             # every frame's scores: per-test histograms (kept forever, tiny) and a
             # rolling raw log (for recalibration and research)
             counts = self.stats["test_hist"]["counts"]

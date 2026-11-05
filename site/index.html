@@ -38,12 +38,18 @@
     <div class="stat"><b id="s-last">–</b><small>last scan finished</small></div>
   </section>
 
-  <section class="wrap card">
+  <section class="wrap card" id="hist-card" aria-labelledby="hist-h">
     <div class="card-head">
-      <h2>How static is static?</h2>
-      <small class="muted">Every scanned frame, counted by score. Bars right of the dashed line are finds.</small>
+      <h2 id="hist-h">How static is static?</h2>
+      <div id="hist-view" class="seg" role="group" aria-label="Chart view">
+        <button type="button" data-view="all" aria-pressed="true">Strongest test per frame</button>
+        <button type="button" data-view="tests" aria-pressed="false">Each test</button>
+      </div>
     </div>
-    <svg id="hist" role="img" aria-label="Histogram of frame scores"></svg>
+    <p class="muted small hist-caption" id="hist-caption"></p>
+    <div id="hist-scroll" class="hist-scroll"><svg id="hist" role="img" aria-label="Histogram of frame scores"></svg></div>
+    <div id="hist-tests" class="mini-hists" hidden></div>
+    <p class="muted small hist-legend" id="hist-legend"></p>
   </section>
 
   <section class="wrap card live" id="live">

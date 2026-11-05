@@ -269,3 +269,26 @@ body.present .wrap { max-width: 1400px; }
 body.present .clock { font-size: 2.4rem; }
 body.present .step { font-size: 1rem; padding: 14px; }
 body.present .prompt { font-size: 1rem; }
+
+/* score distribution chart */
+#hist-card .card-head .seg { margin-left: auto; }
+.hist-caption { margin: 0 0 6px; max-width: 80ch; }
+.hist-legend { margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+#hist .expect { fill: none; stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; opacity: .75; }
+#hist .expect-dot { fill: var(--surface); stroke: var(--text); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.key-bar, .key-dot, .key-thr { display: inline-block; vertical-align: middle; margin-right: 6px; }
+.key-bar { width: 14px; height: 10px; background: var(--accent); border-radius: 2px; }
+.key-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--text); background: var(--surface); }
+.key-thr { width: 0; height: 14px; border-left: 2px dashed var(--danger); }
+.mini-hists { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 6px; }
+.mini-hists[hidden] { display: none; }
+.mini-hist { margin: 0; display: grid; gap: 4px; min-width: 0; }
+.mini-hist figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 8px; font-size: .88rem; }
+.mini-hist svg { width: 100%; height: 96px; display: block; overflow: visible; }
+.mini-hist .bar { fill: var(--accent); }
+.mini-hist .bar.over { fill: var(--t-striking); }
+.mini-hist .axis { stroke: var(--line); }
+.mini-hist .thr { stroke: var(--danger); stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+.mini-hist text { fill: var(--muted); font: 10px var(--mono); }
+.hist-scroll { overflow-x: auto; }
+.hist-scroll #hist { min-width: 680px; }
