@@ -71,3 +71,16 @@ def test_spec_results_are_consistent():
         assert r["status"] == "waiting"
     if r["variant"] == "buggy":
         assert r["status"] == "failed" and r["passed"] == 4
+
+
+def test_bust_cache(tmp_path):
+    from babel_surfer.build_site import bust_cache
+    (tmp_path / "app.js").write_text("v1")
+    (tmp_path / "index.html").write_text('<script src="app.js"></script><a href="https://x.org/y.js">')
+    bust_cache(tmp_path)
+    first = (tmp_path / "index.html").read_text()
+    assert 'src="app.js?v=' in first and 'href="https://x.org/y.js"' in first
+    (tmp_path / "app.js").write_text("v2")
+    bust_cache(tmp_path)                        # re-stamped, not stacked
+    second = (tmp_path / "index.html").read_text()
+    assert second != first and second.count("?v=") == 1
