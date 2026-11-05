@@ -220,9 +220,14 @@ def run(trials: int, null_frames: int, out: Path | None, seed: int = 7) -> dict:
     ex_res = results[pos:]
 
     null_sig = [c.sigma for c in null]
+    from .storage import HIST_EDGES, hist_bin
+    null_hist = [0] * (len(HIST_EDGES) + 1)
+    for v in null_sig:
+        null_hist[hist_bin(v)] += 1
     result = {
         "threshold_sigma": INTERESTING_SIGMA,
         "null": {"frames": null_frames, "max_sigma": round(max(null_sig), 2),
+                 "hist_edges": HIST_EDGES, "hist": null_hist,
                  "mean_sigma": round(statistics.fmean(null_sig), 2),
                  "false_positives": sum(c.is_interesting for c in null),
                  "worst_test": max(null, key=lambda c: c.sigma).reason},
