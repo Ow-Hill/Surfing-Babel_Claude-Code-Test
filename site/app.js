@@ -5,6 +5,22 @@ const SLIDESHOW_MAX = 9007199250000000n;   // same start range as Babelia's slid
 let THRESHOLD = 4;
 let DATA = { finds: [], near: [], demos: [] };
 
+// One plain-language name per test, used everywhere (description, bars,
+// filters, overlay, benchmark) so the same thing is never called two names.
+const TEST_INFO = {
+  shape:      { name: "Shapes & regions", about: "areas, gradients and large shapes that survive averaging (4–64 px)" },
+  blob:       { name: "Small objects", about: "the most extreme small patch anywhere in the frame (8–48 px)" },
+  lines:      { name: "Rows & columns", about: "horizons, stripes and bands along rows or columns (1–8 px thick)" },
+  angled:     { name: "Angled lines", about: "lines and bands at 15° steps between rows and columns" },
+  contrast:   { name: "Contrast", about: "patches flatter or noisier than static, even when their colour blends in" },
+  texture:    { name: "Texture", about: "neighbouring pixels that agree (smooth) or alternate (checkerboards)" },
+  repetition: { name: "Repetition", about: "any part of the frame recurring at an offset: tiles, repeated motifs" },
+  symmetry:   { name: "Symmetry", about: "mirror symmetry about any vertical or horizontal axis" },
+  tone:       { name: "Colour balance", about: "too many or too few pixels in some colour range (too dark, too bright, too few colours)" },
+  palette:    { name: "Colour correlation", about: "colour channels moving together (greyscale or limited palettes)" },
+};
+const testName = (k) => (TEST_INFO[k] ? TEST_INFO[k].name : k);
+
 const fmtInt = (n) => Number(n || 0).toLocaleString();
 const fmtSigma = (s) => {
   if (s == null) return "–";
@@ -17,8 +33,7 @@ const shortLoc = (l) => (l.length > 16 ? `#${l.slice(0, 6)}…${l.slice(-6)}` : 
 const shortDesc = (d) => {
   if (!d) return "";
   let s = d.replace(/^[^:]*:\s*/, "").split(/\.\s/)[0].replace(/\s*\([\d.,]+σ\)\.?$/, "");
-  s = s.charAt(0).toUpperCase() + s.slice(1);
-  return s.length > 110 ? s.slice(0, 107) + "…" : s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
 };
 const tierClass = (t) => ({ "near miss": "near" }[t] || t);
 const ago = (t) => {
@@ -30,17 +45,22 @@ const ago = (t) => {
   return `${Math.round(s / 86400)} days ago`;
 };
 
-async function getJSON(path, fallback) {
+// Loads report failure instead of silently returning empty data (which
+// would look like a real "nothing found").
+let loadFailed = false;
+async function getJSON(path, fallback, required = true) {
   try {
     const r = await fetch(path, { cache: "no-cache" });
-    return r.ok ? await r.json() : fallback;
-  } catch { return fallback; }
+    if (r.ok) return await r.json();
+    if (required) loadFailed = true;
+  } catch { if (required) loadFailed = true; }
+  return fallback;
 }
 
 function tile({ img, loc, label, sigma, tier, caption, onClick }) {
   const b = document.createElement("button");
   b.className = "tile";
-  b.innerHTML = `<img loading="lazy" alt=""><div class="meta"><span class="loc"></span><span class="tag"></span></div>`;
+  b.innerHTML = `<img loading="lazy" alt=""><div class="meta"><span class="tag"></span><span class="loc"></span></div>`;
   b.querySelector("img").src = img;
   b.querySelector("img").alt = caption || `Babel location ${loc}`;
   b.querySelector(".loc").textContent = label || (loc ? shortLoc(loc) : "test image");
@@ -60,9 +80,10 @@ function tile({ img, loc, label, sigma, tier, caption, onClick }) {
 }
 
 // ---------------------------------------------------------------- detail view
-// item: { key, location?, locationFile?, locationPreview?, preview, full?, maps?, mask?, description?,
-//         sigma?, tier?, reason?, tests?, note? }
+// item: { key, kind, location?, locationFile?, locationPreview?, preview, full?, maps?, mask?,
+//         description?, sigma?, tier?, reason?, tests?, note? }
 let current = null;
+let nav = { list: [], index: -1, label: "" };   // what ‹ › step through
 
 function setHash(key) {
   const url = key ? `#${key}` : location.pathname + location.search;
@@ -75,42 +96,49 @@ async function fullLocation(item) {
   return item._loc;
 }
 
-function openDetail(item) {
+function openDetail(item, list = null, label = "") {
+  if (list) nav = { list, index: list.findIndex((x) => x.key === item.key), label };
+  else if (!nav.list.some((x) => x.key === item.key)) nav = { list: [item], index: 0, label: "" };
+  else nav.index = nav.list.findIndex((x) => x.key === item.key);
   current = item;
   setHash(item.key);
+
+  const n = nav.list.length;
+  $("d-title").textContent = n > 1 ? `${nav.label || "Frame"} ${nav.index + 1} of ${n}` : (nav.label || "Frame");
+  $("d-prev").disabled = n < 2;
+  $("d-next").disabled = n < 2;
+
   const img = $("d-img");
   img.src = item.preview;
+  img.alt = item.description || `Babel location ${item.location || ""}`;
   $("d-note").textContent = item.note || "";
   $("d-note").hidden = !item.note;
 
   // full-resolution frame from Babelia (finds store only a small preview)
   $("d-full").hidden = true;
   if (item.full) {
-    $("d-full").textContent = "preview: loading full image from Babelia…";
+    $("d-full").textContent = "Showing the stored preview; loading the full image from Babelia…";
     $("d-full").hidden = false;
     const full = new Image();
     full.onload = () => { if (current === item) { img.src = full.src; $("d-full").hidden = true; } };
     full.onerror = () => {
-      if (current === item) $("d-full").textContent = "preview (Babelia didn't respond; try “Open in Babelia”)";
+      if (current === item) $("d-full").textContent = "Showing the stored preview: Babelia didn't respond. “Open in Babelia” may work later.";
     };
     full.src = item.full;
   }
 
-  // description + evidence overlay
   $("d-desc").textContent = item.description || "";
   $("d-desc").hidden = !item.description;
   Overlay.show(item);
 
-  // score
   $("d-score").hidden = item.sigma == null;
   if (item.sigma != null) {
     $("d-tier").textContent = item.tier;
     $("d-tier").className = `tag ${tierClass(item.tier)}`;
     $("d-sigma").textContent = fmtSigma(item.sigma);
-    $("d-reason").textContent = `strongest signal: ${item.reason}`;
+    $("d-reason").textContent = `strongest test: ${testName(item.reason)}`;
   }
 
-  // location
   $("d-loc").value = item.location || item.locationPreview;
   $("d-dl").hidden = !item.download;
   if (item.download) {
@@ -118,49 +146,62 @@ function openDetail(item) {
     $("d-dl").download = item.downloadName;
   }
 
-  // per-test bars
   const bars = $("d-tests");
   bars.innerHTML = "";
+  $("d-tests-box").hidden = !item.tests;
   if (item.tests) {
     const max = Math.max(THRESHOLD * 1.5, ...Object.values(item.tests));
-    for (const [name, z] of Object.entries(item.tests).sort((a, b) => b[1] - a[1])) {
+    for (const [k, z] of Object.entries(item.tests).sort((a, b) => b[1] - a[1])) {
       const pct = Math.max(0, Math.min(100, (Math.log1p(Math.max(0, z)) / Math.log1p(max)) * 100));
-      bars.insertAdjacentHTML("beforeend",
-        `<span class="name">${name}</span><span class="track"><span class="fill" style="width:${pct}%"></span></span><span class="val">${fmtSigma(z)}</span>`);
+      const row = document.createElement("div");
+      row.className = "bar-row";
+      row.innerHTML = `<span class="name"></span><span class="track"><span class="fill" style="width:${pct}%"></span></span><span class="val">${fmtSigma(z)}</span>`;
+      row.querySelector(".name").textContent = testName(k);
+      row.querySelector(".name").title = TEST_INFO[k] ? TEST_INFO[k].about : "";
+      bars.append(...row.children);
     }
   }
   if (!$("detail").open) $("detail").showModal();
 }
 
-const findItem = (f) => ({
-  key: f.location, location: f.location, preview: `data/${f.image}`, full: BABELIA + f.location,
+function step(delta) {
+  const n = nav.list.length;
+  if (n < 2) return;
+  nav.index = (nav.index + delta + n) % n;
+  openDetail(nav.list[nav.index]);
+}
+
+const findItem = (f, kind = "Find") => ({
+  key: f.location, kind, location: f.location, preview: `data/${f.image}`, full: BABELIA + f.location,
   maps: f.maps ? `data/${f.maps}` : null, mask: f.mask ? `data/${f.mask}` : null,
   description: f.description, sigma: f.sigma, tier: f.tier, reason: f.reason, tests: f.tests,
   download: `data/${f.image}`, downloadName: `babel-${f.location}-preview.jpg`,
 });
 
 const demoItem = (d) => ({
-  key: `demo-${d.slug}`, locationFile: d.locationFile || d.location_file,
+  key: `demo-${d.slug}`, kind: "Demo", locationFile: d.locationFile || d.location_file,
   locationPreview: `${d.location_preview} (${fmtInt(d.location_digits)} digits)`,
   preview: d.image, maps: d.maps, mask: d.mask, description: d.description,
   sigma: d.sigma, tier: d.tier, reason: d.reason, tests: d.tests,
   download: d.image, downloadName: `babel-demo-${d.slug}.jpg`,
-  note: `Seeded demo: we drew this picture, got its location from Babelia's image search, then fetched it back from that location with the scanner. It was not found by scanning.`,
+  note: "Seeded demo: we drew this picture, got its location from Babelia's image search, then fetched it back from that location with the scanner. It was not found by scanning.",
 });
 
 const lookupItem = (loc) => ({
-  key: loc, location: loc, preview: BABELIA + loc, download: null,
+  key: loc, kind: "Location", location: loc, preview: BABELIA + loc, download: null,
   note: "This location isn't in our finds; it's shown straight from Babelia, without a score.",
 });
 
 function openFromHash() {
   const key = decodeURIComponent(location.hash.slice(1));
-  if (!key) return;
-  const f = DATA.finds.find((x) => x.location === key) || DATA.near.find((x) => x.location === key);
-  if (f) return openDetail(findItem(f));
+  if (!key || key === "how") return;
+  const fi = DATA.finds.find((x) => x.location === key);
+  if (fi) return openDetail(findItem(fi), visibleFinds().map((f) => findItem(f)), "Find");
+  const ni = DATA.near.find((x) => x.location === key);
+  if (ni) return openDetail(findItem(ni, "Near miss"), DATA.near.map((f) => findItem(f, "Near miss")), "Near miss");
   const d = DATA.demos.find((x) => `demo-${x.slug}` === key);
-  if (d) return openDetail(demoItem(d));
-  if (/^\d{1,4000}$/.test(key)) openDetail(lookupItem(key.replace(/^0+(?=\d)/, "")));
+  if (d) return openDetail(demoItem(d), DATA.demos.map(demoItem), "Demo");
+  if (/^\d{1,4000}$/.test(key)) openDetail(lookupItem(key.replace(/^0+(?=\d)/, "")), null, "Location");
 }
 
 // Babelia's GET URL can't carry a ~1 MB location, so open long ones by POST.
@@ -175,18 +216,31 @@ async function openInBabelia() {
 }
 
 async function copyText(text, btn) {
+  const old = btn.textContent;
   try {
     await navigator.clipboard.writeText(text);
-    const old = btn.textContent; btn.textContent = "Copied";
-    setTimeout(() => (btn.textContent = old), 1200);
-  } catch {}
+    btn.textContent = "Copied";
+  } catch {
+    btn.textContent = "Couldn't copy";
+  }
+  setTimeout(() => (btn.textContent = old), 1400);
 }
 
 $("d-copy").onclick = async () => copyText(await fullLocation(current), $("d-copy"));
 $("d-link").onclick = () => copyText(location.href, $("d-link"));
 $("d-open").onclick = openInBabelia;
+$("d-prev").onclick = () => step(-1);
+$("d-next").onclick = () => step(1);
+$("d-close").onclick = () => $("detail").close();
 $("detail").addEventListener("close", () => { current = null; Overlay.reset(); setHash(null); });
-Overlay.init();
+$("detail").addEventListener("keydown", (e) => {
+  if (e.target.matches("input[type=range], textarea, select")) return;
+  if (e.key === "ArrowLeft") { step(-1); e.preventDefault(); }
+  else if (e.key === "ArrowRight") { step(1); e.preventDefault(); }
+  else if (e.key === "e" || e.key === "E") Overlay.toggle();
+  else if (/^[1-5]$/.test(e.key)) Overlay.setLayerIndex(+e.key - 1);
+});
+Overlay.init(testName);
 window.addEventListener("hashchange", openFromHash);
 
 // ---------------------------------------------------------------- histogram
@@ -198,8 +252,11 @@ function renderHist(stats) {
     svg.innerHTML = `<text x="0" y="20">No frames scanned yet.</text>`;
     return;
   }
-  const labels = ["<" + edges[0], ...edges.map((e, i) => (i < edges.length - 1 ? `${e}` : `≥${e}`))];
-  const W = 1000, H = 190, padB = 24, padT = 16;
+  // bin i covers [edges[i-1], edges[i]); label as ranges
+  const num = (v) => String(v).replace("-", "−");   // proper minus sign
+  const labels = counts.map((_, i) => i === 0 ? `<${num(edges[0])}` : i === counts.length - 1 ? `≥${num(edges[i - 1])}`
+    : `${num(edges[i - 1])} to ${num(edges[i])}`);
+  const W = 1000, H = 220, padB = 44, padT = 22;
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.setAttribute("preserveAspectRatio", "none");
   const n = counts.length, bw = W / n;
@@ -211,12 +268,14 @@ function renderHist(stats) {
     const over = i > 0 && edges[i - 1] >= THRESHOLD;
     out += `<rect class="bar${over ? " over" : ""}" x="${x}" y="${y}" width="${bw - 6}" height="${h}"><title>${labels[i]}σ: ${fmtInt(c)} frames</title></rect>`;
     if (c) out += `<text x="${x + (bw - 6) / 2}" y="${y - 4}" text-anchor="middle">${fmtInt(c)}</text>`;
-    out += `<text x="${x + (bw - 6) / 2}" y="${H - 6}" text-anchor="middle">${labels[i]}</text>`;
+    out += `<text x="${x + (bw - 6) / 2}" y="${H - padB + 16}" text-anchor="middle">${labels[i]}</text>`;
   });
+  out += `<text x="${W / 2}" y="${H - 4}" text-anchor="middle" class="axis-title">score (σ): how unusual vs. random static · bar heights on a log scale</text>`;
   const ti = edges.indexOf(THRESHOLD);
   if (ti >= 0) {
     const x = (ti + 1) * bw;
-    out += `<line class="thr" x1="${x}" x2="${x}" y1="${padT - 10}" y2="${H - padB}"/>`;
+    out += `<line class="thr" x1="${x}" x2="${x}" y1="${padT - 14}" y2="${H - padB}"/>` +
+           `<text x="${x + 6}" y="${padT - 6}" class="thr-label">find threshold (${THRESHOLD}σ) →</text>`;
   }
   svg.innerHTML = out;
 }
@@ -224,7 +283,7 @@ function renderHist(stats) {
 // ---------------------------------------------------------------- live strip
 // Frames straight from Babelia, walking locations like its slideshow does.
 // Display only: Babelia sends no CORS headers, so the browser can't score them.
-const live = { loc: null, playing: true, loading: false, history: [] };
+const live = { loc: null, playing: true, loading: false, history: [], failures: 0 };
 
 function randomStart() {
   const a = new Uint32Array(2);
@@ -237,28 +296,40 @@ function liveVisible() {
   return !document.hidden && r.bottom > 0 && r.top < innerHeight;
 }
 
+function livePlaceholder(text) {
+  // only shown until the first frame arrives; afterwards the last frame stays
+  if ($("live-img").hidden) $("live-ph").textContent = text;
+}
+
 function liveNext() {
   if (live.loading || !live.playing) return;
   if (!liveVisible()) { setTimeout(liveNext, 1500); return; }
   live.loading = true;
   live.loc = live.loc == null ? randomStart() : live.loc + 1n;
   const loc = live.loc.toString();
-  $("live-status").textContent = `loading #${loc}…`;
+  $("live-status").textContent = `loading the next frame (Babelia takes 5–20 s)…`;
+  livePlaceholder("Loading the first frame from Babelia (5–20 s)…");
   const img = new Image();
   const done = (ok) => {
     live.loading = false;
     if (ok) {
+      live.failures = 0;
       $("live-img").src = img.src;
+      $("live-img").hidden = false;
+      $("live-ph").hidden = true;
       $("live-img").dataset.loc = loc;
       $("live-loc").textContent = `#${loc}`;
       $("live-status").textContent = "";
       live.history = [loc, ...live.history].slice(0, 6);
       $("live-history").replaceChildren(...live.history.slice(1).map((l) =>
-        tile({ img: BABELIA + l, loc: l, onClick: () => openDetail(lookupItem(l)) })));
+        tile({ img: BABELIA + l, loc: l, onClick: () => openDetail(lookupItem(l), null, "Location") })));
     } else {
-      $("live-status").textContent = "Babelia didn't respond; retrying…";
+      live.failures += 1;
+      const wait = Math.min(60, 8 * live.failures);
+      $("live-status").textContent = `Babelia didn't respond; trying again in ${wait} s.`;
+      livePlaceholder(`Babelia isn't responding right now. Trying again in ${wait} s…`);
     }
-    setTimeout(liveNext, ok ? 2500 : 8000);
+    setTimeout(liveNext, ok ? 2500 : Math.min(60, 8 * live.failures) * 1000);
   };
   img.onload = () => done(true);
   img.onerror = () => done(false);
@@ -268,65 +339,119 @@ function liveNext() {
 $("live-toggle").onclick = () => {
   live.playing = !live.playing;
   $("live-toggle").textContent = live.playing ? "Pause" : "Play";
+  $("live-status").textContent = live.playing ? "" : "paused";
+  livePlaceholder(live.playing ? "Connecting to Babelia…" : "Paused");
   if (live.playing) liveNext();
 };
-$("live-img").onclick = () => {
+document.querySelector(".live-frame").onclick = () => {
   const l = $("live-img").dataset.loc;
-  if (l) openDetail(lookupItem(l));
+  if (l) openDetail(lookupItem(l), null, "Location");
 };
+
+// ---------------------------------------------------------------- finds: sort + filter
+const view = { sort: "score", filter: "all" };
+
+function visibleFinds() {
+  let list = [...DATA.finds];
+  if (view.filter !== "all") list = list.filter((f) => f.reason === view.filter);
+  list.sort(view.sort === "new" ? (a, b) => b.found_at - a.found_at : (a, b) => b.sigma - a.sigma);
+  return list;
+}
+
+function renderFinds(totalFinds) {
+  const finds = DATA.finds;
+  const list = visibleFinds();
+  const items = list.map((f) => findItem(f));
+  $("finds").replaceChildren(...list.map((f, i) =>
+    tile({ img: `data/${f.image}`, loc: f.location, sigma: f.sigma, tier: f.tier,
+           caption: shortDesc(f.description), onClick: () => openDetail(items[i], items, "Find") })));
+  $("finds-controls").hidden = finds.length < 2;
+  // filter chips by strongest test, with counts
+  const counts = {};
+  finds.forEach((f) => (counts[f.reason] = (counts[f.reason] || 0) + 1));
+  const chips = [["all", `All (${finds.length})`],
+    ...Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([k, c]) => [k, `${testName(k)} (${c})`])];
+  $("finds-filter").replaceChildren(...chips.map(([k, text]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = text;
+    b.setAttribute("aria-pressed", String(view.filter === k));
+    b.onclick = () => { view.filter = k; renderFinds(totalFinds); };
+    return b;
+  }));
+  $("finds-empty").hidden = finds.length > 0;
+  const shown = view.filter === "all" ? "" : ` · showing ${list.length} (${testName(view.filter)})`;
+  $("finds-note").textContent = !finds.length ? ""
+    : (totalFinds > finds.length ? `top ${finds.length} of ${fmtInt(totalFinds)} by score` : `${finds.length} so far`) + shown;
+}
+$("finds-sort").onchange = (e) => { view.sort = e.target.value; renderFinds(DATA.totalFinds); };
 
 // ---------------------------------------------------------------- data
 async function load() {
+  loadFailed = false;
   const [stats, finds, near, bench, demos] = await Promise.all([
     getJSON("data/stats.json", {}), getJSON("data/finds.json", []),
-    getJSON("data/near_misses.json", []), getJSON("benchmark/benchmark.json", null),
-    getJSON("demo/demo.json", []),
+    getJSON("data/near_misses.json", []), getJSON("benchmark/benchmark.json", null, false),
+    getJSON("demo/demo.json", [], false),
   ]);
+  $("load-error").hidden = !loadFailed;
   DATA = { finds, near, demos };
   if (bench) THRESHOLD = bench.threshold_sigma;
   document.querySelectorAll(".thr").forEach((e) => (e.textContent = THRESHOLD));
 
   $("s-scanned").textContent = fmtInt(stats.scanned);
   const totalFinds = stats.finds_total ?? finds.length;
+  DATA.totalFinds = totalFinds;
   $("s-finds").textContent = fmtInt(totalFinds);
+  // measured rate, not a promise
+  const rate = totalFinds && stats.scanned ? `1 in ${fmtInt(Math.round(stats.scanned / totalFinds / 100) * 100 || 1)} frames` : "rate not known yet";
+  $("s-rate").textContent = rate;
+  document.querySelectorAll(".rate-text").forEach((e) => (e.textContent = totalFinds ? `about ${rate}` : "about 1 in 2,000"));
   $("s-best").textContent = stats.best ? fmtSigma(stats.best.sigma) : "–";
   $("s-last").textContent = ago(stats.last_run && stats.last_run.finished_at);
   renderHist(stats);
 
-  const byScore = [...finds].sort((a, b) => b.sigma - a.sigma);
-  $("finds").replaceChildren(...byScore.map((f) =>
-    tile({ img: `data/${f.image}`, loc: f.location, sigma: f.sigma, tier: f.tier,
-           caption: shortDesc(f.description), onClick: () => openDetail(findItem(f)) })));
-  $("finds-empty").hidden = finds.length > 0;
-  $("finds-note").textContent = !finds.length ? ""
-    : totalFinds > finds.length ? `top ${finds.length} of ${fmtInt(totalFinds)} by score`
-    : "highest score first";
+  renderFinds(totalFinds);
+  $("finds-empty").textContent = loadFailed ? "Finds couldn't be loaded (see the message above)."
+    : `Nothing yet. Finds are rare: ${totalFinds ? rate : "roughly 1 in 2,000 frames"} so far. Check back after the next scan.`;
 
-  $("near").replaceChildren(...near.map((f) =>
-    tile({ img: `data/${f.image}`, loc: f.location, sigma: f.sigma, tier: f.tier, onClick: () => openDetail(findItem(f)) })));
+  const nearItems = near.map((f) => findItem(f, "Near miss"));
+  $("near").replaceChildren(...near.map((f, i) =>
+    tile({ img: `data/${f.image}`, loc: f.location, sigma: f.sigma, tier: f.tier,
+           caption: shortDesc(f.description), onClick: () => openDetail(nearItems[i], nearItems, "Near miss") })));
 
   $("demo-section").hidden = !demos.length;
-  $("demos").replaceChildren(...demos.map((d) =>
+  const demoItems = demos.map(demoItem);
+  $("demos").replaceChildren(...demos.map((d, i) =>
     tile({ img: d.image, label: "seeded demo", sigma: d.sigma, tier: d.tier, caption: d.title,
-           onClick: () => openDetail(demoItem(d)) })));
+           onClick: () => openDetail(demoItems[i], demoItems, "Demo") })));
+
+  $("tests-list").replaceChildren(...Object.entries(TEST_INFO).map(([, v]) => {
+    const d = document.createElement("div");
+    d.innerHTML = "<b></b><span></span>";
+    d.querySelector("b").textContent = v.name;
+    d.querySelector("span").textContent = v.about;
+    return d;
+  }));
 
   if (bench) {
     const n = bench.null;
     $("null-note").textContent =
       `Calibration check: of ${fmtInt(n.frames)} frames of simulated Babel static, ${n.false_positives} reached the ` +
-      `${bench.threshold_sigma}σ threshold (expected: about 1 in 400); the highest scored ${n.max_sigma}σ.`;
+      `${bench.threshold_sigma}σ threshold and the highest scored ${n.max_sigma}σ. Real Babel static is a little ` +
+      `quieter than the simulation.`;
     $("bench").replaceChildren(...(bench.examples || []).map((e) =>
       tile({ img: `benchmark/${e.file}`, sigma: e.sigma, tier: e.tier, caption: e.label,
              onClick: () => window.open(`benchmark/${e.file}`, "_blank") })));
     const rows = bench.signals.map((r) =>
       `<tr><td>${r.signal}</td><td>${r.strength === "-" ? "–" : Math.round(r.strength * 100) + "%"}</td>` +
-      `<td>${r.detected}/${r.trials}</td><td>${fmtSigma(r.min_sigma)}</td><td>${r.reason}</td></tr>`).join("");
+      `<td>${r.detected}/${r.trials}</td><td>${fmtSigma(r.min_sigma)}</td><td>${testName(r.reason)}</td></tr>`).join("");
     $("bench-table").innerHTML =
       `<thead><tr><th>Hidden signal</th><th>Strength</th><th>Detected</th><th>Weakest score</th><th>Caught by</th></tr></thead><tbody>${rows}</tbody>`;
   }
   if (!$("detail").open) openFromHash();
 }
 
+$("load-retry").onclick = () => load();
 window.reloadData = load;
 load();
 liveNext();

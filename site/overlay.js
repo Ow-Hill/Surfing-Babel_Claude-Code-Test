@@ -8,7 +8,7 @@
 const Overlay = (() => {
   const $ = (id) => document.getElementById(id);
   const LAYERS = {
-    mean:     { label: "Brightness & colour", tests: ["shape", "blob"], slider: true,
+    mean:     { label: "Shapes & objects", tests: ["shape", "blob"], slider: true,
                 hint: "16 px areas whose average brightness or colour departs from static" },
     contrast: { label: "Contrast", tests: ["contrast"], slider: true,
                 hint: "areas flatter (blue) or noisier (orange) than static" },
@@ -24,6 +24,15 @@ const Overlay = (() => {
     repetition: "geometry", symmetry: "geometry", tone: "tone", palette: "tone", texture: "tone",
   };
   const STATIC_LIMIT = { mean: 3, contrast: 3, rows: 3, geometry: 3, tone: 3 };
+  // colour key per layer (recognition, not recall)
+  const KEYS = {
+    mean:     [["hsl(55,95%,55%)", "just over threshold"], ["hsl(0,95%,55%)", "strongest"]],
+    contrast: [["hsl(30,95%,55%)", "noisier than static"], ["hsl(215,95%,55%)", "flatter than static"]],
+    rows:     [["hsl(40,95%,55%)", "brighter band"], ["hsl(220,95%,55%)", "darker band"]],
+    geometry: [["rgb(255,70,70)", "angled line"], ["rgb(80,220,255)", "repeat offset"], ["rgb(190,110,255)", "mirror axis"]],
+    tone:     [["rgb(255,60,210)", "pixels in the flagged colour range"], ["rgb(40,36,50)", "everything else (dimmed)"]],
+  };
+  let nameOf = (k) => k;
 
   let state = null;   // { item, maps, mask, layer, thr: {layer: value} }
 
@@ -194,6 +203,9 @@ const Overlay = (() => {
       }
     }
     $("d-ov-note").textContent = note;
+    $("d-ov-key").innerHTML = (KEYS[layer] || []).map(([c, t]) =>
+      `<span><i style="background:${c}"></i>${t}</span>`).join("");
+    $("d-ov-reset").disabled = thr === defaultThreshold(layer, maps);
     document.querySelectorAll("#d-ov-layers button").forEach((b) =>
       b.setAttribute("aria-pressed", String(b.dataset.layer === layer)));
   }
@@ -222,11 +234,18 @@ const Overlay = (() => {
     }
   }
 
-  function init() {
+  function setLayer(k) { if (state && state.maps && LAYERS[k]) { state.layer = k; render(); } }
+
+  function init(testName) {
+    if (testName) nameOf = testName;
+    $("d-ov-reset").onclick = () => {
+      if (state && state.maps) { state.thr[state.layer] = defaultThreshold(state.layer, state.maps); render(); }
+    };
     const bar = $("d-ov-layers");
     bar.replaceChildren(...Object.entries(LAYERS).map(([k, v]) => {
       const b = document.createElement("button");
       b.type = "button"; b.dataset.layer = k; b.textContent = v.label;
+      b.title = `${v.hint} (tests: ${v.tests.map((t) => nameOf(t)).join(", ")})`;
       b.onclick = () => { if (state) { state.layer = k; render(); } };
       return b;
     }));
@@ -234,5 +253,9 @@ const Overlay = (() => {
     $("d-ov-toggle").onchange = render;
   }
 
-  return { init, show, reset: () => { state = null; } };
+  return {
+    init, show, reset: () => { state = null; },
+    toggle: () => { if (state && state.maps) { $("d-ov-toggle").checked = !$("d-ov-toggle").checked; render(); } },
+    setLayerIndex: (i) => setLayer(Object.keys(LAYERS)[i]),
+  };
 })();
