@@ -13,9 +13,10 @@ import argparse
 import hashlib
 import json
 import shutil
+from datetime import date, datetime, timezone
 from pathlib import Path
 
-from . import alerts, benchmark, seeded
+from . import alerts, benchmark, demo_slot, seeded
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
@@ -63,6 +64,27 @@ def build(out: Path, trials: int = 8, null_frames: int = 500, force_bench: bool 
     finds_file = out / "data" / "finds.json"
     finds = json.loads(finds_file.read_text()) if finds_file.exists() else []
     (out / "feed.xml").write_text(alerts.build_feed(finds))
+
+    # live-coding demo slot (site/agent.html shows the spec until it's implemented)
+    (out / "agent").mkdir(exist_ok=True)
+    (out / "agent" / "find_of_the_day.json").write_text(json.dumps(demo_slot_result(finds)))
+
+
+def demo_slot_result(finds: list[dict], day: date | None = None) -> dict:
+    """Run the demo slot safely: whatever the agent wrote, the build goes on."""
+    day = day or datetime.now(timezone.utc).date()
+    try:
+        pick = demo_slot.find_of_the_day(finds, day)
+    except NotImplementedError:
+        return {"status": "not_implemented", "day": day.isoformat()}
+    except Exception as e:                       # a broken implementation
+        return {"status": "error", "day": day.isoformat(), "message": f"{type(e).__name__}: {e}"[:300]}
+    if pick is None:
+        return {"status": "no_finds", "day": day.isoformat()}
+    keep = {k: pick.get(k) for k in ("location", "sigma", "tier", "reason", "caption")}
+    match = next((f for f in finds if f["location"] == keep["location"]), {})
+    keep["image"] = match.get("image")
+    return {"status": "ok", "day": day.isoformat(), "pick": keep}
 
 
 def main(argv=None) -> int:

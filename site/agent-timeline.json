@@ -1,0 +1,69 @@
+{
+  "intro": "Every line of Surfing Babel (scanner, detector, calibration, website, automation) was written by Claude Code, an AI coding agent, working from short requests in a conversation. The agent read code and websites, ran experiments, wrote and ran tests, opened and merged pull requests and watched the deployments. The person directed it; the agent did the engineering. Below is how it went, including the mistakes the agent caught in its own work.",
+  "stats": [
+    { "value": "9", "label": "pull requests merged in ~24 h" },
+    { "value": "~3,600", "label": "lines of Python, JavaScript, HTML and CSS" },
+    { "value": "32", "label": "automated tests" },
+    { "value": "10", "label": "statistical tests in the detector" }
+  ],
+  "events": [
+    {
+      "date": "2026-11-04", "pr": 1,
+      "title": "Built the scanner, detector and site",
+      "request": "Build a website that scans Babel's slideshow and keeps images that resemble something.",
+      "did": "Read Babelia's slideshow JavaScript and found it simply POSTs location=N, N+1, … to babelia.cgi; the location is the seed. Wrote a direct scanner, a statistical detector and a GitHub Pages site with a scheduled GitHub Actions scan.",
+      "moments": [
+        { "kind": "bug caught", "text": "Its first calibration said real Babel static scored up to 14σ. The cause: the simulation used a generic JPEG quality setting. It read Babelia's exact quantisation tables out of real frames, re-encoded the simulation with them, and real static dropped back under 3σ." },
+        { "kind": "improvement", "text": "The benchmark showed a small 24 px square was found only 2 times in 5. It switched to sliding windows: 5 out of 5." }
+      ]
+    },
+    {
+      "date": "2026-11-04", "pr": 3,
+      "title": "Lowered the threshold so scans actually find things",
+      "request": "Lower the threshold so it actually finds something.",
+      "did": "Measured how often pure static reaches each score, chose 4σ, and labelled 4–8σ finds 'anomalies' so the site stays honest that they are unusual static, not pictures.",
+      "moments": []
+    },
+    {
+      "date": "2026-11-04", "pr": 4,
+      "title": "Scan now button",
+      "request": "Add a scan now button.",
+      "did": "Checked Babelia's CORS headers first: none, so a browser can't score frames. Built the button on GitHub's API instead, with the token kept only in the visitor's browser.",
+      "moments": [ { "kind": "decision", "text": "Never put a token in the public site; status works for everyone without one." } ]
+    },
+    {
+      "date": "2026-11-04", "pr": 5,
+      "title": "Made it able to run forever",
+      "request": "Keep only the top finds and store smaller images.",
+      "did": "Projected storage would hit GitHub Pages' 1 GB limit in about 8 months. Stored 28 KB previews instead of 460 KB frames (the seed regenerates the original), kept the top 100 finds and published without git history.",
+      "moments": []
+    },
+    {
+      "date": "2026-11-04", "pr": 7,
+      "title": "Proof it works, heatmaps, share links, live strip, alerts",
+      "request": "Add share links, a live strip, heatmaps, a proof it works and alerts.",
+      "did": "Used Babelia's own image search to find where a drawn picture lives in the archive, then fetched it back with the scanner: 339,434σ. Real pictures live at locations about 961,760 digits long, which is why the slideshow never meets one.",
+      "moments": [
+        { "kind": "bug caught", "text": "The first heatmap made plain static look structured: it was computed from downscaled JPEG previews, which no longer behave like static. It moved the computation to full-resolution frames." },
+        { "kind": "bug caught", "text": "Edge padding counted the same evidence twice and pushed static to 7σ; fixed so static stays under 4.5σ." }
+      ]
+    },
+    {
+      "date": "2026-11-05", "pr": 8,
+      "title": "Four new tests, evidence overlays and descriptions",
+      "request": "Make the overlay perceptible, describe each find, and add more ways to screen for anomalies.",
+      "did": "Added contrast, angled-line, repetition and symmetry tests, per-find evidence maps with adjustable thresholds, and a generated description for every find.",
+      "moments": [
+        { "kind": "discovery", "text": "The new repetition test flagged real frames at one offset, again and again. Digging in, the agent found a fingerprint of Babelia's generator: in every frame, red at row y correlates with green 156 rows lower (and green with blue), about +10σ per frame. It documented it and excluded that offset." },
+        { "kind": "bug caught", "text": "Its own benchmark blended two layers of static, which secretly changed the colour histogram. It switched to per-pixel mixing so only the intended signal was tested." }
+      ]
+    },
+    {
+      "date": "2026-11-05", "pr": 9,
+      "title": "Usability review",
+      "request": "Use Nielsen's usability heuristics to critique, evaluate and update the UI.",
+      "did": "Reviewed every screen against the 10 heuristics, rated 25 findings by severity, fixed 23 and published the review in the repository.",
+      "moments": [ { "kind": "bug caught", "text": "A failed data load looked exactly like 'no finds yet'. Now it shows an error with a Retry button." } ]
+    }
+  ]
+}
