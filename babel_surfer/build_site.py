@@ -23,6 +23,25 @@ SITE = ROOT / "site"
 PKG = Path(__file__).resolve().parent
 
 
+def bust_cache(out: Path) -> None:
+    """Give every local script and stylesheet link a content fingerprint
+    (app.js -> app.js?v=1a2b3c4d). Browsers cache these files, so without it
+    a new page can run yesterday's code until the cache expires."""
+    import re
+    for page in out.glob("*.html"):
+        html = page.read_text()
+
+        def stamp(m):
+            name = m.group(2)
+            f = out / name
+            if not f.exists():
+                return m.group(0)
+            v = hashlib.sha256(f.read_bytes()).hexdigest()[:10]
+            return f'{m.group(1)}{name}?v={v}"'
+        html = re.sub(r'((?:src|href)=")([\w./-]+\.(?:js|css))(?:\?v=\w+)?"', stamp, html)
+        page.write_text(html)
+
+
 def detector_fingerprint() -> str:
     h = hashlib.sha256()
     for name in ("classifier.py", "calibration.json", "benchmark.py", "calibrate.py"):
@@ -37,6 +56,7 @@ def build(out: Path, trials: int = 8, null_frames: int = 500, force_bench: bool 
         if f.is_file():
             shutil.copy2(f, out / f.name)
     (out / ".nojekyll").touch()
+    bust_cache(out)
     (out / "data").mkdir(exist_ok=True)
 
     bench_dir = out / "benchmark"
