@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="How one request to Claude Code was processed: prompt, planning, execution, testing, retries and review.">
+<meta name="description" content="How one request to an AI coding agent was processed: prompt, planning, execution, testing, retries and review.">
 <title>Anatomy of One Loop</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -89,7 +89,7 @@
 <div class="wrap">
   <p style="margin:0 0 10px;font-size:.9rem"><a href="agent.html">← How this was built</a></p>
   <h1>Anatomy of one loop</h1>
-  <p class="lede">One request to Claude Code on Surfing Babel, traced through your harness diagram, box by box. This is
+  <p class="lede">One request to the AI coding agent on Surfing Babel, traced through your harness diagram, box by box. This is
     the loop that became pull request #11. It has explicit sub-goals and several real fail-and-retry cycles.</p>
 
   <div class="prompt"><small>The prompt</small>build this plan and do a round of error fixing<br>make clicking off an image take you back to the home page</div>
@@ -118,7 +118,7 @@
 
       <!-- harness -->
       <rect x="18" y="130" width="964" height="494" rx="14" fill="none" stroke="#e6b97a" stroke-width="2" stroke-dasharray="18 12"/>
-      <text x="40" y="168" fill="#ecebe6" font-size="26">Harness (Claude Code)</text>
+      <text x="40" y="168" fill="#ecebe6" font-size="26">Harness (coding agent)</text>
 
       <!-- blue model traffic -->
       <line x1="320" y1="104" x2="320" y2="262" stroke="#6fb3f2" stroke-width="2.5" marker-start="url(#ab)" marker-end="url(#ab)"/>
@@ -338,7 +338,7 @@
     </li>
   </ol>
 
-  <footer>Traced from the Claude Code session that built Surfing Babel. Every error, number and file above is from that session.</footer>
+  <footer>Traced from the coding-agent session that built Surfing Babel. Every error, number and file above is from that session.</footer>
 </div>
 </body>
 </html>

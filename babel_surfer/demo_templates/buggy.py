@@ -1,8 +1,8 @@
 """Live-coding demo slot: "Find of the day".
 
 This module is deliberately left unimplemented. It is the task for the live
-demo of agentic coding on the showcase page (site/agent.html): Claude Code is
-asked to implement it on stage, from this docstring and the tests in
+demo of agentic coding on the showcase page (site/agent.html): an AI coding agent
+is asked to implement it on stage, from this docstring and the tests in
 ``tests/test_demo_slot.py`` alone. Until then the site shows the spec and
 "waiting for the agent". See ``docs/live-demo.md`` for the runbook.
 
