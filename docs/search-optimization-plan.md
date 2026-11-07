@@ -61,10 +61,10 @@ covers each:
 | item | status |
 |---|---|
 | 1.1 adaptive concurrency | **done.** Starts at 3, up to 5, backs off to 1. Live test: ramped 2→5 at 3.7 s responses, backed off to 1 at 15 s. |
-| 1.2 persistent connections | not done: under 5% gain, and it complicates proxy support |
+| 1.2 persistent connections | not done: under 5% gain, and it complicates proxy support. Measured (Nov 7): POST babelia.cgi, GET babelia.cgi and GET imagedl.cgi all take 10–17 s, and the same location re-requested is rendered again (no server cache), so no endpoint is faster |
 | 1.3 scan more often | **done.** Hourly 45-minute scans. GitHub's cron proved unreliable, so an external cron is documented in [external-cron.md](external-cron.md). Each run now logs its concurrency history. |
 | 1.4 parallel runners | not done: multiplies load on Babelia; revisit only with a hard rate cap |
-| 1.5 incremental publishing | **done.** Publishes every 30 minutes; `gh-pages` stays a single commit. |
+| 1.5 incremental publishing | **done.** Publishes every 30 minutes; `gh-pages` stays a single commit. A long run now hands its remaining minutes to a fresh run when main moves, so merges go live within one chunk |
 | 1.6 local generation | blocked on 3.2 |
 | 2.1 log every frame's scores | **done.** `stats.test_hist` (forever) and `data/scores.npy` (last 100k frames). |
 | 2.2 per-test calibration | **done (Nov 2026).** The audit of 23,456 logged frames found that 9 of 10 tests had spreads of 0.3–0.7 because of a 1.0 floor on the standard deviation. They are replaced by empirical null maps learned on real frames (`nullmap.py`); held-out frames now match N(0, 1). `remine.py` re-scored the log and recovered 5 finds from 4 tests. |

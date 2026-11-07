@@ -113,7 +113,8 @@ def ensure(out: Path, network: bool = True) -> list[dict]:
         c = classify(frame)
         maps = analysis.analyze(frame)
         (out / f"{demo['slug']}.heat.png").unlink(missing_ok=True)     # superseded
-        (out / f"{demo['slug']}.maps.json").write_text(json.dumps(maps, separators=(",", ":")))
+        public = {k: v for k, v in maps.items() if k not in analysis.SERVER_ONLY}
+        (out / f"{demo['slug']}.maps.json").write_text(json.dumps(public, separators=(",", ":")))
         mask = None
         if c.reason == "tone" or c.tests.get("tone", 0) >= 3:
             (out / f"{demo['slug']}.mask.png").write_bytes(analysis.tone_mask_png(frame, maps))

@@ -223,7 +223,12 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
                 store.error(run)
                 continue
             polite.release(time.time() - t0)
-            result = score(data)
+            try:
+                result = score(data)
+            except Exception as e:      # e.g. a truncated JPEG: count it, keep scanning
+                log.warning("could not score %s: %s", loc, e)
+                store.error(run)
+                continue
             kind = store.record(loc, data, result, run)
             if kind == "find":
                 log.info("FIND  location=%s  %.1fσ (%s, %s)", loc, result.sigma,

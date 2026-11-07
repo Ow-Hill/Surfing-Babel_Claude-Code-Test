@@ -24,7 +24,7 @@ GitHub Actions (hourly) ─► scan.py ─► POST babelia.cgi location=N, N+1, 
   5–30 s to render a frame, so concurrency is **adaptive**: it starts at 3 parallel requests,
   opens up to 5 while response time stays near its best, and backs off (down to 1) as soon as
   responses slow or fail.
-* **Classifier** (`babel_surfer/classifier.py`): ten statistical tests, each run on brightness and both colour
+* **Classifier** (`babel_surfer/classifier.py`): sixteen tests. Ten are statistical tests, each run on brightness and both colour
   channels, each expressed in **σ** (standard deviations away from what static produces):
 
   | test | catches |
@@ -125,18 +125,26 @@ texture). They are still the extreme tail of static, the "anomaly" tier.
 
 ## Benchmark (`python -m babel_surfer.benchmark`)
 
-Known pictures blended into simulated Babel static (8 trials each):
+Known pictures blended into simulated Babel static (8 trials each; Nov 2026, all 16 tests):
 
-| hidden signal | strength | detected | weakest score |
-|---|---|---|---|
-| large disc | 5% | 8/8 | 105σ |
-| landscape | 5% | 8/8 | 2,597σ |
-| word "BABEL" | 5% | 8/8 | 4,287σ |
-| 2 px horizon line | 25% | 8/8 | 16.9σ |
-| 24 px square | 25% | 8/8 | 10.1σ |
-| greyscale / dark static, 1 px checkerboard | – | 8/8 | > 5,000σ |
-| *anything at 2%* | 2% | 0/8 | erased by Babel's 16-level colour quantization |
-| pure static (1,000 frames) | – | none reach 8σ | max 4.99σ |
+| hidden signal | strength | detected | weakest score | caught by |
+|---|---|---|---|---|
+| large disc | 5% | 8/8 | 19σ | tone |
+| landscape | 5% | 8/8 | 73σ | tone |
+| word "BABEL" | 5% | 8/8 | 87σ | tone |
+| 2 px horizon line | 10% | 8/8 | 4.3σ | lines |
+| 24 px square | 25% | 8/8 | 10.8σ | blob |
+| thin 3 px arc | 50% | 8/8 | 6.5σ | curves |
+| 2 px pen stroke | 80% | 8/8 | 7.4σ | flat |
+| face-like spots | 15% | 8/8 | 5.8σ | spot |
+| few-colour 64 px patch | 15% | 8/8 | 9.0σ | colours |
+| photo-like 1/f texture | 5% | 8/8 | 15.6σ | spectrum |
+| greyscale / dark static, 1 px checkerboard | – | 8/8 | > 100σ | flat, tone, repetition |
+| *anything at 2%* | 2% | 0/8 | erased by Babel's 16-level colour quantization | |
+| pure static (500 frames) | – | 1 at 4σ | max 4.2σ | |
+
+Scores are lower than in earlier versions of this table because the calibration became
+honest (see "Calibration audit"), not because detection got weaker.
 
 **Detector vs eye** (Nov 2026, all 16 tests): the benchmark now also reports the visibility model
 for each signal. Signals caught 8/8 while the model rates them invisible include:
@@ -189,9 +197,9 @@ below 10¹⁶) never reaches them. The demos appear on the site, clearly labelle
 
 ## Per-test leaderboards, combined score and fingerprint monitor
 
-- **Leaderboards:** the top 3 frames for each of the ten tests and for the combined score, with
+- **Leaderboards:** the top 3 frames for each of the 16 tests and for the combined score, with
   each test's measured 4σ rate on real frames.
-- **Combined score:** a Stouffer sum of the ten calibrated tests, calibrated separately, which
+- **Combined score:** a Stouffer sum of the calibrated tests (the original ten until the new ones are calibrated on real frames), calibrated separately, which
   catches weak evidence spread across several tests.
 - **Fingerprint monitor:** the strength of Babelia's 156-row red→green / green→blue correlation
   in every frame (about +14 so far; simulated static is about 0).

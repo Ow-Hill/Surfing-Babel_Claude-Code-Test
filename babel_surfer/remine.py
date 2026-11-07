@@ -142,7 +142,7 @@ def mine(store: Store, threshold: float = INTERESTING_SIGMA, workers: int = 2,
         list(ex.map(one, todo))
     run["finished_at"] = time.time()
     run["max_sigma"] = round(float(np.nanmax(peak)), 3)
-    store.add_run(run)
+    store.add_run(run, primary=False)
     store.save()
     return run
 

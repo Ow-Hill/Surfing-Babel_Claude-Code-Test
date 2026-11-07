@@ -117,7 +117,7 @@ def process(store: Store, gh: GitHub, fetch, threshold: float = INTERESTING_SIGM
     if done:
         run["finished_at"] = time.time()
         run["flags"] = done
-        store.add_run(run)
+        store.add_run(run, primary=False)
         store.save()
     return done
 

@@ -57,14 +57,28 @@ def build_feed(finds: list[dict], site_url: str = SITE_URL) -> str:
 """
 
 
-def build_alert(stats: dict, site_url: str = SITE_URL) -> str | None:
-    """Issue body if the latest run found anything at or above PICTURE_SIGMA."""
-    run = stats.get("last_run") or {}
-    big = [f for f in run.get("new_finds", []) if f["sigma"] >= PICTURE_SIGMA]
+def build_alert(stats: dict, site_url: str = SITE_URL, since: float | None = None) -> str | None:
+    """Issue body for finds at or above PICTURE_SIGMA in every run that
+    finished after ``since`` (default: only the latest scan). Several runs
+    can be recorded between alerts (a scan, then a re-mine), so checking
+    only the last one could miss a find."""
+    runs = stats.get("runs") or []
+    if since is None:
+        last = stats.get("last_run") or {}
+        runs = [last] if last else []
+    else:
+        runs = [r for r in runs if (r.get("finished_at") or 0) > since]
+    seen, big = set(), []
+    for run in runs:
+        for f in run.get("new_finds", []):
+            if f["sigma"] >= PICTURE_SIGMA and f["location"] not in seen:
+                seen.add(f["location"])
+                big.append(f)
     if not big:
         return None
     big.sort(key=lambda f: f["sigma"], reverse=True)
-    lines = [f"The scan that finished {_iso(run.get('finished_at', time.time()))} found "
+    end = max((r.get("finished_at") or 0) for r in runs) or time.time()
+    lines = [f"Scans up to {_iso(end)} found "
              f"{len(big)} frame(s) at or above {PICTURE_SIGMA:g}σ. Pure static has never reached that "
              f"score in calibration, so these are worth a look.", ""]
     for f in big:
@@ -73,7 +87,7 @@ def build_alert(stats: dict, site_url: str = SITE_URL) -> str | None:
                      f"[full image]({image_url(f['location'])}) · location `{f['location']}`")
         if f.get("description"):
             lines.append(f"  {f['description']}")
-    lines += ["", f"Frames scanned in this run: {run.get('scanned', 0):,}."]
+    lines += ["", f"Frames scanned in these runs: {sum(r.get('scanned', 0) for r in runs):,}."]
     return "\n".join(lines)
 
 
@@ -87,7 +101,16 @@ def main(argv=None) -> int:
     finds = json.loads((args.data / "finds.json").read_text()) if (args.data / "finds.json").exists() else []
     stats = json.loads((args.data / "stats.json").read_text()) if (args.data / "stats.json").exists() else {}
     args.feed.write_text(build_feed(finds))
-    body = build_alert(stats)
+    # remember how far alerts have looked, so every run is checked exactly once
+    mark = args.data / "alerted.json"
+    try:
+        since = float(json.loads(mark.read_text())["until"])
+    except (OSError, ValueError, KeyError, TypeError):
+        last = stats.get("last_run") or {}
+        since = (last.get("started_at") or time.time()) - 1      # first time: the latest scan
+    body = build_alert(stats, since=since)
+    newest = max([since] + [r.get("finished_at") or 0 for r in stats.get("runs") or []])
+    mark.write_text(json.dumps({"until": newest}))
     if body:
         args.alert.write_text(body)
         print(f"alert written to {args.alert}")

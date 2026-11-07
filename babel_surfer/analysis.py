@@ -42,6 +42,8 @@ RGB = ("red", "green", "blue")
 LAYER_DEFAULTS = {"mean": 3.0, "contrast": 3.0, "rows": 3.0, "tone": 3.0, "eye": 4.5}
 #: the perceptual tests' local evidence, merged into one overlay layer
 EYE_KINDS = ("spot", "curves", "flat", "colours")
+#: in analyze()'s output but not written to maps.json (used only by describe)
+SERVER_ONLY = ("eye_parts", "eye_kind")
 
 
 def _load(image) -> Image.Image:

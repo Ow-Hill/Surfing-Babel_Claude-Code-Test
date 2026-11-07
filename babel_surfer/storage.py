@@ -123,9 +123,12 @@ class Store:
         callers run it outside the lock."""
         self._img(location).write_bytes(make_thumb(image))
         maps = analysis.analyze(image)
-        self._maps(location).write_text(json.dumps(maps, separators=(",", ":")))
+        description = analysis.describe(result.tests, maps, result.sigma)
+        # the per-test eye maps only feed the description; the site draws the merged map
+        public = {k: v for k, v in maps.items() if k not in analysis.SERVER_ONLY}
+        self._maps(location).write_text(json.dumps(public, separators=(",", ":")))
         fields = {"maps": f"images/{location}.maps.json", "mask": None,
-                  "description": analysis.describe(result.tests, maps, result.sigma),
+                  "description": description,
                   "detector": detector_id(), "visibility": maps.get("visibility")}
         if result.reason == "tone" or result.tests.get("tone", 0) >= 3:
             self._mask(location).write_bytes(analysis.tone_mask_png(image, maps))
@@ -379,9 +382,16 @@ class Store:
         """A frame a person flagged: always kept (with preview, maps and
         description) in the "People noticed" list, ranked by votes, and also
         accounted as a find / near miss / leader if it qualifies."""
-        if run is not None:
-            self.record(location, image, result, run, count=False)
-        fields = self._write_assets(location, image, result)
+        kept = self.record(location, image, result, run, count=False) if run is not None else None
+        fields = None
+        if kept:                                   # record() already wrote fresh assets
+            with self._lock:
+                prev = next((e for e in self._all_entries()
+                             if e["location"] == location and e.get("maps")), None)
+            if prev:
+                fields = {k: prev.get(k) for k in ("maps", "mask", "description", "detector", "visibility")}
+        if fields is None:
+            fields = self._write_assets(location, image, result)
         entry = {"location": location, "sigma": result.sigma, "tier": result.label,
                  "reason": result.reason, "tests": result.tests,
                  "combined": getattr(result, "combined", 0.0),
@@ -427,13 +437,17 @@ class Store:
             self.stats["errors"] += 1
             run["errors"] += 1
 
-    def add_run(self, run: dict) -> None:
+    def add_run(self, run: dict, primary: bool = True) -> None:
+        """Record a run. ``primary=False`` for side jobs (re-mining, flags):
+        they go into the history but don't replace ``last_run`` (the site's
+        "last scan" and the frame counts refer to real scans)."""
         with self._lock:
             # keep run history small: summaries of new finds, not full entries
             run["new_finds"] = [{k: f.get(k) for k in ("location", "sigma", "tier", "reason", "description")}
                                 for f in run.get("new_finds", [])]
             self.stats["runs"] = (self.stats["runs"] + [run])[-RUN_HISTORY:]
-            self.stats["last_run"] = run
+            if primary:
+                self.stats["last_run"] = run
 
     def save(self) -> None:
         with self._save_lock:

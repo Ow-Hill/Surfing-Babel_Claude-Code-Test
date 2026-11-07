@@ -298,3 +298,4 @@ body.present .prompt { font-size: 1rem; }
 .vis { font: .7rem/1.4 var(--mono); padding: 1px 6px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
 .vis-likely { color: var(--t-faint); border-color: currentColor; font-weight: 600; }
 .vis-faint { color: var(--t-near); border-color: currentColor; }
+.board-group { grid-column: 1 / -1; margin: 10px 0 0; font-size: 1rem; color: var(--muted); font-weight: 600; }
