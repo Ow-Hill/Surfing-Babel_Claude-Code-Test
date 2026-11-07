@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+"""Read-only status of Surfing Babel: recent scan runs, the last Pages deploy,
+what the published data says, and whether main is ahead of what's live.
+Works from a sandbox that can't reach github.io (public GitHub API + git).
+
+    python3 .claude/skills/babel-operations/scripts/status.py
+"""
+import datetime as dt
+import json
+import subprocess
+import urllib.request
+
+REPO = "Ow-Hill/Surfing-Babel_Claude-Code-Test"
+API = f"https://api.github.com/repos/{REPO}"
+
+
+def get(path):
+    req = urllib.request.Request(API + path, headers={"Accept": "application/vnd.github+json",
+                                                      "User-Agent": "surfing-babel-status"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.load(r)
+
+
+def git(*args):
+    return subprocess.run(["git", *args], capture_output=True, text=True).stdout.strip()
+
+
+def when(ts):
+    return dt.datetime.fromtimestamp(ts, dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC") if ts else "?"
+
+
+print("== scan-and-publish runs (newest first)")
+runs = get("/actions/workflows/scan-and-publish.yml/runs?per_page=5")["workflow_runs"]
+for r in runs:
+    print(f"  {r['event']:17s} {r['head_sha'][:7]} {r['status']:11s} {str(r['conclusion']):9s} {r['created_at']}")
+if sum(r["status"] in ("queued", "pending", "waiting") for r in runs):
+    print("  note: only one run can wait; a newer trigger cancels the waiting one")
+
+print("== last Pages deploy")
+pages = [r for r in get("/actions/runs?per_page=30")["workflow_runs"]
+         if r["name"] == "pages build and deployment"]
+print(f"  {pages[0]['status']} {pages[0]['conclusion']} {pages[0]['updated_at']}" if pages
+      else "  none in the last 30 runs")
+
+print("== published data (gh-pages)")
+git("fetch", "-q", "origin", "gh-pages", "main")
+try:
+    s = json.loads(git("show", "origin/gh-pages:data/stats.json"))
+    last = s.get("last_run") or {}
+    print(f"  frames scanned {s.get('scanned', 0):,}  finds {s.get('finds_total', 0)}  best {s.get('best')}")
+    print(f"  last scan {when(last.get('finished_at'))}: {last.get('scanned', 0)} frames, "
+          f"{last.get('finds', 0)} finds")
+    print("  re-mined for the current calibration: "
+          + ("yes" if s.get("log_calibration") else "not yet (new code not live, or re-mine pending)"))
+except (ValueError, json.JSONDecodeError):
+    print("  could not read data/stats.json")
+
+print("== code")
+ok = get("/actions/workflows/scan-and-publish.yml/runs?per_page=20&status=success")["workflow_runs"]
+main = git("rev-parse", "origin/main")
+if not ok:
+    print("  no successful publish found")
+elif ok[0]["head_sha"] == main:
+    print(f"  live site built from main ({main[:7]})")
+else:
+    behind = git("rev-list", "--count", f"{ok[0]['head_sha']}..{main}") or "?"
+    print(f"  live site built from {ok[0]['head_sha'][:7]}; main is {main[:7]}: "
+          f"{behind} commit(s) not live yet")
