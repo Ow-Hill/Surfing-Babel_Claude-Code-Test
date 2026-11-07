@@ -140,3 +140,34 @@ def test_scores_stay_finite():
     out = nullmap.sigma_array(m, np.array([np.inf, -np.inf, np.nan, 1e9]))
     assert out[0] == nullmap.Z_MAX and out[1] == nullmap.Z_FLOOR and np.isnan(out[2])
     assert out[3] <= nullmap.Z_MAX and np.isfinite(np.float16(out[3]))
+
+
+def test_steep_tail_is_not_inflated_within_the_data():
+    """A statistic whose tail is steeper than one-for-one (like the colours
+    test's robust z of counts) must read its empirical rarity, not more."""
+    rng = np.random.default_rng(9)
+    v = np.round(rng.standard_normal(20000) * 1.5, 1)      # raw outpaces sigma, with ties
+    m = nullmap.fit(v)
+    probe = float(np.quantile(v, 1 - 5 / 20000))          # 1 in 4,000
+    expected = -NormalDist().inv_cdf(5 / 20000)            # about 3.5
+    assert abs(nullmap.sigma(m, probe) - expected) < 0.35
+    held_out = nullmap.sigma_array(m, np.round(rng.standard_normal(200000) * 1.5, 1))
+    assert (held_out >= 4).sum() < 4 * 200000 * (1 - NormalDist().cdf(4)) + 10
+
+
+def test_refit_live_refits_when_the_log_doubles(tmp_path, monkeypatch):
+    legacy = {t: {"mean": 1.5, "std": 1.0} for t in TESTS}
+    log, _ = legacy_log(np.random.default_rng(10), 6000, legacy)
+    (tmp_path / "pkg.json").write_text(json.dumps({"tests": legacy}))
+    monkeypatch.setattr(calibrate, "CALIBRATION_FILE", tmp_path / "pkg.json")
+    monkeypatch.setattr(classifier, "package_calibration_hash", lambda: "pkg")
+    monkeypatch.setattr(classifier, "live_calibration_path",
+                        lambda d: (d / "calibration.json") if (d / "calibration.json").exists() else None)
+    np.save(tmp_path / "scores.npy", log)
+    assert calibrate.refit_live(tmp_path)                  # first fit: simulated -> real
+    assert not calibrate.refit_live(tmp_path)              # nothing new
+    bigger, _ = legacy_log(np.random.default_rng(11), 12000, legacy)
+    np.save(tmp_path / "scores.npy", bigger)
+    assert calibrate.refit_live(tmp_path)                  # the log doubled
+    src = json.loads((tmp_path / "calibration.json").read_text())["map_sources"]["shape"]
+    assert src["frames"] == 12000

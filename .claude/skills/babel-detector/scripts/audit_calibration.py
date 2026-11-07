@@ -29,6 +29,10 @@ def main() -> int:
     ap.add_argument("scores", type=Path)
     ap.add_argument("--calibration", type=Path, help="e.g. a live data/calibration.json")
     args = ap.parse_args()
+    if not args.calibration:            # the site's live layer, if it sits next to the log
+        side = args.scores.with_name("calibration.json")
+        if side.exists():
+            args.calibration = side
     if args.calibration:
         classifier.use_calibration(args.calibration)
     cal = classifier.load_calibration()

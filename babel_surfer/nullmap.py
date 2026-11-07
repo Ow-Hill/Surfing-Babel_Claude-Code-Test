@@ -7,15 +7,20 @@ standard deviation mislabels how rare a value is. Instead we learn its
 distribution on real Babelia frames and map each value to the normal
 quantile with the same upper-tail probability:
 
-* **body** (up to the 99th percentile): the empirical CDF, stored as quantile
-  knots and interpolated linearly;
-* **tail** (above it): a generalised Pareto fit to the exceedances, with the
-  shape clamped at xi >= 0 (an exponential tail or heavier), which can only
-  understate significance;
+* **body** (as far as the data reaches: up to the value only ``TAIL_K``
+  frames exceed): the empirical CDF, stored as quantile knots and
+  interpolated linearly;
+* **tail** (above it): a generalised Pareto fit to the exceedances over the
+  99th percentile, with the shape clamped at xi >= 0 (an exponential tail
+  or heavier), which can only understate significance;
 * **far beyond the data**: the raw statistics are themselves z-like, and for
   a maximum of Gaussian scores sigma grows about one-for-one with the raw
-  value, so sigma never rises more slowly than that. This keeps real pictures
-  (raw values in the hundreds or more) far above every threshold.
+  value, so beyond the last knot sigma never rises more slowly than that
+  (or than the test's own pace over its upper knots, if that is slower).
+  This keeps real pictures (raw values in the hundreds or more) far above
+  every threshold. (Starting that floor at the 99th percentile instead
+  overstated steep tails: the colours test's 1-in-4,000 values read 4.1
+  sigma instead of about 3.5.)
 
 The resulting sigma is monotone in the raw value and, on static, distributed
 as N(0, 1): a 4-sigma reading has the false-positive rate of a 4-sigma event.
@@ -32,6 +37,8 @@ _N = NormalDist()
 TAIL_P = 0.01                    # body / tail split: the top 1%
 BODY_P = np.concatenate([[0.0005, 0.001, 0.002, 0.005],
                          np.linspace(0.01, 0.99, 197)])
+TAIL_K = 10                      # last empirical knot: the value only this many frames exceed
+UPPER_P = np.array([0.995, 0.998, 0.999, 0.9995, 0.9998, 0.9999, 0.99995, 0.99998, 0.99999])
 Z_FLOOR = -8.0
 OUTLIER_RAW = 1.0e5               # raw values this large are pictures, never static
 Z_MAX = 6.0e4                     # keeps every score finite in the float16 score log
@@ -72,10 +79,20 @@ def fit(values: np.ndarray) -> dict:
     # f16 logs have ties: keep knots strictly increasing
     keep = np.concatenate([[True], np.diff(xs) > 1e-9])
     xs, ps = xs[keep], probs[keep]
+    u, tail_p = float(xs[-1]), float(1.0 - ps[-1])         # the Pareto tail starts here
+    # empirical knots past the 99th percentile, as far as TAIL_K exceedances
+    # support (ties: a knot at x takes the share of values above x)
+    srt = np.sort(v)
+    upper = [float(np.quantile(srt, p)) for p in UPPER_P if (1 - p) * len(v) >= TAIL_K]
+    for x in upper:
+        if x > xs[-1] + 1e-9:
+            above = len(v) - np.searchsorted(srt, x, side="right")
+            if above >= TAIL_K:
+                xs = np.append(xs, x)
+                ps = np.append(ps, 1.0 - above / len(v))
     if atom_info:
         xs = np.concatenate([[atom_info["x"]], xs])
         ps = np.concatenate([[atom], ps])
-    u = float(xs[-1])
     y = np.sort(v[v > u] - u)
     # A real picture logged among the static frames would dominate a moment
     # fit of the tail; drop exceedances far beyond the rest (more than 4x the
@@ -87,9 +104,15 @@ def fit(values: np.ndarray) -> dict:
     # method of moments for the generalised Pareto, shape clamped at >= 0
     xi = max(0.0, 0.5 * (1.0 - m * m / s2)) if s2 > 0 else 0.0
     scale = 0.5 * m * (m * m / s2 + 1.0) if xi > 0 else m
+    zk = [round(_N.inv_cdf(float(p)), 5) for p in ps]
+    # The floor's pace beyond the data: this test's own sigma-per-raw over its
+    # upper knots, never above one-for-one (a z-like statistic's pace).
+    slope = 1.0
+    if xs[-1] > u + 1e-9:
+        slope = min(1.0, max(0.05, (zk[-1] - _N.inv_cdf(1.0 - tail_p)) / (float(xs[-1]) - u)))
     return {"x": [round(float(a), 5) for a in xs],
-            "z": [round(_N.inv_cdf(float(p)), 5) for p in ps],
-            "u": round(u, 5), "tail_p": round(float(1.0 - ps[-1]), 6),
+            "z": zk, "slope": round(slope, 5),
+            "u": round(u, 5), "tail_p": round(tail_p, 6),
             "xi": round(xi, 5), "scale": round(max(scale, 1e-6), 6), "n": int(len(v)),
             "n_tail": int(len(y)), "atom": atom_info}
 
@@ -104,12 +127,12 @@ def sigma(m: dict, raw: float) -> float:
         return a["z"]
     if raw <= xs[0]:
         return max(Z_FLOOR, zs[0] + (raw - xs[0]))
-    if raw <= m["u"]:
+    if raw <= xs[-1]:
         return float(np.interp(raw, xs, zs))
     y = raw - m["u"]
     xi, sc = m["xi"], m["scale"]
     log_sf = math.log(m["tail_p"]) + (-math.log1p(xi * y / sc) / xi if xi > 0 else -y / sc)
-    return min(Z_MAX, max(_z_from_log_sf(log_sf), zs[-1] + y))
+    return min(Z_MAX, max(_z_from_log_sf(log_sf), zs[-1] + m.get("slope", 1.0) * (raw - xs[-1])))
 
 
 def sigma_array(m: dict, raw: np.ndarray) -> np.ndarray:
@@ -121,7 +144,7 @@ def sigma_array(m: dict, raw: np.ndarray) -> np.ndarray:
     a = m.get("atom")
     if a:
         out[raw <= a["x"]] = a["z"]
-    hi = np.flatnonzero(raw > m["u"])
+    hi = np.flatnonzero(raw > m["x"][-1])
     for i in hi:
         out[i] = sigma(m, float(raw[i]))
     out[np.isnan(raw)] = np.nan          # not measured (rows logged before a test existed)

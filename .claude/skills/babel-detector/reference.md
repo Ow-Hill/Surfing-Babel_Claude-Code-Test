@@ -26,9 +26,16 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
 - **Always audit against real data.** Load `scores.npy` and compare per-test sd and the counts
   above 2σ and 3σ with N(0,1). A test with sd far from 1 is miscalibrated.
 - **`nullmap.fit`, the empirical null:**
-  - quantile knots for the body;
+  - quantile knots for the body, **extended past p99 up to the value only `TAIL_K`=10 frames
+    exceed** (ties handled), so the empirical CDF decides as far as the data reaches;
   - a generalised Pareto tail fitted above p99, with ξ clamped at 0 or above;
-  - a slope-1 line far beyond the data, so real pictures still score hundreds of σ;
+  - beyond the last knot, a floor rising at the test's own σ-per-raw pace over its upper
+    knots (`slope`, at most 1), so real pictures still score far above every threshold;
+  - *Lesson (2026-11-07):* the floor used to rise one-for-one from p99. For tests whose raw
+    value outpaces σ (colours: a robust z of counts), that read 1-in-4,000 values as 4.1σ
+    instead of about 3.5σ. Dropping the floor entirely went too far the other way: the ξ ≥ 0
+    exponential tail understates σ for max-of-Gaussian statistics (2 frames at 4σ where about
+    11 were expected). Validate any tail change on held-out frames at both 3σ and 4σ;
   - point-mass ("atom") handling for statistics clipped at 0, which take a mid-probability z;
   - outliers excluded before fitting: raw values above 1e5, and exceedances more than 4× the
     p95 exceedance;
@@ -39,6 +46,14 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
   - `calibrate --simulate-missing 6000` covers new tests until the log has 5,000 real frames
     for them.
   - The workflow's `calibrate --refit-live <data>` then writes `<data>/calibration.json`.
+    It refits again whenever a test's real frames reach `REFIT_GROWTH`=2× the count it was
+    last fitted on (`map_sources[t].frames`): a first fit from 5,000 frames has a rough tail
+    (curves: 24 frames above 3σ where 12 were expected).
+- **Open finding: colours clusters by location.** Its tail frames come in groups, about 3 per
+  block (for example 3562822126412…, 781012942002…, 4559865634742…), so neighbouring
+  locations share colour-count structure. Held-out frames above 4σ stay too many (4 where
+  0.3 are expected) whatever the fit. This bears on the location→image mapping research
+  lead in babelia-archive.
 - **Rows logged before the raw columns existed** are recovered exactly as
   `raw = z*std + mean`, using the legacy `tests` block.
 

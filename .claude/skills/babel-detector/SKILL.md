@@ -7,7 +7,8 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
 
 ## Must
 - **Audit against real frames** before and after any calibration change, using
-  `scripts/audit_calibration.py`. Every test should be about N(0,1) on static. Tests
+  `scripts/audit_calibration.py`. It uses `calibration.json` next to the log when present.
+  Copy *both* files from gh-pages, or the audit checks the wrong calibration. Every test should be about N(0,1) on static. Tests
   clipped at 0 (marked `*`) have sd < 1 by design; judge those by their tail counts.
 - **Keep raw statistics identical when optimising.** `tests/test_detector_regression.py`
   pins 20 reference frames to within 2e-3. If you change a statistic on purpose:
@@ -41,7 +42,8 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
 
 ## Recipes
 - **Calibration audit:**
-  `git show origin/gh-pages:data/scores.npy > <scratch>/scores.npy`, then
+  `git show origin/gh-pages:data/scores.npy > <scratch>/scores.npy` and the same for
+  `data/calibration.json`, then
   `python3 .claude/skills/babel-detector/scripts/audit_calibration.py <scratch>/scores.npy`
 - **Refit from real frames:** `python -m babel_surfer.calibrate --from-log <scores.npy>`
   prints a before/after table on held-out frames.
