@@ -7,7 +7,10 @@ description: Ship and run Surfing Babel. Covers the branch → PR → CI → mer
 
 ## Must
 - Work on `claude/pensive-ritchie-hc4bfy`. If its last PR was merged, first run
-  `git checkout -B claude/pensive-ritchie-hc4bfy origin/main`.
+  `git checkout -B claude/pensive-ritchie-hc4bfy origin/main`. Force-push is blocked, so
+  when pushing the restarted branch is rejected, run
+  `git pull --no-rebase --no-edit origin claude/pensive-ritchie-hc4bfy`. The squashed PR
+  makes that merge empty, and `git diff origin/main --stat` should show only the new work.
 - Before pushing, run `python -m pytest -q` and `node --check site/*.js`. Then open a PR
   with the GitHub MCP tools, wait for the **Tests** check, and merge (the owner has
   authorised merging to main).
@@ -35,6 +38,14 @@ description: Ship and run Surfing Babel. Covers the branch → PR → CI → mer
   publish even if refit, re-mine, build or alerts fail.
 
 ## Recipes
+- **"Improve" / "find more things to improve":** the loop that has worked:
+  1. Measure first: run `status.py`, then the detector audit (copy gh-pages `scores.npy`
+     *and* `calibration.json`). Read `stats.runs` for throughput and duty cycle.
+  2. Fix the biggest measured loss, with a test that fails on the old code (check this by
+     swapping the old file back in).
+  3. For calibration, validate on held-out frames at both 3σ and 4σ before shipping.
+  4. Preview the site, ship it, and schedule a `send_later` check of the live data.
+  5. Record the lesson in the matching skill.
 - **What's live, what's queued, what the data says:**
   `python3 .claude/skills/babel-operations/scripts/status.py`
 - **Local preview:**
