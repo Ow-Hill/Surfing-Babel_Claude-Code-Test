@@ -195,6 +195,7 @@ def main(argv=None) -> int:
 
 
 MIN_LOG_FRAMES = 5000
+REFIT_GROWTH = 2.0          # refit a test once the log has this many times the frames it was fitted on
 
 
 def raw_from_log(log, legacy: dict) -> dict:
@@ -337,10 +338,11 @@ def calibrate_simulated(out: Path = CALIBRATION_FILE, frames: int = 6000, seed: 
 
 def refit_live(data_dir: Path) -> bool:
     """For the scan workflow: once the score log has enough real frames for a
-    test still calibrated on simulated static, refit from the log into
-    ``<data_dir>/calibration.json`` (a live layer over the package's
-    calibration, picked up by the next scan, which then re-mines). Returns
-    True if it wrote a new live calibration."""
+    test still calibrated on simulated static, or ``REFIT_GROWTH`` times the
+    frames a test was last fitted on (a first fit from 5,000 frames has a
+    rough tail), refit from the log into ``<data_dir>/calibration.json`` (a
+    live layer over the package's calibration, picked up by the next scan,
+    which then re-mines). Returns True if it wrote a new live calibration."""
     log_path = data_dir / "scores.npy"
     if not log_path.exists():
         return False
@@ -348,7 +350,12 @@ def refit_live(data_dir: Path) -> bool:
     data = json.loads(effective.read_text())
     sources = data.get("map_sources") or {}
     raw = raw_from_log(np.load(log_path), data.get("tests") or {})
-    pending = [t for t in ready_tests(raw) if sources.get(t, {}).get("source") != "real"]
+    def due(t):
+        src = sources.get(t, {})
+        if src.get("source") != "real":
+            return True
+        return int(np.isfinite(raw[t]).sum()) >= REFIT_GROWTH * max(src.get("frames", 0), 1)
+    pending = [t for t in ready_tests(raw) if due(t)]
     if not pending:
         return False
     live = data_dir / "calibration.json"
@@ -356,7 +363,8 @@ def refit_live(data_dir: Path) -> bool:
     d = json.loads(live.read_text())
     d["base"] = classifier.package_calibration_hash()
     live.write_text(_compact_json(d))
-    print(f"live calibration refitted from the scan log: {', '.join(pending)} now real")
+    print(f"live calibration refitted from the scan log ({len(np.load(log_path)):,} frames); "
+          f"due: {', '.join(pending)}")
     return True
 
 
