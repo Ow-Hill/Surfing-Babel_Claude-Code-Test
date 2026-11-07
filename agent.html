@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How Surfing Babel Was Built</title>
+  <meta name="description" content="How an AI coding agent built Surfing Babel, with a live-coding demo slot and live repository activity.">
+  <link rel="stylesheet" href="style.css?v=06d2d5e640">
+</head>
+<body>
+  <header class="wrap">
+    <p class="crumb"><a href="./">← Surfing Babel</a></p>
+    <h1>How this was built</h1>
+    <p class="lede" id="intro"></p>
+    <p class="site-nav"><a href="loop.html">Anatomy of one loop: a single request traced through the agent's harness →</a></p>
+  </header>
+
+  <section class="wrap stats" id="a-stats" aria-label="Project in numbers"></section>
+
+  <section class="wrap card" id="demo" aria-labelledby="demo-h">
+    <div class="card-head">
+      <h2 id="demo-h">Live demo: watch the agent work</h2>
+      <span id="slot-state" class="tag"></span>
+      <span id="clock" class="clock mono" aria-live="off">0:00</span>
+    </div>
+
+    <ol id="stepper" class="stepper" aria-label="Demo progress"></ol>
+
+    <div class="demo-grid">
+      <div>
+        <h3>The spec <span class="muted small" id="spec-meta"></span></h3>
+        <ul id="checklist" class="checklist" aria-live="polite"></ul>
+        <div id="fotd-box"></div>
+      </div>
+      <div>
+        <h3>The prompt</h3>
+        <p class="muted small">Paste this into your coding agent with this repository open:</p>
+        <pre id="prompt" class="code prompt"></pre>
+        <div class="actions">
+          <button id="copy-prompt" class="btn ghost" type="button">Copy prompt</button>
+          <button id="start" class="btn" type="button">Start the clock</button>
+        </div>
+        <details class="presenter-tools">
+          <summary>Presenter tools</summary>
+          <p class="muted small">Reset the slot between demos. <b>Unimplemented</b>: the agent writes the
+            function. <b>Buggy</b>: it runs but breaks two requirements, and the agent has to find out why.
+            Needs the same GitHub token as the scanner's Scan now button; without one, use the
+            <a id="reset-link" target="_blank" rel="noopener">Reset live demo</a> workflow on GitHub.</p>
+          <div class="actions">
+            <button class="btn ghost reset" data-variant="stub" type="button">Reset: unimplemented</button>
+            <button class="btn ghost reset" data-variant="buggy" type="button">Reset: buggy</button>
+          </div>
+          <p id="reset-status" class="muted small" aria-live="polite"></p>
+          <p class="muted small">Big screen: open this page with <code>?present=1</code>.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap card" id="activity" aria-labelledby="act-h">
+    <div class="card-head">
+      <h2 id="act-h">Repository activity</h2>
+      <label class="check live-toggle"><input id="live-mode" type="checkbox"> Live mode (refresh every 15 s)</label>
+      <span id="act-status" class="muted small" aria-live="polite"></span>
+    </div>
+    <div class="act-grid">
+      <div><h3>Pull requests</h3><ol id="act-prs" class="feed-list"></ol></div>
+      <div><h3>Commits on main</h3><ol id="act-commits" class="feed-list"></ol></div>
+      <div><h3>Scans &amp; deploys</h3><ol id="act-runs" class="feed-list"></ol></div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <section aria-labelledby="tl-h">
+      <h2 id="tl-h">Timeline</h2>
+      <p class="muted narrow">Each step was one request from the person; the rest (research, code, tests,
+        pull request, deployment) was the agent. “Moments” are where it caught its own mistakes or found
+        something unexpected.</p>
+      <ol id="timeline" class="timeline"></ol>
+    </section>
+  </main>
+
+  <footer class="wrap muted">
+    Built with an AI coding agent.
+    Source and every pull request: <a href="https://github.com/Ow-Hill/Surfing-Babel_Claude-Code-Test/pulls?q=is%3Apr">GitHub</a> ·
+    <a href="./">back to the scanner</a>
+  </footer>
+
+  <script src="agent.js?v=6e93a2177c"></script>
+</body>
+</html>

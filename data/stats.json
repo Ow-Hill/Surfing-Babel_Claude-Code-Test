@@ -1,0 +1,4543 @@
+{
+ "scanned": 73736,
+ "errors": 95,
+ "hist_edges": [
+  -2,
+  -1,
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  8,
+  12,
+  16,
+  40
+ ],
+ "hist": [
+  0,
+  0,
+  507,
+  30713,
+  34511,
+  7426,
+  557,
+  20,
+  2,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "runs": [
+  {
+   "started_at": 1793965095.8453922,
+   "start_location": "5314044021239800",
+   "scanned": 426,
+   "finds": 0,
+   "errors": 12,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.18,
+   "finished_at": 1793966910.2863111,
+   "end_location": "5314044021240238",
+   "concurrency": {
+    "final": 2,
+    "max_used": 5,
+    "baseline_latency_s": 7.32,
+    "changes": 29
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1793966915.0099769,
+   "start_location": "3687923921875952",
+   "scanned": 433,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 2.699,
+   "finished_at": 1793967821.7979648,
+   "end_location": "3687923921876385",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 6.21,
+    "changes": 10
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1793980799.036543,
+   "start_location": "5836083031614916",
+   "scanned": 630,
+   "finds": 0,
+   "errors": 2,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.048,
+   "finished_at": 1793982608.976198,
+   "end_location": "5836083031615548",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 8.56,
+    "changes": 8
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1793982612.6980138,
+   "start_location": "4236702093833105",
+   "scanned": 392,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 2.974,
+   "finished_at": 1793983521.8978376,
+   "end_location": "4236702093833497",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 7.24,
+    "changes": 8
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1793994430.372014,
+   "start_location": "2556836625162953",
+   "scanned": 570,
+   "finds": 0,
+   "errors": 5,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 2.957,
+   "finished_at": 1793996233.9781406,
+   "end_location": "2556836625163528",
+   "concurrency": {
+    "final": 2,
+    "max_used": 5,
+    "baseline_latency_s": 3.83,
+    "changes": 41
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1793996238.2269046,
+   "start_location": "8013789983023145",
+   "scanned": 606,
+   "finds": 0,
+   "errors": 2,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.489,
+   "finished_at": 1793998042.2157185,
+   "end_location": "8013789983023753",
+   "concurrency": {
+    "final": 4,
+    "max_used": 5,
+    "baseline_latency_s": 7.46,
+    "changes": 27
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1793998045.9153178,
+   "start_location": "8325712808749557",
+   "scanned": 607,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.018,
+   "finished_at": 1793999855.886611,
+   "end_location": "8325712808750164",
+   "concurrency": {
+    "final": 1,
+    "max_used": 5,
+    "baseline_latency_s": 9.27,
+    "changes": 6
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1793999859.242966,
+   "start_location": "3612798727043390",
+   "scanned": 441,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.014,
+   "finished_at": 1794001670.9167745,
+   "end_location": "3612798727043831",
+   "concurrency": {
+    "final": 3,
+    "max_used": 5,
+    "baseline_latency_s": 8.39,
+    "changes": 24
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794001674.369093,
+   "start_location": "6183774214541917",
+   "scanned": 510,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 2.938,
+   "finished_at": 1794003482.7601638,
+   "end_location": "6183774214542427",
+   "concurrency": {
+    "final": 1,
+    "max_used": 5,
+    "baseline_latency_s": 7.67,
+    "changes": 28
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794003486.3071544,
+   "start_location": "4442987573628471",
+   "scanned": 513,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 2.84,
+   "finished_at": 1794005356.927094,
+   "end_location": "4442987573628984",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 9.55,
+    "changes": 16
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794005360.3904152,
+   "start_location": "2437324402479860",
+   "scanned": 656,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.513,
+   "finished_at": 1794007171.1626549,
+   "end_location": "2437324402480516",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 9.96,
+    "changes": 2
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794007174.5042763,
+   "start_location": "7008300161281813",
+   "scanned": 593,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 2.828,
+   "finished_at": 1794008984.684975,
+   "end_location": "7008300161282406",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 8.25,
+    "changes": 16
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794008988.0130363,
+   "start_location": "6341131583198799",
+   "scanned": 616,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 2.903,
+   "finished_at": 1794010792.932972,
+   "end_location": "6341131583199415",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 4.35,
+    "changes": 26
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794010796.254745,
+   "start_location": "3897053608085547",
+   "scanned": 613,
+   "finds": 0,
+   "errors": 1,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.172,
+   "finished_at": 1794012599.2394874,
+   "end_location": "3897053608086161",
+   "concurrency": {
+    "final": 3,
+    "max_used": 5,
+    "baseline_latency_s": 4.25,
+    "changes": 44
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794012603.0183294,
+   "start_location": "158228210951724",
+   "scanned": 595,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.165,
+   "finished_at": 1794014403.9532225,
+   "end_location": "158228210952319",
+   "concurrency": {
+    "final": 1,
+    "max_used": 5,
+    "baseline_latency_s": 4.17,
+    "changes": 52
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794014424.6334605,
+   "start_location": "3698609311645841",
+   "scanned": 615,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 2.934,
+   "finished_at": 1794016231.3696926,
+   "end_location": "3698609311646456",
+   "concurrency": {
+    "final": 1,
+    "max_used": 5,
+    "baseline_latency_s": 6.82,
+    "changes": 14
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794016235.8713717,
+   "start_location": "3977809900734635",
+   "scanned": 263,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.057,
+   "finished_at": 1794017152.089067,
+   "end_location": "3977809900734898",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 10.78,
+    "changes": 10
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794017174.4698706,
+   "start_location": "6033562498040444",
+   "scanned": 546,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 2.821,
+   "finished_at": 1794018979.117474,
+   "end_location": "6033562498040990",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 8.9,
+    "changes": 16
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794018983.364589,
+   "start_location": "5627996315636867",
+   "scanned": 412,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 2.986,
+   "finished_at": 1794019892.2822273,
+   "end_location": "5627996315637279",
+   "concurrency": {
+    "final": 3,
+    "max_used": 5,
+    "baseline_latency_s": 6.54,
+    "changes": 4
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794020946.0315762,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 31042,
+   "refetched": 1,
+   "mismatches": 0,
+   "finished_at": 1794020950.0996401,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794020950.1070004,
+   "start_location": "1133637777061581",
+   "scanned": 39,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.07,
+   "finished_at": 1794021018.1152692,
+   "end_location": "1133637777061620",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 4.46,
+    "changes": 2,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.2,
+      4
+     ],
+     [
+      0.3,
+      5
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794022558.6487193,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 31081,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794022558.6487765,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794022558.6566153,
+   "start_location": "7418339995254393",
+   "scanned": 621,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.851,
+   "finished_at": 1794024375.209035,
+   "end_location": "7418339995255014",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 8.29,
+    "changes": 14,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.6,
+      5
+     ],
+     [
+      16.7,
+      4
+     ],
+     [
+      17.1,
+      3
+     ],
+     [
+      17.4,
+      2
+     ],
+     [
+      17.8,
+      1
+     ],
+     [
+      20.7,
+      2
+     ],
+     [
+      21.1,
+      3
+     ],
+     [
+      22.4,
+      4
+     ],
+     [
+      22.6,
+      5
+     ],
+     [
+      26.9,
+      4
+     ],
+     [
+      27.1,
+      3
+     ],
+     [
+      28.0,
+      4
+     ],
+     [
+      28.2,
+      5
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794024380.5179205,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 31702,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794024380.517962,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794024380.5261536,
+   "start_location": "5300739010876677",
+   "scanned": 510,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.913,
+   "finished_at": 1794026187.5326855,
+   "end_location": "5300739010877187",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 6.93,
+    "changes": 18,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.7,
+      4
+     ],
+     [
+      0.8,
+      5
+     ],
+     [
+      13.6,
+      4
+     ],
+     [
+      14.2,
+      3
+     ],
+     [
+      14.7,
+      2
+     ],
+     [
+      15.0,
+      1
+     ],
+     [
+      21.1,
+      2
+     ],
+     [
+      21.3,
+      3
+     ],
+     [
+      21.6,
+      4
+     ],
+     [
+      21.8,
+      5
+     ],
+     [
+      23.2,
+      4
+     ],
+     [
+      23.3,
+      3
+     ],
+     [
+      23.8,
+      2
+     ],
+     [
+      23.9,
+      1
+     ],
+     [
+      26.0,
+      2
+     ],
+     [
+      26.3,
+      3
+     ],
+     [
+      28.8,
+      4
+     ],
+     [
+      28.9,
+      5
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794026192.288054,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 32212,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794026192.2881136,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794026192.2957678,
+   "start_location": "1800984053427483",
+   "scanned": 629,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.539,
+   "finished_at": 1794027996.5817304,
+   "end_location": "1800984053428112",
+   "concurrency": {
+    "final": 2,
+    "max_used": 5,
+    "baseline_latency_s": 6.32,
+    "changes": 25,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.5,
+      5
+     ],
+     [
+      3.3,
+      4
+     ],
+     [
+      3.4,
+      3
+     ],
+     [
+      4.1,
+      4
+     ],
+     [
+      4.3,
+      5
+     ],
+     [
+      9.1,
+      4
+     ],
+     [
+      11.3,
+      3
+     ],
+     [
+      11.5,
+      2
+     ],
+     [
+      11.9,
+      3
+     ],
+     [
+      12.1,
+      4
+     ],
+     [
+      12.3,
+      5
+     ],
+     [
+      15.8,
+      4
+     ],
+     [
+      16.0,
+      3
+     ],
+     [
+      16.2,
+      2
+     ],
+     [
+      16.9,
+      3
+     ],
+     [
+      17.2,
+      4
+     ],
+     [
+      21.0,
+      3
+     ],
+     [
+      21.3,
+      2
+     ],
+     [
+      25.7,
+      3
+     ],
+     [
+      26.0,
+      4
+     ],
+     [
+      27.9,
+      3
+     ],
+     [
+      28.5,
+      2
+     ],
+     [
+      28.8,
+      1
+     ],
+     [
+      30.1,
+      2
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794028001.195606,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 32841,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794028001.1956573,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794028001.2034125,
+   "start_location": "1192944591259316",
+   "scanned": 442,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.285,
+   "finished_at": 1794029803.3533187,
+   "end_location": "1192944591259758",
+   "concurrency": {
+    "final": 1,
+    "max_used": 5,
+    "baseline_latency_s": 5.89,
+    "changes": 28,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.6,
+      5
+     ],
+     [
+      7.5,
+      4
+     ],
+     [
+      7.8,
+      3
+     ],
+     [
+      8.5,
+      2
+     ],
+     [
+      9.3,
+      1
+     ],
+     [
+      11.5,
+      2
+     ],
+     [
+      11.7,
+      3
+     ],
+     [
+      12.0,
+      4
+     ],
+     [
+      12.8,
+      3
+     ],
+     [
+      13.0,
+      2
+     ],
+     [
+      15.5,
+      3
+     ],
+     [
+      17.4,
+      2
+     ],
+     [
+      17.9,
+      1
+     ],
+     [
+      21.7,
+      2
+     ],
+     [
+      22.0,
+      3
+     ],
+     [
+      22.2,
+      4
+     ],
+     [
+      22.4,
+      5
+     ],
+     [
+      24.1,
+      4
+     ],
+     [
+      24.3,
+      3
+     ],
+     [
+      24.5,
+      2
+     ],
+     [
+      25.9,
+      1
+     ],
+     [
+      27.2,
+      2
+     ],
+     [
+      27.4,
+      3
+     ],
+     [
+      27.7,
+      4
+     ],
+     [
+      28.2,
+      3
+     ],
+     [
+      28.6,
+      2
+     ],
+     [
+      29.0,
+      1
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794029808.1687045,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 33283,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794029808.1687503,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794029808.1771674,
+   "start_location": "6444134382755174",
+   "scanned": 597,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 4.067,
+   "new_finds": [
+    {
+     "location": "6444134382755534",
+     "sigma": 4.067,
+     "tier": "anomaly",
+     "reason": "lines",
+     "description": "Statistically unusual static, not a picture: a darker vertical band near x \u2248 590 px (4.1\u03c3)."
+    }
+   ],
+   "finished_at": 1794031614.1007986,
+   "end_location": "6444134382755771",
+   "concurrency": {
+    "final": 1,
+    "max_used": 5,
+    "baseline_latency_s": 7.69,
+    "changes": 10,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.8,
+      4
+     ],
+     [
+      1.0,
+      5
+     ],
+     [
+      26.8,
+      4
+     ],
+     [
+      27.0,
+      3
+     ],
+     [
+      27.3,
+      2
+     ],
+     [
+      27.8,
+      3
+     ],
+     [
+      28.3,
+      4
+     ],
+     [
+      29.5,
+      3
+     ],
+     [
+      29.8,
+      2
+     ],
+     [
+      30.1,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794031618.8807771,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 33880,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794031618.8808172,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794031618.8902216,
+   "start_location": "4949562210884579",
+   "scanned": 626,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.901,
+   "finished_at": 1794033423.340384,
+   "end_location": "4949562210885205",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 7.18,
+    "changes": 16,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.6,
+      5
+     ],
+     [
+      4.6,
+      4
+     ],
+     [
+      4.9,
+      3
+     ],
+     [
+      5.1,
+      2
+     ],
+     [
+      6.1,
+      1
+     ],
+     [
+      9.8,
+      2
+     ],
+     [
+      10.3,
+      3
+     ],
+     [
+      10.6,
+      4
+     ],
+     [
+      10.8,
+      5
+     ],
+     [
+      24.0,
+      4
+     ],
+     [
+      24.2,
+      3
+     ],
+     [
+      24.5,
+      2
+     ],
+     [
+      27.2,
+      3
+     ],
+     [
+      27.4,
+      4
+     ],
+     [
+      27.5,
+      5
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794033428.3284934,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 34506,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794033428.3285465,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794033428.337323,
+   "start_location": "4893141154412911",
+   "scanned": 862,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.93,
+   "finished_at": 1794035235.569624,
+   "end_location": "4893141154413773",
+   "concurrency": {
+    "final": 4,
+    "max_used": 5,
+    "baseline_latency_s": 4.7,
+    "changes": 9,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.6,
+      4
+     ],
+     [
+      0.8,
+      5
+     ],
+     [
+      23.6,
+      4
+     ],
+     [
+      23.9,
+      3
+     ],
+     [
+      24.1,
+      2
+     ],
+     [
+      24.4,
+      1
+     ],
+     [
+      25.0,
+      2
+     ],
+     [
+      25.2,
+      3
+     ],
+     [
+      25.3,
+      4
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794035240.4662983,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 35368,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794035240.4663446,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794035240.4749281,
+   "start_location": "3250139334559825",
+   "scanned": 904,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 4.09,
+   "new_finds": [
+    {
+     "location": "3250139334560313",
+     "sigma": 4.09,
+     "tier": "anomaly",
+     "reason": "blob",
+     "description": "Statistically unusual static, not a picture: a bluer spot around the right side, roughly 72 px across (4.1\u03c3)."
+    }
+   ],
+   "finished_at": 1794037046.3622642,
+   "end_location": "3250139334560729",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 4.31,
+    "changes": 24,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.5,
+      5
+     ],
+     [
+      16.6,
+      4
+     ],
+     [
+      16.7,
+      3
+     ],
+     [
+      18.5,
+      4
+     ],
+     [
+      18.6,
+      5
+     ],
+     [
+      20.3,
+      4
+     ],
+     [
+      20.4,
+      3
+     ],
+     [
+      20.6,
+      2
+     ],
+     [
+      20.9,
+      3
+     ],
+     [
+      21.0,
+      4
+     ],
+     [
+      21.1,
+      5
+     ],
+     [
+      25.5,
+      4
+     ],
+     [
+      25.6,
+      3
+     ],
+     [
+      25.8,
+      2
+     ],
+     [
+      26.1,
+      3
+     ],
+     [
+      26.3,
+      4
+     ],
+     [
+      26.4,
+      5
+     ],
+     [
+      27.6,
+      4
+     ],
+     [
+      27.7,
+      3
+     ],
+     [
+      28.0,
+      2
+     ],
+     [
+      28.2,
+      3
+     ],
+     [
+      28.3,
+      4
+     ],
+     [
+      28.4,
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794037051.2599864,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 36272,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794037051.2600372,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794037051.26864,
+   "start_location": "4266343578092311",
+   "scanned": 802,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.809,
+   "finished_at": 1794038858.8703232,
+   "end_location": "4266343578093113",
+   "concurrency": {
+    "final": 1,
+    "max_used": 5,
+    "baseline_latency_s": 4.08,
+    "changes": 36,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.2,
+      4
+     ],
+     [
+      0.3,
+      5
+     ],
+     [
+      9.8,
+      4
+     ],
+     [
+      9.9,
+      3
+     ],
+     [
+      10.1,
+      2
+     ],
+     [
+      10.2,
+      1
+     ],
+     [
+      10.8,
+      2
+     ],
+     [
+      10.9,
+      3
+     ],
+     [
+      11.1,
+      4
+     ],
+     [
+      11.2,
+      5
+     ],
+     [
+      12.7,
+      4
+     ],
+     [
+      12.9,
+      3
+     ],
+     [
+      13.0,
+      2
+     ],
+     [
+      14.5,
+      1
+     ],
+     [
+      16.1,
+      2
+     ],
+     [
+      16.3,
+      3
+     ],
+     [
+      17.1,
+      2
+     ],
+     [
+      17.2,
+      1
+     ],
+     [
+      17.8,
+      2
+     ],
+     [
+      18.0,
+      3
+     ],
+     [
+      18.1,
+      4
+     ],
+     [
+      18.2,
+      5
+     ],
+     [
+      19.7,
+      4
+     ],
+     [
+      19.9,
+      3
+     ],
+     [
+      20.1,
+      2
+     ],
+     [
+      20.3,
+      1
+     ],
+     [
+      20.9,
+      2
+     ],
+     [
+      21.1,
+      3
+     ],
+     [
+      21.3,
+      4
+     ],
+     [
+      21.8,
+      3
+     ],
+     [
+      22.6,
+      4
+     ],
+     [
+      22.7,
+      5
+     ],
+     [
+      23.0,
+      4
+     ],
+     [
+      23.1,
+      3
+     ],
+     [
+      24.5,
+      2
+     ],
+     [
+      24.8,
+      1
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794038863.7815685,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 37074,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794038863.781608,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794038863.7905667,
+   "start_location": "1574930160829383",
+   "scanned": 1085,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.723,
+   "finished_at": 1794040667.885944,
+   "end_location": "1574930160830468",
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 3.82,
+    "changes": 16,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.5,
+      4
+     ],
+     [
+      0.6,
+      5
+     ],
+     [
+      14.4,
+      4
+     ],
+     [
+      14.5,
+      3
+     ],
+     [
+      17.5,
+      4
+     ],
+     [
+      17.6,
+      5
+     ],
+     [
+      18.1,
+      4
+     ],
+     [
+      18.3,
+      3
+     ],
+     [
+      18.5,
+      2
+     ],
+     [
+      18.8,
+      3
+     ],
+     [
+      19.1,
+      4
+     ],
+     [
+      19.2,
+      5
+     ],
+     [
+      23.0,
+      4
+     ],
+     [
+      23.1,
+      3
+     ],
+     [
+      23.2,
+      4
+     ],
+     [
+      23.2,
+      5
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794040672.7378294,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 38159,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794040672.737868,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794040672.7468348,
+   "start_location": "4987412979778911",
+   "scanned": 1227,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.981,
+   "finished_at": 1794042477.0986905,
+   "end_location": "4987412979780138",
+   "concurrency": {
+    "final": 3,
+    "max_used": 5,
+    "baseline_latency_s": 3.38,
+    "changes": 42,
+    "history": [
+     [
+      1.5,
+      4
+     ],
+     [
+      1.6,
+      3
+     ],
+     [
+      1.8,
+      2
+     ],
+     [
+      1.9,
+      1
+     ],
+     [
+      2.1,
+      2
+     ],
+     [
+      2.2,
+      3
+     ],
+     [
+      2.4,
+      4
+     ],
+     [
+      2.4,
+      5
+     ],
+     [
+      4.0,
+      4
+     ],
+     [
+      4.1,
+      3
+     ],
+     [
+      4.2,
+      2
+     ],
+     [
+      4.3,
+      1
+     ],
+     [
+      4.6,
+      2
+     ],
+     [
+      4.7,
+      3
+     ],
+     [
+      4.8,
+      4
+     ],
+     [
+      6.2,
+      3
+     ],
+     [
+      6.3,
+      2
+     ],
+     [
+      6.5,
+      3
+     ],
+     [
+      6.6,
+      4
+     ],
+     [
+      7.5,
+      5
+     ],
+     [
+      7.9,
+      4
+     ],
+     [
+      10.7,
+      3
+     ],
+     [
+      11.0,
+      2
+     ],
+     [
+      11.1,
+      1
+     ],
+     [
+      11.5,
+      2
+     ],
+     [
+      11.6,
+      3
+     ],
+     [
+      11.8,
+      4
+     ],
+     [
+      11.8,
+      5
+     ],
+     [
+      17.7,
+      4
+     ],
+     [
+      17.8,
+      3
+     ],
+     [
+      18.1,
+      4
+     ],
+     [
+      18.2,
+      5
+     ],
+     [
+      20.4,
+      4
+     ],
+     [
+      20.5,
+      3
+     ],
+     [
+      21.1,
+      4
+     ],
+     [
+      25.8,
+      3
+     ],
+     [
+      25.9,
+      2
+     ],
+     [
+      26.1,
+      1
+     ],
+     [
+      26.9,
+      2
+     ],
+     [
+      28.6,
+      3
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794042596.6290863,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 39386,
+   "refetched": 3,
+   "mismatches": 2,
+   "finished_at": 1794042612.1676202,
+   "max_sigma": 4.141,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794042612.180224,
+   "start_location": "2339012915051140",
+   "scanned": 1183,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 4.102,
+   "new_finds": [
+    {
+     "location": "2339012915051888",
+     "sigma": 4.102,
+     "tier": "anomaly",
+     "reason": "contrast",
+     "description": "Statistically unusual static, not a picture: a patch around the bottom-right that is noisier than static (4.1\u03c3)."
+    }
+   ],
+   "finished_at": 1794044430.8891113,
+   "end_location": "2339012915052323",
+   "frames_per_hour": 2342,
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 7.62,
+    "changes": 2,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.6,
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794044432.3131256,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 40569,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794044432.313181,
+   "max_sigma": 4.156,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794044678.4505758,
+   "start_location": "7841466451572061",
+   "scanned": 566,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 4.034,
+   "new_finds": [
+    {
+     "location": "7841466451572351",
+     "sigma": 4.034,
+     "tier": "anomaly",
+     "reason": "colours",
+     "description": "Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the top-left, roughly 64 px across (4.0\u03c3)."
+    }
+   ],
+   "finished_at": 1794045585.7938797,
+   "end_location": "7841466451572627",
+   "frames_per_hour": 2246,
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 9.02,
+    "changes": 4,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.6,
+      5
+     ],
+     [
+      6.4,
+      4
+     ],
+     [
+      6.6,
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794045609.8388808,
+   "start_location": "4674800312680299",
+   "scanned": 919,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.786,
+   "finished_at": 1794047415.6474216,
+   "end_location": "4674800312681218",
+   "frames_per_hour": 1832,
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 8.24,
+    "changes": 6,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.5,
+      5
+     ],
+     [
+      11.5,
+      4
+     ],
+     [
+      12.3,
+      5
+     ],
+     [
+      23.4,
+      4
+     ],
+     [
+      23.9,
+      5
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794047421.0671294,
+   "start_location": "49115015210814",
+   "scanned": 1112,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.831,
+   "finished_at": 1794049225.1092334,
+   "end_location": "49115015211926",
+   "frames_per_hour": 2219,
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 5.45,
+    "changes": 8,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.9,
+      4
+     ],
+     [
+      1.2,
+      5
+     ],
+     [
+      22.4,
+      4
+     ],
+     [
+      22.9,
+      3
+     ],
+     [
+      23.7,
+      2
+     ],
+     [
+      24.5,
+      3
+     ],
+     [
+      24.7,
+      4
+     ],
+     [
+      24.9,
+      5
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794049230.5752006,
+   "start_location": "4800846717862329",
+   "scanned": 1356,
+   "finds": 0,
+   "errors": 9,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.678,
+   "finished_at": 1794051036.3226583,
+   "end_location": "4800846717863694",
+   "frames_per_hour": 2703,
+   "concurrency": {
+    "final": 4,
+    "max_used": 5,
+    "baseline_latency_s": 5.5,
+    "changes": 19,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.2,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      9.5,
+      4
+     ],
+     [
+      9.5,
+      3
+     ],
+     [
+      9.7,
+      4
+     ],
+     [
+      9.9,
+      5
+     ],
+     [
+      11.2,
+      4
+     ],
+     [
+      11.2,
+      3
+     ],
+     [
+      11.5,
+      4
+     ],
+     [
+      11.7,
+      5
+     ],
+     [
+      13.6,
+      4
+     ],
+     [
+      13.8,
+      5
+     ],
+     [
+      16.7,
+      4
+     ],
+     [
+      16.8,
+      5
+     ],
+     [
+      21.4,
+      4
+     ],
+     [
+      21.5,
+      5
+     ],
+     [
+      29.4,
+      4
+     ],
+     [
+      29.4,
+      3
+     ],
+     [
+      29.7,
+      4
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794051037.8918774,
+   "trigger": "remine",
+   "scanned": 0,
+   "finds": 0,
+   "errors": 0,
+   "remined": 44522,
+   "refetched": 0,
+   "mismatches": 0,
+   "finished_at": 1794051037.891913,
+   "max_sigma": 4.199,
+   "new_finds": []
+  },
+  {
+   "started_at": 1794051302.2863362,
+   "start_location": "4243066330327377",
+   "scanned": 865,
+   "finds": 2,
+   "errors": 4,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 4.333,
+   "new_finds": [
+    {
+     "location": "4243066330327733",
+     "sigma": 4.333,
+     "tier": "anomaly",
+     "reason": "spectrum",
+     "description": "Statistically unusual static, not a picture: more large-scale variation than static, like a photo's soft shading; nothing local (4.3\u03c3). Nothing local: no shapes, lines or patterns stand out."
+    },
+    {
+     "location": "4243066330328066",
+     "sigma": 4.053,
+     "tier": "anomaly",
+     "reason": "spot",
+     "description": "Statistically unusual static, not a picture: a soft, round patch around the centre, roughly 40 px across (4.1\u03c3). Also a redder spot around the top-left, roughly 104 px across (3.1\u03c3)."
+    }
+   ],
+   "finished_at": 1794053114.962743,
+   "end_location": "4243066330328246",
+   "frames_per_hour": 1718,
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 12.46,
+    "changes": 10,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.4,
+      5
+     ],
+     [
+      13.9,
+      4
+     ],
+     [
+      13.9,
+      3
+     ],
+     [
+      14.2,
+      2
+     ],
+     [
+      14.2,
+      1
+     ],
+     [
+      14.9,
+      2
+     ],
+     [
+      15.2,
+      3
+     ],
+     [
+      15.5,
+      4
+     ],
+     [
+      16.5,
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794053120.1524475,
+   "start_location": "5458828735531803",
+   "scanned": 1003,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 4.659,
+   "new_finds": [
+    {
+     "location": "5458828735532410",
+     "sigma": 4.659,
+     "tier": "anomaly",
+     "reason": "colours",
+     "description": "Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the top-left, roughly 24 px across (4.7\u03c3)."
+    }
+   ],
+   "finished_at": 1794054923.8001947,
+   "end_location": "5458828735532806",
+   "frames_per_hour": 2002,
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 9.28,
+    "changes": 2,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.6,
+      4
+     ],
+     [
+      0.9,
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794054929.087564,
+   "start_location": "3562822126412188",
+   "scanned": 1083,
+   "finds": 2,
+   "errors": 4,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 4.292,
+   "new_finds": [
+    {
+     "location": "3562822126412742",
+     "sigma": 4.292,
+     "tier": "anomaly",
+     "reason": "flat",
+     "description": "Statistically unusual static, not a picture: a run of near-identical neighbouring pixels (a flat patch or a single-colour stroke) around the centre, roughly 64 px across (4.3\u03c3)."
+    },
+    {
+     "location": "3562822126413177",
+     "sigma": 4.173,
+     "tier": "anomaly",
+     "reason": "spot",
+     "description": "Statistically unusual static, not a picture: a soft, round patch around the top, roughly 48 px across (4.2\u03c3). Also a darker spot around the top, roughly 88 px across (3.2\u03c3)."
+    }
+   ],
+   "finished_at": 1794056736.2637942,
+   "end_location": "3562822126413275",
+   "frames_per_hour": 2157,
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 8.08,
+    "changes": 12,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.6,
+      5
+     ],
+     [
+      9.7,
+      4
+     ],
+     [
+      9.7,
+      3
+     ],
+     [
+      10.1,
+      2
+     ],
+     [
+      10.7,
+      1
+     ],
+     [
+      11.1,
+      2
+     ],
+     [
+      11.4,
+      3
+     ],
+     [
+      11.5,
+      4
+     ],
+     [
+      11.9,
+      5
+     ],
+     [
+      22.7,
+      4
+     ],
+     [
+      23.3,
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794056741.576646,
+   "start_location": "781012942002383",
+   "scanned": 938,
+   "finds": 2,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 4.63,
+   "new_finds": [
+    {
+     "location": "781012942002579",
+     "sigma": 4.111,
+     "tier": "anomaly",
+     "reason": "colours",
+     "description": "Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the bottom-left, roughly 24 px across (4.1\u03c3)."
+    },
+    {
+     "location": "781012942003168",
+     "sigma": 4.63,
+     "tier": "anomaly",
+     "reason": "flat",
+     "description": "Statistically unusual static, not a picture: a run of near-identical neighbouring pixels (a flat patch or a single-colour stroke) around the top-left, roughly 64 px across (4.6\u03c3)."
+    }
+   ],
+   "finished_at": 1794058550.4265144,
+   "end_location": "781012942003321",
+   "frames_per_hour": 1867,
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 10.73,
+    "changes": 2,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.7,
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794058555.6639714,
+   "start_location": "7419889628012503",
+   "scanned": 796,
+   "finds": 0,
+   "errors": 2,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.92,
+   "finished_at": 1794060370.7720144,
+   "end_location": "7419889628013301",
+   "frames_per_hour": 1579,
+   "concurrency": {
+    "final": 4,
+    "max_used": 5,
+    "baseline_latency_s": 15.88,
+    "changes": 7,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      14.0,
+      4
+     ],
+     [
+      15.1,
+      5
+     ],
+     [
+      28.4,
+      4
+     ],
+     [
+      29.2,
+      3
+     ],
+     [
+      30.2,
+      4
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794060376.092581,
+   "start_location": "6414088276977150",
+   "scanned": 727,
+   "finds": 0,
+   "errors": 2,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.867,
+   "finished_at": 1794062189.5610442,
+   "end_location": "6414088276977879",
+   "frames_per_hour": 1443,
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 14.15,
+    "changes": 6,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.2,
+      2
+     ],
+     [
+      0.7,
+      3
+     ],
+     [
+      1.1,
+      4
+     ],
+     [
+      1.4,
+      5
+     ],
+     [
+      18.3,
+      4
+     ],
+     [
+      18.8,
+      5
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794062194.9697762,
+   "start_location": "340754400175245",
+   "scanned": 687,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.58,
+   "finished_at": 1794064000.6036127,
+   "end_location": "340754400175932",
+   "frames_per_hour": 1370,
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 12.87,
+    "changes": 4,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.5,
+      4
+     ],
+     [
+      0.8,
+      5
+     ],
+     [
+      11.6,
+      4
+     ],
+     [
+      12.9,
+      5
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794064019.8495817,
+   "start_location": "8863981630394368",
+   "scanned": 782,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 4.008,
+   "new_finds": [
+    {
+     "location": "8863981630394927",
+     "sigma": 4.008,
+     "tier": "anomaly",
+     "reason": "flat",
+     "description": "Statistically unusual static, not a picture: a run of near-identical neighbouring pixels (a flat patch or a single-colour stroke) around the centre, roughly 64 px across (4.0\u03c3)."
+    }
+   ],
+   "finished_at": 1794065830.0275736,
+   "end_location": "8863981630395150",
+   "frames_per_hour": 1555,
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 11.71,
+    "changes": 4,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.5,
+      4
+     ],
+     [
+      0.8,
+      5
+     ],
+     [
+      12.2,
+      4
+     ],
+     [
+      13.0,
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794065834.4084826,
+   "start_location": "2461614979585757",
+   "scanned": 763,
+   "finds": 0,
+   "errors": 2,
+   "workers": 3,
+   "max_workers": 5,
+   "max_sigma": 3.826,
+   "finished_at": 1794067646.5361032,
+   "end_location": "2461614979586522",
+   "frames_per_hour": 1516,
+   "concurrency": {
+    "final": 5,
+    "max_used": 5,
+    "baseline_latency_s": 12.67,
+    "changes": 6,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.6,
+      4
+     ],
+     [
+      0.9,
+      5
+     ],
+     [
+      14.1,
+      4
+     ],
+     [
+      14.3,
+      3
+     ],
+     [
+      14.7,
+      4
+     ],
+     [
+      15.0,
+      5
+     ]
+    ]
+   },
+   "new_finds": []
+  }
+ ],
+ "best": {
+  "location": "5458828735532410",
+  "sigma": 4.659
+ },
+ "updated_at": 1794067646.5361536,
+ "last_run": {
+  "started_at": 1794065834.4084826,
+  "start_location": "2461614979585757",
+  "scanned": 763,
+  "finds": 0,
+  "errors": 2,
+  "workers": 3,
+  "max_workers": 5,
+  "max_sigma": 3.826,
+  "finished_at": 1794067646.5361032,
+  "end_location": "2461614979586522",
+  "frames_per_hour": 1516,
+  "concurrency": {
+   "final": 5,
+   "max_used": 5,
+   "baseline_latency_s": 12.67,
+   "changes": 6,
+   "history": [
+    [
+     -0.0,
+     3
+    ],
+    [
+     0.6,
+     4
+    ],
+    [
+     0.9,
+     5
+    ],
+    [
+     14.1,
+     4
+    ],
+    [
+     14.3,
+     3
+    ],
+    [
+     14.7,
+     4
+    ],
+    [
+     15.0,
+     5
+    ]
+   ]
+  },
+  "new_finds": []
+ },
+ "finds_total": 13,
+ "test_hist": {
+  "lo": -5.0,
+  "step": 0.25,
+  "counts": {
+   "shape": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    152,
+    0,
+    278,
+    193,
+    533,
+    906,
+    1400,
+    2044,
+    2805,
+    3539,
+    4239,
+    4884,
+    5158,
+    5111,
+    4840,
+    4259,
+    3590,
+    2750,
+    2035,
+    1370,
+    871,
+    556,
+    300,
+    182,
+    95,
+    53,
+    14,
+    6,
+    1,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "blob": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    219,
+    178,
+    231,
+    560,
+    902,
+    1390,
+    2032,
+    2769,
+    3524,
+    4228,
+    4850,
+    5150,
+    5141,
+    4854,
+    4264,
+    3522,
+    2808,
+    2057,
+    1410,
+    898,
+    546,
+    311,
+    145,
+    105,
+    41,
+    24,
+    4,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "lines": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    32,
+    38,
+    88,
+    170,
+    291,
+    589,
+    910,
+    1380,
+    2024,
+    2759,
+    3578,
+    4257,
+    4826,
+    5185,
+    5131,
+    4793,
+    4262,
+    3554,
+    2747,
+    2026,
+    1402,
+    928,
+    546,
+    308,
+    180,
+    90,
+    44,
+    17,
+    9,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "texture": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    31,
+    41,
+    87,
+    160,
+    311,
+    549,
+    904,
+    1408,
+    1970,
+    2747,
+    3512,
+    4327,
+    4786,
+    5147,
+    5178,
+    4892,
+    4302,
+    3545,
+    2767,
+    2015,
+    1393,
+    909,
+    567,
+    278,
+    168,
+    101,
+    38,
+    24,
+    6,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "palette": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    25,
+    38,
+    93,
+    169,
+    310,
+    548,
+    909,
+    1393,
+    2051,
+    2773,
+    3516,
+    4273,
+    4854,
+    5094,
+    5175,
+    4866,
+    4280,
+    3590,
+    2733,
+    2009,
+    1370,
+    885,
+    567,
+    309,
+    169,
+    91,
+    47,
+    18,
+    8,
+    2,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "tone": [
+    0,
+    0,
+    0,
+    0,
+    4,
+    2,
+    7,
+    18,
+    47,
+    78,
+    180,
+    319,
+    541,
+    915,
+    1366,
+    2051,
+    2782,
+    3552,
+    8764,
+    9049,
+    48,
+    1491,
+    4887,
+    4250,
+    3552,
+    2743,
+    2006,
+    1398,
+    911,
+    570,
+    276,
+    199,
+    92,
+    52,
+    7,
+    6,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "contrast": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    17886,
+    0,
+    26194,
+    0,
+    10,
+    1,
+    3,
+    5,
+    2,
+    2546,
+    2059,
+    1393,
+    908,
+    537,
+    294,
+    179,
+    80,
+    46,
+    11,
+    10,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "angled": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    27,
+    33,
+    100,
+    166,
+    319,
+    555,
+    908,
+    1367,
+    1990,
+    2716,
+    3565,
+    4284,
+    4844,
+    5177,
+    5153,
+    4862,
+    4280,
+    3519,
+    2775,
+    2020,
+    1427,
+    866,
+    560,
+    307,
+    188,
+    88,
+    41,
+    18,
+    7,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "repetition": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    6863,
+    4605,
+    257,
+    4252,
+    4847,
+    5164,
+    5140,
+    4838,
+    4260,
+    3576,
+    2778,
+    2056,
+    1399,
+    933,
+    547,
+    306,
+    187,
+    93,
+    35,
+    22,
+    4,
+    4,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "symmetry": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    3,
+    26,
+    53,
+    89,
+    153,
+    322,
+    516,
+    920,
+    1392,
+    1995,
+    2753,
+    3541,
+    4241,
+    4878,
+    5152,
+    5194,
+    4795,
+    4276,
+    3534,
+    2785,
+    2048,
+    1408,
+    919,
+    542,
+    306,
+    168,
+    99,
+    34,
+    13,
+    10,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "spot": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    6,
+    8,
+    18,
+    36,
+    80,
+    117,
+    203,
+    340,
+    482,
+    689,
+    893,
+    1057,
+    1142,
+    1228,
+    1288,
+    1199,
+    1061,
+    880,
+    688,
+    508,
+    345,
+    214,
+    144,
+    74,
+    34,
+    25,
+    11,
+    7,
+    1,
+    0,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "curves": [
+    1,
+    0,
+    0,
+    0,
+    3,
+    1,
+    2,
+    4,
+    10,
+    19,
+    43,
+    60,
+    119,
+    201,
+    352,
+    504,
+    633,
+    919,
+    984,
+    1202,
+    1292,
+    1304,
+    1196,
+    1089,
+    803,
+    697,
+    477,
+    331,
+    219,
+    139,
+    79,
+    46,
+    24,
+    17,
+    7,
+    2,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "flat": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    5294,
+    0,
+    0,
+    1123,
+    1245,
+    1195,
+    1041,
+    897,
+    668,
+    530,
+    323,
+    218,
+    106,
+    65,
+    43,
+    14,
+    9,
+    3,
+    1,
+    2,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "colours": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1596,
+    0,
+    1375,
+    1,
+    1081,
+    1170,
+    2534,
+    1,
+    1124,
+    1178,
+    913,
+    473,
+    487,
+    283,
+    273,
+    129,
+    55,
+    23,
+    56,
+    12,
+    4,
+    8,
+    1,
+    2,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "spectrum": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    9382,
+    0,
+    0,
+    0,
+    546,
+    837,
+    633,
+    462,
+    368,
+    256,
+    130,
+    77,
+    32,
+    33,
+    17,
+    3,
+    2,
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "face": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    4,
+    9,
+    19,
+    44,
+    72,
+    140,
+    239,
+    364,
+    506,
+    689,
+    895,
+    1056,
+    1161,
+    1296,
+    1237,
+    1190,
+    1002,
+    820,
+    660,
+    477,
+    374,
+    234,
+    138,
+    73,
+    40,
+    28,
+    5,
+    4,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "combined": [
+    0,
+    0,
+    0,
+    0,
+    1,
+    3,
+    9,
+    20,
+    44,
+    82,
+    174,
+    326,
+    562,
+    951,
+    1416,
+    2065,
+    2772,
+    3602,
+    4233,
+    4743,
+    5137,
+    5128,
+    4782,
+    4268,
+    3495,
+    2749,
+    2017,
+    1404,
+    932,
+    566,
+    331,
+    167,
+    106,
+    47,
+    18,
+    12,
+    1,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "detector": "29dafadae160",
+  "since_log": true
+ },
+ "fingerprint": {
+  "n": 52166,
+  "sum": 735036.7400000014,
+  "sumsq": 10408675.41059993,
+  "min": {
+   "value": 10.07,
+   "location": "2877716159800749"
+  }
+ },
+ "hist_current": {
+  "detector": "29dafadae160",
+  "since": null,
+  "edges": [
+   -2,
+   -1,
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   8,
+   12,
+   16,
+   40
+  ],
+  "counts": [
+   0,
+   0,
+   77,
+   8039,
+   32076,
+   11155,
+   806,
+   13,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "log_calibration": "19817e9be026"
+}
