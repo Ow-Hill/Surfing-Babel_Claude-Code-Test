@@ -4,3 +4,4 @@ public/
 data/
 .venv/
 .pytest_cache/
+!tests/data/
