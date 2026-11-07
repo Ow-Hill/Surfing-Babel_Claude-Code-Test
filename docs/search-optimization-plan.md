@@ -71,7 +71,7 @@ covers each:
 | 2.3 combined score | **done.** Calibrated separately; shown in the detail view and as a leaderboard. |
 | 2.4 cascade | superseded: shared preprocessing, a rotation index, pyramids and a process pool made all 16 tests (0.42 s) cheaper than the original 10 (0.60 s) |
 | 2.5 learned detector | partly: six hand-built perceptual tests (spot, curves, flat, colours, spectrum, face) came first. A pretrained vision model (CLIP-style, CPU) is the agreed next phase, once the log has 5,000 real frames for the new tests |
-| 2.8 human-noticeable | **done.** Each find gets a visibility score (contrast against static's own flicker), finds sort by it, and the benchmark reports detector vs eye |
+| 2.8 human-noticeable | **done.** Each find gets a visibility score (colour patches, smooth or busy patches and thin lines, against what pure static shows), finds sort by it, and the benchmark reports detector vs eye |
 | 2.9 human flags | **done.** "I see something" opens a GitHub issue; the workflow scores the frame, replies and lists it under People noticed |
 | 2.10 look-elsewhere | **done.** Each find shows a frame-wide σ allowing for all 16 tests (Šidák); finds still use per-test 4σ, by choice |
 | 2.6 per-test leaderboards | **done** (top 3 each) |

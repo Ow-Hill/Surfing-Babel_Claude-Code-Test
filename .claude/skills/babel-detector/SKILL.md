@@ -20,6 +20,9 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
   - a simulated map in `calibration.json`;
   - a `describe()` phrase in `analysis.py` and an entry in `TEST_INFO` in `site/app.js`;
   - a signal in `benchmark.py`, prototyped against static before you choose a method.
+- **Judge the visibility model by eye.** Before trusting a change, look at the benchmark
+  example images and check full-size (640×416) real frames, not the site's 320×208 copies.
+  Static and real frames must read about 1 on every cue (`parts`).
 - **Describe finds honestly.** 4–8σ are the statistical tail of static, and the visibility
   model rates them invisible. Never call them pictures.
 

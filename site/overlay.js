@@ -34,7 +34,7 @@ const Overlay = (() => {
     rows:     [["hsl(40,95%,55%)", "brighter band"], ["hsl(220,95%,55%)", "darker band"]],
     geometry: [["rgb(255,70,70)", "angled line"], ["rgb(80,220,255)", "repeat offset"], ["rgb(190,110,255)", "mirror axis"]],
     tone:     [["rgb(255,60,210)", "pixels in the flagged colour range"], ["rgb(40,36,50)", "everything else (dimmed)"]],
-    eye:      [["hsl(55,95%,55%)", "just over threshold"], ["hsl(0,95%,55%)", "strongest"], ["rgb(120,255,160)", "face-like layout"]],
+    eye:      [["hsl(55,95%,55%)", "just over threshold"], ["hsl(0,95%,55%)", "strongest"], ["rgb(120,255,160)", "face-like layout"], ["rgba(255,255,255,.95)", "most noticeable to a person"]],
   };
   let nameOf = (k) => k;
 
@@ -177,6 +177,24 @@ const Overlay = (() => {
            `<div class="tone-legend"><span>red</span><span>green</span><span>blue</span><span class="muted">each bar: one 16-value range, dark → light; above/below the line = more/fewer pixels than static</span></div>`;
   }
 
+  // the visibility model's most noticeable spot (visibility.py), when a person might see it
+  function drawNoticeable(ctx, v) {
+    if (!v || !v.cue || v.ratio < 1.4 || !v.patch) return "";
+    ctx.save();
+    ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.lineWidth = 2; ctx.setLineDash([6, 4]);
+    if (v.cue === "line") {
+      // a strip v.patch px long through (x, y), along (cos, sin) of v.angle in image coordinates (y down)
+      const t = (v.angle || 0) * Math.PI / 180, dx = Math.cos(t) * v.patch / 2, dy = Math.sin(t) * v.patch / 2;
+      ctx.beginPath(); ctx.arc(v.x, v.y, v.patch / 2 + 6, 0, 2 * Math.PI); ctx.stroke();
+      ctx.setLineDash([]); ctx.beginPath(); ctx.moveTo(v.x - dx, v.y - dy); ctx.lineTo(v.x + dx, v.y + dy); ctx.stroke();
+    } else ctx.strokeRect(v.x - v.patch / 2, v.y - v.patch / 2, v.patch, v.patch);
+    ctx.restore();
+    label(ctx, `to the eye ${v.ratio}×`, v.x - v.patch / 2, v.y - v.patch / 2 - 8);
+    return v.cue === "line" ? "the thin line a person would most likely notice"
+      : v.cue === "texture" ? `the patch a person would most likely notice (${v.smoother ? "smoother" : "busier"} than static)`
+      : "the colour patch a person would most likely notice";
+  }
+
   function render() {
     if (!state || !state.maps) return;
     const { maps, layer } = state;
@@ -209,6 +227,8 @@ const Overlay = (() => {
           ctx.strokeRect(f.x - f.size / 2, f.y - f.size / 2, f.size, f.size);
           label(ctx, `face-like ${f.z.toFixed(1)}`, f.x - f.size / 2, f.y - f.size / 2 - 8);
         }
+        const v = drawNoticeable(ctx, maps.visibility);
+        if (v) note += `. Dashed white: ${v}`;
         if (!maps.eye) note += ". (This frame was saved before these tests existed; it is re-scored on the next scan.)";
       }
       if (layer === "tone") {

@@ -87,6 +87,36 @@ def test_visibility_static_vs_obvious_picture():
     assert disc["label"] == "likely" and disc["ratio"] > 10
 
 
+@pytest.mark.parametrize("make", [
+    lambda r: B._diagonal_line(r, 1.0),            # a 2 px line: barely moves any patch's mean colour
+    lambda r: B._blend(r, *B.pic_line(), 1.0),     # a horizon line
+    lambda r: B._grey_patch(r, 1.0),               # a flat grey square: same mean, no flicker
+    lambda r: B._special(r, "greyscale static"),   # the whole frame loses its colour
+])
+def test_visibility_sees_lines_and_smooth_patches(make):
+    """The old model compared only patch-average colour and rated all of these
+    invisible (about 1.0), though a person sees each at a glance."""
+    import io
+    from PIL import Image
+    rgb = np.asarray(Image.open(io.BytesIO(make(np.random.default_rng(3)))).convert("RGB"), dtype=np.float64)
+    v = visibility.visibility(rgb)
+    assert v["label"] == "likely", v
+
+
+def test_visibility_points_at_the_line():
+    import io
+    from PIL import Image
+    rgb = np.asarray(Image.open(io.BytesIO(B._diagonal_line(np.random.default_rng(4), 1.0))).convert("RGB"),
+                     dtype=np.float64)
+    v = visibility.visibility(rgb)
+    assert v["cue"] == "line"
+    # the line runs from (40, 400) to (600, 77): the marked point lies on it
+    y_on_line = 400 + (v["x"] - 40) * (77 - 400) / (600 - 40)
+    assert abs(v["y"] - y_on_line) < 6, v
+    # direction (cos, sin) of the angle in image coordinates (y down): rising to the right is ~150
+    assert v["angle"] in (135, 150, 165), v
+
+
 @pytest.mark.parametrize("k,stride", [(8, 4), (16, 8), (16, 16), (64, 32)])
 def test_vectorised_pool_matches_loop(k, stride):
     z = np.random.default_rng(k).standard_normal(((416 - k) // stride + 1, (640 - k) // stride + 1))
