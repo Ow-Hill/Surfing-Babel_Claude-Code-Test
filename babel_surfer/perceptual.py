@@ -331,9 +331,8 @@ def raw(rgb: np.ndarray) -> dict:
 # --------------------------------------------------------------------------
 # evidence per 16 px cell (for the overlay) and where the face is
 # --------------------------------------------------------------------------
-def _pool(z: np.ndarray, cell: int, stride: int, k: int, gh: int, gw: int) -> np.ndarray:
-    """Max of a window-grid map onto the cell grid (each window's value goes
-    to the cells it covers)."""
+def _pool_loop(z: np.ndarray, cell: int, stride: int, k: int, gh: int, gw: int) -> np.ndarray:
+    """Reference implementation of :func:`_pool` (slow; used by the tests)."""
     out = np.full((gh, gw), -np.inf)
     for (iy, ix), v in np.ndenumerate(z):
         y0, x0 = iy * stride // cell, ix * stride // cell
@@ -341,6 +340,26 @@ def _pool(z: np.ndarray, cell: int, stride: int, k: int, gh: int, gw: int) -> np
         if y1 > y0 and x1 > x0:
             blk = out[y0:y1, x0:x1]
             np.maximum(blk, v, out=blk)
+    return out
+
+
+def _pool(z: np.ndarray, cell: int, stride: int, k: int, gh: int, gw: int) -> np.ndarray:
+    """Max of a window-grid map onto the cell grid (each window's value goes
+    to the cells it covers). Separable: windows covering a cell form a
+    contiguous range along each axis, so take the max over rows, then columns."""
+    def ranges(n_win: int, n_cell: int):
+        i = np.arange(n_win)
+        lo, hi = i * stride // cell, np.minimum(n_cell, (i * stride + k) // cell)
+        return [np.flatnonzero((lo <= c) & (c < hi)) for c in range(n_cell)]
+    out = np.full((gh, gw), -np.inf)
+    rows, cols = ranges(z.shape[0], gh), ranges(z.shape[1], gw)
+    tmp = np.full((gh, z.shape[1]), -np.inf)
+    for cy, r in enumerate(rows):
+        if r.size:
+            tmp[cy] = z[r[0]:r[-1] + 1].max(axis=0)
+    for cx, c in enumerate(cols):
+        if c.size:
+            out[:, cx] = tmp[:, c[0]:c[-1] + 1].max(axis=1)
     return out
 
 

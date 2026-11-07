@@ -39,8 +39,10 @@ stopwatch, and the spec as a checklist that turns green as the requirements pass
 2. Open `https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/agent.html?present=1` on the
    presenter screen. Presenter mode hides the story, enlarges the tracker and turns live mode on.
 3. **Check what's running:** in the "Scans & deploys" column, an hourly 45-minute scan may be in
-   progress. They start at about :23 past the hour. A merge waits behind it, so plan the demo
-   to start just after a scan finishes, or cancel the running scan from the Actions tab.
+   progress. They start at about :23 past the hour. A merge waits until the scan's current
+   30-minute chunk ends; the scan then hands its remaining minutes to a new run on the new code,
+   which publishes first. For the fastest demo, start just after a scan finishes, or cancel the
+   running scan from the Actions tab.
 4. Open a coding-agent session on the repository, starting from an up-to-date `main`.
 
 ## On stage

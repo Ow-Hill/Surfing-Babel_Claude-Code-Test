@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 
@@ -42,6 +43,10 @@ def rescore_log(store: Store) -> tuple[np.ndarray, np.ndarray] | None:
     cal = classifier.load_calibration()
     if not path.exists() or not cal["maps"]:
         return None
+    # Frames scanned since the last re-mine were scored with this calibration
+    # already; only a new calibration (or an unfinished re-mine) needs work.
+    if store.stats.get("log_calibration") == classifier.calibration_hash():
+        return None
     old = np.load(path)
     if not len(old):
         return None
@@ -53,10 +58,6 @@ def rescore_log(store: Store) -> tuple[np.ndarray, np.ndarray] | None:
         new[t] = z[t]
         new[f"raw_{t}"] = raw[t]
     new["combined"] = comb
-    unchanged = old.dtype == new.dtype and all(
-        np.array_equal(old[c], new[c], equal_nan=True) for c in new.dtype.names)
-    if unchanged:
-        return None
     tmp = store.dir / "scores.tmp.npy"
     np.save(tmp, new)
     os.replace(tmp, path)
@@ -76,8 +77,11 @@ def rescore_log(store: Store) -> tuple[np.ndarray, np.ndarray] | None:
                 if np.isfinite(v):
                     bins[test_hist_bin(float(v))] += 1
             th[c] = bins
+        # older counts were in the previous calibration's units: start again
+        # from the log (the last SCORE_LOG_KEEP frames)
         store.stats["test_hist"]["counts"] = th
         store.stats["test_hist"]["detector"] = classifier.detector_id()
+        store.stats["test_hist"]["since_log"] = True
         best = int(np.nanargmax(peak))
         store.stats["best"] = {"location": str(int(new["location"][best])),
                                "sigma": round(float(peak[best]), 3)}
@@ -111,6 +115,7 @@ def mine(store: Store, threshold: float = INTERESTING_SIGMA, workers: int = 2,
     res = rescore_log(store)
     if res is None:
         return None
+    lock = threading.Lock()
     scores, peak = res
     if fetch is None:
         from .scan import fetch
@@ -124,17 +129,23 @@ def mine(store: Store, threshold: float = INTERESTING_SIGMA, workers: int = 2,
         loc, expected = item
         try:
             data = fetch(loc)
+            result = classify(data, threshold=threshold)
         except Exception as e:
-            log.warning("could not fetch %s: %s", loc, e)
+            log.warning("could not fetch or score %s: %s", loc, e)
             store.error(run)
             return
-        result = classify(data, threshold=threshold)
-        run["refetched"] += 1
-        if abs(result.sigma - expected) > TOLERANCE:
-            # Babelia's frame is the truth; the log was float16 or an older code path
-            run["mismatches"] += 1
-            log.warning("%s: logged %.2fσ, fetched frame scores %.2fσ", loc, expected, result.sigma)
-        kind = store.record(loc, data, result, run, count=False)
+        with lock:
+            run["refetched"] += 1
+            if abs(result.sigma - expected) > TOLERANCE:
+                # Babelia's frame is the truth; the log was float16 or an older code path
+                run["mismatches"] += 1
+                log.warning("%s: logged %.2fσ, fetched frame scores %.2fσ", loc, expected, result.sigma)
+        try:
+            kind = store.record(loc, data, result, run, count=False)
+        except Exception as e:
+            log.warning("could not keep %s: %s", loc, e)
+            store.error(run)
+            return
         if kind == "find":
             log.info("FIND (re-mined) location=%s  %.1fσ (%s)", loc, result.sigma, result.reason)
 
@@ -143,6 +154,8 @@ def mine(store: Store, threshold: float = INTERESTING_SIGMA, workers: int = 2,
     run["finished_at"] = time.time()
     run["max_sigma"] = round(float(np.nanmax(peak)), 3)
     store.add_run(run, primary=False)
+    # only now is this calibration done: an interrupted re-mine runs again
+    store.stats["log_calibration"] = classifier.calibration_hash()
     store.save()
     return run
 

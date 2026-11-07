@@ -94,6 +94,14 @@ PACKAGE_CALIBRATION = Path(__file__).with_name("calibration.json")
 CALIBRATION_FILE = PACKAGE_CALIBRATION        # see use_calibration()
 
 
+def calibration_hash() -> str:
+    """What scores mean: the calibration in use and the code that applies it."""
+    import hashlib
+    h = hashlib.sha256(CALIBRATION_FILE.read_bytes() if CALIBRATION_FILE.exists() else b"")
+    h.update(Path(__file__).with_name("nullmap.py").read_bytes())
+    return h.hexdigest()[:12]
+
+
 def detector_id() -> str:
     """Short hash of the detector code and calibration: saved frames record
     it, so frames scored by an older detector can be re-scored."""
@@ -635,7 +643,7 @@ def calibrate_scores(raw: dict) -> dict:
             out[t] = round(nullmap.sigma(m, float(v)), 3)
         else:
             c = cal["tests"].get(t, {"mean": 0.0, "std": 1.0})
-            out[t] = round((v - c["mean"]) / max(c["std"], 1e-9), 3)
+            out[t] = round(min(nullmap.Z_MAX, (v - c["mean"]) / max(c["std"], 1e-9)), 3)
     return out
 
 

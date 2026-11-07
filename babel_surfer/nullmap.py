@@ -33,6 +33,8 @@ TAIL_P = 0.01                    # body / tail split: the top 1%
 BODY_P = np.concatenate([[0.0005, 0.001, 0.002, 0.005],
                          np.linspace(0.01, 0.99, 197)])
 Z_FLOOR = -8.0
+OUTLIER_RAW = 1.0e5               # raw values this large are pictures, never static
+Z_MAX = 6.0e4                     # keeps every score finite in the float16 score log
 
 
 def _z_from_log_sf(log_sf: float) -> float:
@@ -53,7 +55,7 @@ def _z_from_log_sf(log_sf: float) -> float:
 def fit(values: np.ndarray) -> dict:
     """Fit a null map to raw statistics measured on static."""
     v = np.asarray(values, dtype=float)
-    v = v[np.isfinite(v)]
+    v = v[np.isfinite(v) & (v < OUTLIER_RAW)]       # flat channels and the like aren't static
     if len(v) < 1000:
         raise ValueError(f"need at least 1000 null values, got {len(v)}")
     # Several tests are clipped at zero ("no evidence"), which puts a point
@@ -74,7 +76,12 @@ def fit(values: np.ndarray) -> dict:
         xs = np.concatenate([[atom_info["x"]], xs])
         ps = np.concatenate([[atom], ps])
     u = float(xs[-1])
-    y = v[v > u] - u
+    y = np.sort(v[v > u] - u)
+    # A real picture logged among the static frames would dominate a moment
+    # fit of the tail; drop exceedances far beyond the rest (more than 4x the
+    # 95th percentile of the exceedances) before fitting.
+    if len(y) >= 20:
+        y = y[y <= 4.0 * float(np.quantile(y, 0.95))]
     m = float(y.mean()) if len(y) else 1e-3
     s2 = float(y.var()) if len(y) > 1 else m * m
     # method of moments for the generalised Pareto, shape clamped at >= 0
@@ -90,8 +97,8 @@ def fit(values: np.ndarray) -> dict:
 def sigma(m: dict, raw: float) -> float:
     """Map one raw statistic to sigma."""
     xs, zs = m["x"], m["z"]
-    if not math.isfinite(raw):
-        return Z_FLOOR
+    if not math.isfinite(raw):           # +inf: off the scale; NaN / -inf: no evidence
+        return Z_MAX if raw == math.inf else Z_FLOOR
     a = m.get("atom")
     if a and raw <= a["x"]:
         return a["z"]
@@ -102,7 +109,7 @@ def sigma(m: dict, raw: float) -> float:
     y = raw - m["u"]
     xi, sc = m["xi"], m["scale"]
     log_sf = math.log(m["tail_p"]) + (-math.log1p(xi * y / sc) / xi if xi > 0 else -y / sc)
-    return max(_z_from_log_sf(log_sf), zs[-1] + y)
+    return min(Z_MAX, max(_z_from_log_sf(log_sf), zs[-1] + y))
 
 
 def sigma_array(m: dict, raw: np.ndarray) -> np.ndarray:
@@ -117,5 +124,7 @@ def sigma_array(m: dict, raw: np.ndarray) -> np.ndarray:
     hi = np.flatnonzero(raw > m["u"])
     for i in hi:
         out[i] = sigma(m, float(raw[i]))
-    out[~np.isfinite(raw)] = np.nan
-    return out
+    out[np.isnan(raw)] = np.nan          # not measured (rows logged before a test existed)
+    out[raw == np.inf] = Z_MAX
+    out[raw == -np.inf] = Z_FLOOR
+    return np.minimum(out, Z_MAX)

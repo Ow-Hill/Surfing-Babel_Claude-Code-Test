@@ -25,6 +25,7 @@ import urllib.parse
 import urllib.request
 
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from concurrent.futures.process import BrokenProcessPool
 
 from . import classifier
 from .classifier import INTERESTING_SIGMA, classify
@@ -133,6 +134,12 @@ class Politeness:
                         self._set(self.limit + 1, f"fast ({med:.1f}s)")
             self._cv.notify_all()
 
+    def release_unused(self) -> None:
+        """Give back a slot that never made a request (no latency to learn from)."""
+        with self._cv:
+            self.active -= 1
+            self._cv.notify_all()
+
     def _set(self, n: int, why: str) -> None:
         n = max(self.min, min(self.max, n))
         if n != self.limit:
@@ -198,21 +205,35 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
                                 initargs=(str(classifier.CALIBRATION_FILE),))
             if processes > 0 else None)
 
+    pool_lock = threading.Lock()
+
     def score(data: bytes):
-        if pool is None:
+        nonlocal pool
+        p = pool
+        if p is None:
             return classify(data, threshold=threshold)
-        return pool.submit(classify, data, threshold=threshold).result()
+        try:
+            return p.submit(classify, data, threshold=threshold).result()
+        except BrokenProcessPool:
+            # a worker process died (e.g. out of memory): score in this thread
+            # from now on rather than throwing every later frame away
+            with pool_lock:
+                if pool is p:
+                    log.warning("classifier process pool broke; scoring in the fetch threads")
+                    pool = None
+                    p.shutdown(wait=False, cancel_futures=True)
+            return classify(data, threshold=threshold)
 
     def worker():
         while not stop.is_set() and time.time() < deadline:
             if not polite.acquire(stop):
                 break
             if time.time() >= deadline:
-                polite.release(0.0)
+                polite.release_unused()
                 break
             loc = counter.next()
             if loc is None:
-                polite.release(0.0)
+                polite.release_unused()
                 break
             t0 = time.time()
             try:
@@ -229,16 +250,20 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
                 log.warning("could not score %s: %s", loc, e)
                 store.error(run)
                 continue
-            kind = store.record(loc, data, result, run)
-            if kind == "find":
-                log.info("FIND  location=%s  %.1fσ (%s, %s)", loc, result.sigma,
-                         result.label, result.reason)
-                store.save()
-            else:
-                log.info("frame %s  %.2fσ %s", loc[:6] + "…" + loc[-4:], result.sigma,
-                         "(new near miss)" if kind == "near" else "")
-            if run["scanned"] % 25 == 0:
-                store.save()
+            try:
+                kind = store.record(loc, data, result, run)
+                if kind == "find":
+                    log.info("FIND  location=%s  %.1fσ (%s, %s)", loc, result.sigma,
+                             result.label, result.reason)
+                    store.save()
+                else:
+                    log.info("frame %s  %.2fσ %s", loc[:6] + "…" + loc[-4:], result.sigma,
+                             "(new near miss)" if kind == "near" else "")
+                if run["scanned"] % 25 == 0:
+                    store.save()
+            except Exception as e:      # an analysis or disk error must not end this thread
+                log.exception("could not keep %s: %s", loc, e)
+                store.error(run)
 
     threads = [threading.Thread(target=worker, daemon=True) for _ in range(max_workers)]
     for t in threads:

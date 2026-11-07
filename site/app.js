@@ -64,14 +64,16 @@ async function getJSON(path, fallback, required = true) {
   return fallback;
 }
 
-const VIS_TEXT = { likely: "visible", faint: "faint to the eye", invisible: "invisible to the eye" };
+// "faint" is also a score tier, so the eye labels avoid that word
+const VIS_TEXT = { likely: "visible", faint: "barely visible", invisible: "invisible to the eye" };
 
 function tile({ img, loc, label, sigma, tier, caption, onClick, visibility }) {
   const b = document.createElement("button");
   b.className = "tile";
   b.innerHTML = `<img loading="lazy" alt=""><div class="meta"><span class="tag"></span><span class="loc"></span></div>`;
   b.querySelector("img").src = img;
-  b.querySelector("img").alt = caption || `Babel location ${loc}`;
+  // a visible caption already describes the tile: don't make screen readers read it twice
+  b.querySelector("img").alt = caption ? "" : `Babel location ${loc}`;
   b.querySelector(".loc").textContent = label || (loc ? shortLoc(loc) : "test image");
   const tag = b.querySelector(".tag");
   if (tier) {
@@ -82,7 +84,8 @@ function tile({ img, loc, label, sigma, tier, caption, onClick, visibility }) {
     const v = document.createElement("span");
     v.className = `vis vis-${visibility.label}`;
     v.textContent = VIS_TEXT[visibility.label] || visibility.label;
-    v.title = `Contrast ${visibility.ratio}× what static itself shows at the same size (≥2 likely visible at a glance, 1.4–2 faint). A simple model: it under-rates thin lines`;
+    v.title = (visibility.ratio != null ? `Contrast ${visibility.ratio}× what static itself shows at the same size ` : "") +
+      `(≥2 likely visible at a glance, 1.4–2 barely visible). A simple model: it under-rates thin lines`;
     b.querySelector(".meta").append(v);
   }
   if (caption) {
@@ -135,6 +138,11 @@ function openDetail(item, list = null, label = "") {
   $("d-next").disabled = n < 2;
 
   const img = $("d-img");
+  img.onerror = () => {
+    if (current !== item) return;
+    $("d-note").textContent = "Babelia didn't return this image (it may be busy or down). Try “Open in Babelia” in a moment.";
+    $("d-note").hidden = false;
+  };
   img.src = item.preview;
   img.alt = item.description || `Babel location ${item.location || ""}`;
   $("d-note").textContent = item.note || "";
@@ -164,7 +172,8 @@ function openDetail(item, list = null, label = "") {
     $("d-sigma").textContent = fmtSigma(item.sigma);
     $("d-reason").textContent = `strongest test: ${testName(item.reason)}` +
       (item.sigma_global != null ? ` · ${fmtSigma(item.sigma_global)} for the whole frame, allowing for ${N_TESTS} tests` : "") +
-      (item.visibility ? ` · to the eye: ${({ likely: "likely visible", faint: "faint", invisible: "invisible" })[item.visibility.label] || item.visibility.label} (${item.visibility.ratio}× static's flicker)` : "") +
+      (item.visibility ? ` · to the eye: ${({ likely: "likely visible", faint: "barely visible", invisible: "invisible" })[item.visibility.label] || item.visibility.label}` +
+        (item.visibility.ratio != null ? ` (${item.visibility.ratio}× static's flicker)` : "") : "") +
       (item.combined != null ? ` · all tests combined: ${fmtSigma(item.combined)}` : "");
   }
 
@@ -227,7 +236,8 @@ const lookupItem = (loc) => ({
 });
 
 function openFromHash() {
-  const key = decodeURIComponent(location.hash.slice(1));
+  let key;
+  try { key = decodeURIComponent(location.hash.slice(1)); } catch { return; }   // malformed link
   if (!key || key === "how") return;
   const fi = DATA.finds.find((x) => x.location === key);
   if (fi) {
@@ -241,7 +251,8 @@ function openFromHash() {
   if (ni) return openDetail(findItem(ni, "Near miss"), DATA.near.map((f) => findItem(f, "Near miss")), "Near miss");
   for (const [t, board] of Object.entries(DATA.leaders || {})) {
     const li = board.find((x) => x.location === key);
-    if (li) return openDetail(findItem(li, testName(t)), board.map((f) => findItem(f, testName(t))), `${testName(t)} leader`);
+    const name = t === "combined" ? "All tests combined" : testName(t);
+    if (li) return openDetail(findItem(li, name), board.map((f) => findItem(f, name)), `${name} leader`);
   }
   const d = DATA.demos.find((x) => `demo-${x.slug}` === key);
   if (d) return openDetail(demoItem(d), DATA.demos.map(demoItem), "Demo");
@@ -276,7 +287,14 @@ $("d-open").onclick = openInBabelia;
 $("d-prev").onclick = () => step(-1);
 $("d-next").onclick = () => step(1);
 $("d-close").onclick = () => $("detail").close();
-$("detail").addEventListener("close", () => { current = null; Overlay.reset(); setHash(null); });
+$("detail").addEventListener("close", () => {
+  current = null; Overlay.reset(); setHash(null);
+  // opened from a link on page load: nothing had focus to go back to
+  if (document.activeElement === document.body || !document.activeElement) {
+    const h = document.getElementById("finds-h");
+    if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); }
+  }
+});
 // Clicking outside a dialog (on the dimmed backdrop) closes it and returns
 // to the home page. Uses the click position, since a click on the backdrop
 // and on the dialog's own padding both report the dialog as the target.
@@ -404,7 +422,8 @@ function renderPerTest(stats) {
   };
   const order = [...Object.keys(TEST_INFO), "combined"].filter((t) => th.counts[t]);
   const n = th.counts[order[0]].reduce((a, b) => a + b, 0);
-  $("hist-caption").textContent = `${fmtInt(n)} frames, each scored by all ${N_TESTS} tests. Each test is calibrated on ` +
+  const present = order.filter((t) => t !== "combined").length;
+  $("hist-caption").textContent = `${fmtInt(n)} frames, each scored by all ${present} tests shown. Each test is calibrated on ` +
     `real Babel frames, so on pure static every one should look like the same bell curve, with about ` +
     `${fmtExpected(n * pMaxOver(THRESHOLD, 1))} frames per test at ${THRESHOLD}σ or more.`;
   $("hist-legend").innerHTML = `<span class="key-bar"></span>frames per 1σ band (log scale) <span class="key-thr"></span>${THRESHOLD}σ`;
@@ -444,7 +463,9 @@ document.querySelectorAll("#hist-view button").forEach((b) => (b.onclick = () =>
 // ---------------------------------------------------------------- live strip
 // Frames straight from Babelia, walking locations like its slideshow does.
 // Display only: Babelia sends no CORS headers, so the browser can't score them.
-const live = { loc: null, playing: true, loading: false, history: [], failures: 0 };
+// People who ask for reduced motion get a still live strip until they press Play.
+const REDUCED_MOTION = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+const live = { loc: null, playing: !REDUCED_MOTION, loading: false, history: [], failures: 0 };
 
 function randomStart() {
   const a = new Uint32Array(2);
@@ -635,6 +656,7 @@ async function load() {
     getJSON("data/flags.json", [], false),
   ]);
   $("load-error").hidden = !loadFailed;
+  if (bench) THRESHOLD = bench.threshold_sigma;      // before anything that uses it renders
   DATA = { finds, near, demos, leaders, flags };
   $("flags-section").hidden = !flags.length;
   const flagItems = flags.map((f) => ({ ...findItem(f, "Flagged"),
@@ -645,7 +667,6 @@ async function load() {
            onClick: () => openDetail(flagItems[i], flagItems, "Flagged") })));
   renderLeaders(leaders, stats);
   renderFingerprint(stats);
-  if (bench) THRESHOLD = bench.threshold_sigma;
   document.querySelectorAll(".thr").forEach((e) => (e.textContent = THRESHOLD));
 
   $("s-scanned").textContent = fmtInt(stats.scanned);
@@ -692,7 +713,7 @@ async function load() {
       `${bench.threshold_sigma}σ threshold and the highest scored ${n.max_sigma}σ. Real Babel static is a little ` +
       `quieter than the simulation.`;
     $("bench").replaceChildren(...(bench.examples || []).map((e) =>
-      tile({ img: `benchmark/${e.file}`, sigma: e.sigma, tier: e.tier, caption: e.label,
+      tile({ img: `benchmark/${e.thumb || e.file}`, sigma: e.sigma, tier: e.tier, caption: e.label,
              onClick: () => window.open(`benchmark/${e.file}`, "_blank") })));
     const rows = bench.signals.map((r) =>
       `<tr><td>${r.signal}</td><td>${r.strength === "-" ? "–" : Math.round(r.strength * 100) + "%"}</td>` +
@@ -711,4 +732,9 @@ async function load() {
 $("load-retry").onclick = () => load();
 window.reloadData = load;
 load();
-liveNext();
+if (live.playing) liveNext();
+else {                     // reduced motion: wait for Play
+  $("live-toggle").textContent = "Play";
+  $("live-status").textContent = "paused (reduced motion)";
+  livePlaceholder("Paused: press Play to stream frames from Babelia");
+}

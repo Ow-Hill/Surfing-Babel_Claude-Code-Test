@@ -2,20 +2,20 @@
   "intro": "Every line of Surfing Babel (scanner, detector, calibration, website, automation) was written by an AI coding agent, working from short requests in a conversation. The agent read code and websites, ran experiments, wrote and ran tests, opened and merged pull requests and watched the deployments. The person directed it; the agent did the engineering. Below is how it went, including the mistakes the agent caught in its own work.",
   "stats": [
     {
-      "value": "12",
-      "label": "pull requests merged in ~27 h"
+      "value": "20",
+      "label": "pull requests merged in ~3 days"
     },
     {
-      "value": "~3,600",
+      "value": "~6,700",
       "label": "lines of Python, JavaScript, HTML and CSS"
     },
     {
-      "value": "39",
+      "value": "90+",
       "label": "automated tests, run on every pull request"
     },
     {
-      "value": "10",
-      "label": "statistical tests in the detector"
+      "value": "16",
+      "label": "tests in the detector (10 statistical, 6 modelled on human vision)"
     }
   ],
   "events": [
@@ -151,6 +151,62 @@
         {
           "kind": "bug caught",
           "text": "Its first test for the demo kit asserted that the repository always ships the unimplemented stub, which would have failed in the middle of every live demo. Rewritten so it checks consistency, whatever is in the slot."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-05",
+      "pr": 15,
+      "title": "Redrew the score chart for the current detector",
+      "request": "Redo the 'How static is static?' graph to reflect the new test.",
+      "did": "Split the histogram so it only counts frames scored by the current detector, backfilled from the score log, and added a per-test view.",
+      "moments": [
+        {
+          "kind": "bug caught",
+          "text": "The user reported the graph hadn't changed. The cause was browsers caching the old app.js; the agent added content fingerprints to every script and stylesheet link (PR #16)."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "pr": 17,
+      "title": "Found the detector was miscalibrated",
+      "request": "Find ways to optimise the search and find more artifacts.",
+      "did": "Checked every test against 23,456 logged real frames: nine of ten had a spread of 0.3 to 0.7 instead of 1, because the calibration floored each standard deviation at 1.0. Replaced it with empirical null distributions learned from real frames, then re-scored the whole log without re-downloading anything.",
+      "moments": [
+        {
+          "kind": "result",
+          "text": "From 0 finds in 23,456 frames to 7, from six different tests, each the statistical tail of static, as expected for honest 4σ."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "pr": 18,
+      "title": "Tests modelled on human vision",
+      "request": "Plan better ways to search and more things to detect, closer to what a person would notice; make detection more efficient.",
+      "did": "Made scoring 30% faster while adding six tests (soft spots, curves, flat strokes, few-colour areas, photo-like texture, face-like layouts), a frame-wide score that allows for running 16 tests, a visibility model, and an 'I see something' button that turns a GitHub issue into a scored frame.",
+      "moments": [
+        {
+          "kind": "bug caught",
+          "text": "Its first curve test (orientation coherence) barely beat static on thin arcs; it measured alternatives and switched to oriented line filters on a half-size copy: 5x stronger and 3x cheaper."
+        },
+        {
+          "kind": "honest result",
+          "text": "The visibility model rates almost every benchmark signal the detector catches as invisible to the eye: the tests integrate evidence people can't."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "pr": 19,
+      "title": "Improvement sweep",
+      "request": "Find more things to improve anywhere.",
+      "did": "Halved per-frame evidence files, made alerts check every run, stopped side jobs overwriting 'last scan', and let long scans hand over to new code within 30 minutes.",
+      "moments": [
+        {
+          "kind": "bug caught",
+          "text": "A second, audit-driven sweep then found that re-mining ran on every scan (a rounding mismatch), re-fetching up to 60 frames and inflating the find count; fixed in PR #20."
         }
       ]
     }
