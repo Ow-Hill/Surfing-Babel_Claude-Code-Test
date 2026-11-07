@@ -75,6 +75,23 @@ over 1,000. Every frame's scores are now logged (`data/scores.npy`, `stats.test_
 4σ rate per test is measured from real scans; the leaderboards show the top frames per test in
 the meantime.
 
+**Calibration audit (Nov 2026).** The score log made it possible to check every test against real
+frames. Nine of the ten tests had a spread of only 0.3–0.7 on real static instead of 1. The
+calibration floored each test's standard deviation at 1.0, but the raw statistics are maxima with a
+smaller spread, so every σ was shrunk: 23,456 frames produced no 4σ readings, where about 7 were
+expected. The detector now uses **empirical null maps** learned from those real frames
+(`nullmap.py`: empirical CDF, then a generalised Pareto tail). On held-out frames, every test lands
+within sampling noise of N(0, 1):
+
+```bash
+python -m babel_surfer.calibrate --from-log public/data/scores.npy
+```
+
+After a recalibration, `remine.py` re-scores the whole score log from the raw statistics it keeps.
+Nothing needs fetching for that step. It then re-fetches only the frames that now qualify. The
+first re-mine turned up 5 finds from four different tests (shape, symmetry, repetition and
+texture). They are still the extreme tail of static, the "anomaly" tier.
+
 ## Benchmark (`python -m babel_surfer.benchmark`)
 
 Known pictures blended into simulated Babel static (8 trials each):
@@ -190,6 +207,10 @@ and write**. You paste it once in the dialog; it is kept only in that browser's 
 sent only to `api.github.com`. Without a token, the dialog links to the workflow's "Run workflow"
 page. The site can't scan from your browser because Babelia sends no CORS headers, so browsers
 can't read its pixels.
+
+**Reliable schedule:** GitHub's hourly cron is best-effort and often skips runs. For scans
+that start on time, see [docs/external-cron.md](docs/external-cron.md), which sets up a free
+external cron that calls the dispatch API with your own token.
 
 The scheduled run only fires once the workflow is on the default branch (`main`). Until then, run
 it from the Actions tab or push to this branch.

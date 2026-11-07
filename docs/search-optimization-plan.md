@@ -62,12 +62,12 @@ covers each:
 |---|---|
 | 1.1 adaptive concurrency | **done.** Starts at 3, up to 5, backs off to 1. Live test: ramped 2→5 at 3.7 s responses, backed off to 1 at 15 s. |
 | 1.2 persistent connections | not done: under 5% gain, and it complicates proxy support |
-| 1.3 scan more often | **done.** Hourly 45-minute scans. |
+| 1.3 scan more often | **done.** Hourly 45-minute scans. GitHub's cron proved unreliable, so an external cron is documented in [external-cron.md](external-cron.md). Each run now logs its concurrency history. |
 | 1.4 parallel runners | not done: multiplies load on Babelia; revisit only with a hard rate cap |
 | 1.5 incremental publishing | **done.** Publishes every 30 minutes; `gh-pages` stays a single commit. |
 | 1.6 local generation | blocked on 3.2 |
 | 2.1 log every frame's scores | **done.** `stats.test_hist` (forever) and `data/scores.npy` (last 100k frames). |
-| 2.2 per-test calibration | **done in spirit.** Fixed the chi-square skew (Wilson–Hilferty) that made colour balance dominate; real-data rates per test are shown on the site. |
+| 2.2 per-test calibration | **done (Nov 2026).** The audit of 23,456 logged frames found that 9 of 10 tests had spreads of 0.3–0.7 because of a 1.0 floor on the standard deviation. They are replaced by empirical null maps learned on real frames (`nullmap.py`); held-out frames now match N(0, 1). `remine.py` re-scored the log and recovered 5 finds from 4 tests. |
 | 2.3 combined score | **done.** Calibrated separately; shown in the detail view and as a leaderboard. |
 | 2.4 cascade | not done: CPU isn't the bottleneck |
 | 2.5 learned detector | not done: needs a training setup; next candidate |
