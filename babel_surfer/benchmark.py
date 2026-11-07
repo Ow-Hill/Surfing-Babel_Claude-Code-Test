@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import statistics
 import sys
@@ -155,13 +156,82 @@ def _mirrored(rng, alpha: float) -> bytes:
     return _snap(_pick(rng, alpha, _noise(rng), m))
 
 
+def _drawn(rng, alpha: float, draw, fill) -> bytes:
+    """A shape drawn by ``draw(ImageDraw, fill)`` over static at ``alpha``."""
+    pic = Image.new("RGB", (W, H), (0, 0, 0))
+    mask = Image.new("L", (W, H), 0)
+    draw(ImageDraw.Draw(pic), fill)
+    draw(ImageDraw.Draw(mask), 255)
+    return _blend(rng, pic, mask, alpha)
+
+
+def _arc(rng, alpha: float) -> bytes:
+    """A thin (3 px) blue arc: an outline, the kind of thing the eye joins up."""
+    return _drawn(rng, alpha, lambda d, f: d.arc((220, 100, 420, 300), 20, 300, fill=f, width=3),
+                  (30, 30, 200))
+
+
+def _stroke(rng, alpha: float) -> bytes:
+    """A wavy 2 px red stroke, like a pen line."""
+    pts = [(100 + i * 4, 200 + 40 * math.sin(i / 6)) for i in range(60)]
+    return _drawn(rng, alpha, lambda d, f: d.line(pts, fill=f, width=2), (200, 60, 30))
+
+
+def _face(rng, alpha: float) -> bytes:
+    """Two dark spots over a third: a smiley's layout, no outline."""
+    def draw(d, f):
+        d.ellipse((270, 150, 300, 180), fill=f)
+        d.ellipse((340, 150, 370, 180), fill=f)
+        d.ellipse((290, 215, 350, 235), fill=f)
+    return _drawn(rng, alpha, draw, (20, 20, 20))
+
+
+def _posterised(rng, alpha: float) -> bytes:
+    """A 64 px patch where a share of pixels use just 4 colours (cartoon-like
+    flat colour; the frame's colour histogram stays static-like)."""
+    x = _noise(rng)
+    pal = LEVELS[rng.integers(0, 16, (4, 3))].astype(float)
+    patch = pal[rng.integers(0, 4, (64, 64))]
+    keep = rng.random((64, 64)) < alpha
+    x[180:244, 300:364][keep] = patch[keep]
+    return _snap(x)
+
+
+def _photo_like(rng, alpha: float) -> bytes:
+    """1/f noise (the spectrum of natural photos) mixed into static; picked
+    per pixel so the colour histogram stays static-like."""
+    fy = np.fft.fftfreq(H)[:, None]
+    fx = np.fft.fftfreq(W)[None, :]
+    r = np.sqrt(fy * fy + fx * fx)
+    r[0, 0] = 1.0
+    img = np.stack([np.real(np.fft.ifft2(np.fft.fft2(rng.standard_normal((H, W))) / r))
+                    for _ in range(3)], axis=-1)
+    img = (img - img.mean()) / img.std()
+    # map to static's levels by rank, so every level stays equally common
+    ranks = img.reshape(-1, 3).argsort(axis=0).argsort(axis=0).reshape(H, W, 3)
+    photo = LEVELS[(ranks * 16 // (H * W)).clip(0, 15)].astype(float)
+    return _snap(_pick(rng, alpha, _noise(rng), photo))
+
+
 NEW_SIGNALS = {
+    "thin arc (3px)": (_arc, (0.2, 0.3, 0.5)),
+    "pen stroke (2px)": (_stroke, (0.3, 0.5, 0.8)),
+    "face-like spots": (_face, (0.08, 0.15, 0.3)),
+    "few-colour patch (64px)": (_posterised, (0.15, 0.3, 0.6)),
+    "photo-like (1/f)": (_photo_like, (0.05, 0.1, 0.2)),
     "grey patch (64px)": (_grey_patch, (0.25, 0.5, 1.0)),
     "diagonal line (2px, 30°)": (_diagonal_line, (0.25, 0.5, 1.0)),
     "tiled static": (_tiled, (0.1, 0.2, 0.4)),
     "mirror-symmetric static": (_mirrored, (0.1, 0.2, 0.4)),
 }
 SPECIALS = ("greyscale static", "dark static (half palette)", "1px checkerboard + static")
+
+
+def _visibility(data: bytes) -> dict:
+    """The visibility model (visibility.py) on one frame: detector vs eye."""
+    import io
+    from .visibility import visibility
+    return visibility(np.asarray(Image.open(io.BytesIO(data)).convert("RGB"), dtype=np.float64))
 
 
 def _classify_many(frames: list[bytes]) -> list:
@@ -207,14 +277,17 @@ def run(trials: int, null_frames: int, out: Path | None, seed: int = 7) -> dict:
         res = results[pos:pos + len(frames)]
         pos += len(frames)
         sig = [r.sigma for r in res]
+        vis = _visibility(frames[0])
         rows.append({
+            "visibility": vis["ratio"], "visible": vis["label"],
             "signal": name, "strength": strength,
             "min_sigma": round(min(sig), 2), "median_sigma": round(statistics.median(sig), 2),
             "detected": sum(r.is_interesting for r in res), "trials": len(res),
             "reason": statistics.mode(r.reason for r in res),
         })
         print(f"  {name:28s} {strength!s:>6}  min {min(sig):8.1f}σ  "
-              f"detected {rows[-1]['detected']}/{len(res)}  ({rows[-1]['reason']})", file=sys.stderr)
+              f"detected {rows[-1]['detected']}/{len(res)}  ({rows[-1]['reason']})  "
+              f"eye {vis['ratio']:.2f} ({vis['label']})", file=sys.stderr)
     null = results[pos:pos + null_frames]
     pos += null_frames
     ex_res = results[pos:]

@@ -43,15 +43,19 @@ def bust_cache(out: Path) -> None:
 
 
 def detector_fingerprint() -> str:
+    from . import classifier
     h = hashlib.sha256()
-    for name in ("classifier.py", "calibration.json", "benchmark.py", "calibrate.py"):
+    for name in ("classifier.py", "perceptual.py", "nullmap.py", "benchmark.py", "calibrate.py"):
         h.update((PKG / name).read_bytes())
+    h.update(classifier.CALIBRATION_FILE.read_bytes())       # package or live calibration
     return h.hexdigest()[:16]
 
 
 def build(out: Path, trials: int = 8, null_frames: int = 500, force_bench: bool = False,
           network: bool = True) -> None:
     out.mkdir(parents=True, exist_ok=True)
+    from . import classifier
+    classifier.activate_live_calibration(out / "data")    # same calibration as the scan
     for f in SITE.iterdir():
         if f.is_file():
             shutil.copy2(f, out / f.name)

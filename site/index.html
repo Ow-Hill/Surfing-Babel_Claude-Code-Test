@@ -67,6 +67,8 @@
         <div class="mono" id="live-loc">–</div>
         <div class="muted small" id="live-status" aria-live="polite">starting…</div>
         <button id="live-toggle" class="btn ghost">Pause</button>
+        <a id="live-flag" class="btn ghost" target="_blank" rel="noopener" hidden
+           title="Flag this frame: opens a pre-filled GitHub issue; the next scan scores it">I see something</a>
         <div id="live-history" class="gallery mini"></div>
       </div>
     </div>
@@ -87,6 +89,7 @@
       </div>
       <div class="controls" id="finds-controls" hidden>
         <label>Sort <select id="finds-sort">
+          <option value="visible">most visible to the eye</option>
           <option value="score">highest score</option>
           <option value="new">newest</option>
         </select></label>
@@ -100,6 +103,12 @@
       <div class="sec-head"><h2 id="near-h">Closest calls</h2>
         <span class="muted">near misses: the highest-scoring frames below the find threshold</span></div>
       <div id="near" class="gallery"></div>
+    </section>
+
+    <section id="flags-section" hidden aria-labelledby="flags-h">
+      <div class="sec-head"><h2 id="flags-h">People noticed</h2>
+        <span class="muted">frames visitors flagged with “I see something”, scored by the scanner, most votes first</span></div>
+      <div id="flags" class="gallery"></div>
     </section>
 
     <section id="leaders-section" hidden aria-labelledby="leaders-h">
@@ -180,11 +189,13 @@
         <button id="d-open" class="btn" type="button">Open in Babelia</button>
         <button id="d-link" class="btn ghost" type="button">Copy link</button>
         <a id="d-dl" class="btn ghost" download>Download</a>
+        <a id="d-flag" class="btn ghost" target="_blank" rel="noopener" hidden
+           title="Opens a pre-filled GitHub issue; the next scan scores this frame and replies">I see something</a>
       </div>
       <div id="d-ov" class="ov" hidden>
         <div class="ov-top">
           <label class="check"><input id="d-ov-toggle" type="checkbox" checked> Show evidence <kbd>E</kbd></label>
-          <div id="d-ov-layers" class="seg" role="group" aria-label="Evidence layer (keys 1–5)"></div>
+          <div id="d-ov-layers" class="seg" role="group" aria-label="Evidence layer (keys 1–6)"></div>
         </div>
         <div class="ov-thr">
           <label for="d-ov-thr">Threshold</label>

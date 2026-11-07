@@ -12,6 +12,8 @@ on:
       minutes:
         description: "Minutes to scan (max ~330; the job limit is 6 h)"
         default: "25"
+  issues:
+    types: [opened]               # "I see something" flags get scored within minutes
   push:
     branches: [main]
     paths: ["babel_surfer/**", "site/**", ".github/workflows/**"]
@@ -27,6 +29,7 @@ concurrency:
 
 jobs:
   scan:
+    if: github.event_name != 'issues' || startsWith(github.event.issue.title, 'Flag')
     runs-on: ubuntu-latest
     timeout-minutes: 355
     steps:
@@ -73,7 +76,8 @@ jobs:
                   fi
                 fi
                 ;;
-              schedule) MIN=45 ;;  # hourly: leaves time for re-scoring, build and publish
+              schedule) MIN=45 ;;
+              issues) MIN=0 ;;     # just score the flag, rebuild and publish  # hourly: leaves time for re-scoring, build and publish
               *) MIN=25 ;;
             esac
           fi
@@ -98,12 +102,19 @@ jobs:
             return 1
           }
 
+          # frames visitors flagged ("I see something" issues): score, reply, close
+          python -m babel_surfer.flags --data public/data || echo "flags step failed; continuing"
+
           remaining=$MIN
           while :; do
             this=$(( remaining < CHUNK ? remaining : CHUNK ))
             echo "::group::scan $this min ($remaining min left)"
             python -m babel_surfer.scan --out public/data --minutes "$this" --workers 3 --max-workers 5
             echo "::endgroup::"
+            # tests still calibrated on simulated static switch to real frames once
+            # the scan log has enough of them; re-score the log if that happened
+            python -m babel_surfer.calibrate --refit-live public/data
+            python -m babel_surfer.remine --out public/data
             python -m babel_surfer.build_site --out public
             python -m babel_surfer.alerts --data public/data --feed public/feed.xml --alert alert.md
             if [ -f alert.md ]; then

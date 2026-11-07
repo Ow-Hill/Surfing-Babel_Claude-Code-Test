@@ -56,7 +56,7 @@ covers each:
 | 3.3 | Search outward from known pictures (seeded demos) | Equivalent to 3.2: without the mapping, a picture's neighbours are random static. |
 | 3.4 | Bias the slideshow start range | No effect: every location is equally random. |
 
-## Status (2026-11-05)
+## Status (2026-11-07)
 
 | item | status |
 |---|---|
@@ -69,8 +69,11 @@ covers each:
 | 2.1 log every frame's scores | **done.** `stats.test_hist` (forever) and `data/scores.npy` (last 100k frames). |
 | 2.2 per-test calibration | **done (Nov 2026).** The audit of 23,456 logged frames found that 9 of 10 tests had spreads of 0.3–0.7 because of a 1.0 floor on the standard deviation. They are replaced by empirical null maps learned on real frames (`nullmap.py`); held-out frames now match N(0, 1). `remine.py` re-scored the log and recovered 5 finds from 4 tests. |
 | 2.3 combined score | **done.** Calibrated separately; shown in the detail view and as a leaderboard. |
-| 2.4 cascade | not done: CPU isn't the bottleneck |
-| 2.5 learned detector | not done: needs a training setup; next candidate |
+| 2.4 cascade | superseded: shared preprocessing, a rotation index, pyramids and a process pool made all 16 tests (0.42 s) cheaper than the original 10 (0.60 s) |
+| 2.5 learned detector | partly: six hand-built perceptual tests (spot, curves, flat, colours, spectrum, face) came first. A pretrained vision model (CLIP-style, CPU) is the agreed next phase, once the log has 5,000 real frames for the new tests |
+| 2.8 human-noticeable | **done.** Each find gets a visibility score (contrast against static's own flicker), finds sort by it, and the benchmark reports detector vs eye |
+| 2.9 human flags | **done.** "I see something" opens a GitHub issue; the workflow scores the frame, replies and lists it under People noticed |
+| 2.10 look-elsewhere | **done.** Each find shows a frame-wide σ allowing for all 16 tests (Šidák); finds still use per-test 4σ, by choice |
 | 2.6 per-test leaderboards | **done** (top 3 each) |
 | 2.7 fingerprint monitor | **done** |
 | 3.2 generator research | **spike done.** Partly affine structure found between equally spaced locations; see `research-babelia-generator.md`. |

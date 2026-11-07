@@ -47,7 +47,7 @@ def rescore_log(store: Store) -> tuple[np.ndarray, np.ndarray] | None:
         return None
     scores = Store.upgrade_score_log(old)
     raw = calibrate.raw_from_log(scores, cal["tests"])
-    z, comb = calibrate.apply_maps(cal["maps"], raw)
+    z, comb = calibrate.apply_maps(cal["maps"], raw, cal["combined_tests"])
     new = scores.copy()
     for t in TESTS:
         new[t] = z[t]
@@ -61,7 +61,8 @@ def rescore_log(store: Store) -> tuple[np.ndarray, np.ndarray] | None:
     np.save(tmp, new)
     os.replace(tmp, path)
 
-    peak = np.nanmax(np.stack([new[t].astype(float) for t in TESTS]), axis=0)
+    with np.errstate(all="ignore"):
+        peak = np.nanmax(np.stack([new[t].astype(float) for t in TESTS]), axis=0)
     with store._lock:
         counts = [0] * (len(HIST_EDGES) + 1)
         for v in peak:
@@ -154,6 +155,7 @@ def main(argv=None) -> int:
     ap.add_argument("--workers", type=int, default=2)
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
+    classifier.activate_live_calibration(args.out)
     run = mine(Store(args.out), args.threshold, args.workers)
     if run is None:
         print("score log already matches the current calibration")

@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import argparse
 import logging
+import multiprocessing
+import os
 import random
 import statistics
 import threading
@@ -22,8 +24,9 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 
+from . import classifier
 from .classifier import INTERESTING_SIGMA, classify
 from .storage import Store
 
@@ -140,7 +143,15 @@ class Politeness:
 
 def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
          threshold: float = INTERESTING_SIGMA, max_frames: int | None = None,
-         max_workers: int | None = None) -> dict:
+         max_workers: int | None = None, processes: int | None = None) -> dict:
+    """Scan for ``minutes``. Fetching happens in threads (the server is the
+    bottleneck); classification runs in ``processes`` worker processes
+    (default: all cores but one; 0 = in the fetch threads), so scoring never
+    holds up the next request."""
+    # a calibration refitted from this site's own scan log, if there is one
+    live = classifier.activate_live_calibration(out)
+    if live:
+        log.info("using live calibration %s", live)
     store = Store(out)
     promoted = store.promote(threshold)
     if promoted:
@@ -180,6 +191,18 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
     deadline = time.time() + minutes * 60
     stop = threading.Event()
 
+    if processes is None:
+        processes = max(1, (os.cpu_count() or 2) - 1)
+    pool = (ProcessPoolExecutor(processes, mp_context=multiprocessing.get_context("forkserver"),
+                                initializer=classifier.use_calibration,
+                                initargs=(str(classifier.CALIBRATION_FILE),))
+            if processes > 0 else None)
+
+    def score(data: bytes):
+        if pool is None:
+            return classify(data, threshold=threshold)
+        return pool.submit(classify, data, threshold=threshold).result()
+
     def worker():
         while not stop.is_set() and time.time() < deadline:
             if not polite.acquire(stop):
@@ -200,7 +223,7 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
                 store.error(run)
                 continue
             polite.release(time.time() - t0)
-            result = classify(data, threshold=threshold)
+            result = score(data)
             kind = store.record(loc, data, result, run)
             if kind == "find":
                 log.info("FIND  location=%s  %.1fσ (%s, %s)", loc, result.sigma,
@@ -222,6 +245,8 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
         stop.set()
         for t in threads:
             t.join(150)
+    if pool is not None:
+        pool.shutdown()
     run["finished_at"] = time.time()
     run["end_location"] = counter.peek()
     run["concurrency"] = {"final": polite.limit, "max_used": max(n for _, n in polite.history),
@@ -247,10 +272,12 @@ def main(argv=None) -> int:
     ap.add_argument("--start", type=int, help="start location (default: random)")
     ap.add_argument("--max-frames", type=int)
     ap.add_argument("--threshold", type=float, default=INTERESTING_SIGMA)
+    ap.add_argument("--processes", type=int, default=None,
+                    help="classifier processes (default: cores - 1; 0 = classify in the fetch threads)")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     run = scan(args.out, args.minutes, args.workers, args.start, args.threshold,
-               args.max_frames, args.max_workers)
+               args.max_frames, args.max_workers, args.processes)
     print(f"scanned {run['scanned']} frames, {run['finds']} finds, "
           f"{run['errors']} errors, best {run.get('max_sigma', 0):.2f}σ")
     return 0

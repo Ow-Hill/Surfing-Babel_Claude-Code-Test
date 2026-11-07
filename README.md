@@ -40,8 +40,39 @@ GitHub Actions (hourly) ─► scan.py ─► POST babelia.cgi location=N, N+1, 
   | repetition | any part of the frame recurring at an offset: tiles, repeated motifs (2-D autocorrelation) |
   | symmetry | mirror symmetry about any vertical or horizontal axis |
 
-* **Calibration** (`babel_surfer/calibrate.py`): every test is re-centred on its null
-  distribution, measured on simulated Babel static. The simulation uses 16 levels per channel
+  Six more tests (`babel_surfer/perceptual.py`) are modelled on what people notice first. They
+  look at the frame blurred to viewing scale and pool the three colour channels, so a coloured
+  shape that is weak in every channel still adds up:
+
+  | test | catches |
+  |---|---|
+  | spot | soft or round patches of any colour, 3–24 px (Gaussian scale-space) |
+  | curves | arcs, outlines and strokes (elongated line filters in 8 directions) |
+  | flat | flat patches and single-colour strokes (neighbours that match on Babelia's 16 levels) |
+  | colours | areas drawn with few colours: cartoons, text on a background |
+  | spectrum | photo-like structure (excess low-frequency power; photos fall off as 1/f) |
+  | face | two spots above a third, the layout people read as a face |
+
+  The headline score is the strongest test. Each find also shows a **frame-wide σ** that
+  allows for running all 16 tests (a 4σ reading on one test is about 3.3σ for the whole frame).
+  A **visibility** score (`visibility.py`) estimates whether a person would see anything. It
+  compares the strongest patch's colour contrast with static's own flicker, and finds are
+  sorted by it by default. Most finds, and most benchmark signals, are caught well before they
+  are visible.
+* **"I see something"** (`babel_surfer/flags.py`): any frame on the site, live frames included,
+  can be flagged. The button opens a pre-filled GitHub issue (`Flag: <location>`). The workflow
+  then fetches and scores the frame, replies with the scores, closes the issue and lists the
+  frame under **People noticed**. A 👍 on the issue counts as a vote.
+* **Speed:** shared FFTs and integral images, a precomputed rotation index for angled lines,
+  half-size copies for large features, and a process pool for scoring. All 16 tests take
+  about 0.42 s per frame, down from 0.60 s for the original 10. A regression test pins the
+  original tests' raw statistics, so these speed-ups can't change their calibration.
+
+* **Calibration** (`babel_surfer/calibrate.py`, `nullmap.py`): each test maps its raw statistic
+  through an empirical null distribution: real logged frames for the original ten, simulated
+  static for the six new ones. Once the scan log holds 5,000 real frames for a new test, the
+  workflow refits it from them (`--refit-live`, stored as `data/calibration.json`) and re-scores
+  the log. The original null was measured on simulated Babel static. The simulation uses 16 levels per channel
   and is JPEG-encoded with **Babelia's own quantization tables**, read from real frames. The
   tone baseline comes from 48 real Babelia frames (leave-one-out). With Pillow's generic
   quality-90 encoder instead, real static scored up to 14σ on the tone test.
@@ -106,6 +137,17 @@ Known pictures blended into simulated Babel static (8 trials each):
 | greyscale / dark static, 1 px checkerboard | – | 8/8 | > 5,000σ |
 | *anything at 2%* | 2% | 0/8 | erased by Babel's 16-level colour quantization |
 | pure static (1,000 frames) | – | none reach 8σ | max 4.99σ |
+
+**Detector vs eye** (Nov 2026, all 16 tests): the benchmark now also reports the visibility model
+for each signal. Signals caught 8/8 while the model rates them invisible include:
+- a thin 3 px arc at 50% (6.5σ, curves);
+- a face-like layout of three spots at 15% (5.8σ);
+- a 2 px pen stroke at 80% (7.4σ, flat);
+- a 64 px grey patch at 25% (22.7σ, colours);
+- tiled and mirror-symmetric static at 20%.
+
+A photo-like 1/f texture at 5% scores 15.6σ and is rated likely visible. Pure static gave 1 false
+4σ reading in 500 simulated frames (expected about 0.25 across 16 tests).
 
 ## Proof it works (`python -m babel_surfer.seeded`)
 
