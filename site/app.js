@@ -300,7 +300,9 @@ function renderOverall(stats, bench) {
   $("hist-caption").textContent =
     `${fmtInt(n)} frames scored by the current detector${since}, each counted by its strongest test.` +
     (total > n ? ` Frames scored by an older version of the detector (${fmtInt(total - n)}) aren't shown.` : "") +
-    (n < 1000 ? " A small sample so far; it fills in as the hourly scans run." : "");
+    (n < 1000 ? " A small sample so far; it fills in as the hourly scans run." : "") +
+    ` Each test is calibrated on real Babel frames, so pure static would put about ${fmtExpected(n * pMaxOver(THRESHOLD, 10))} ` +
+    `frames at ${THRESHOLD}σ or more.`;
 
   // expected for pure static, from the benchmark's simulated frames
   const nullHist = bench && bench.null && bench.null.hist && JSON.stringify(bench.null.hist_edges) === JSON.stringify(edges)
@@ -369,8 +371,9 @@ function renderPerTest(stats) {
   };
   const order = [...Object.keys(TEST_INFO), "combined"].filter((t) => th.counts[t]);
   const n = th.counts[order[0]].reduce((a, b) => a + b, 0);
-  $("hist-caption").textContent = `${fmtInt(n)} frames, each scored by all ten tests. Every test should look like ` +
-    `the same narrow hump near 0; one that reaches further right is noisier on real Babel frames.`;
+  $("hist-caption").textContent = `${fmtInt(n)} frames, each scored by all ten tests. Each test is calibrated on ` +
+    `real Babel frames, so on pure static every one should look like the same bell curve, with about ` +
+    `${fmtExpected(n * pMaxOver(THRESHOLD, 1))} frames per test at ${THRESHOLD}σ or more.`;
   $("hist-legend").innerHTML = `<span class="key-bar"></span>frames per 1σ band (log scale) <span class="key-thr"></span>${THRESHOLD}σ`;
   box.replaceChildren(...order.map((t) => {
     const raw = th.counts[t], bins = regroup(raw), total = raw.reduce((a, b) => a + b, 0);
@@ -392,7 +395,8 @@ function renderPerTest(stats) {
     fig.className = "mini-hist";
     fig.innerHTML = `<figcaption><b></b><span class="muted small"></span></figcaption><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img"></svg>`;
     fig.querySelector("b").textContent = t === "combined" ? "All tests combined" : testName(t);
-    fig.querySelector(".muted").textContent = over && over.k ? `${fmtInt(over.k)} of ${fmtInt(total)} at ${THRESHOLD}σ+` : `none of ${fmtInt(total)} at ${THRESHOLD}σ+`;
+    fig.querySelector(".muted").textContent = (over && over.k ? `${fmtInt(over.k)} of ${fmtInt(total)} at ${THRESHOLD}σ+` : `none of ${fmtInt(total)} at ${THRESHOLD}σ+`) +
+      ` (static: ~${fmtExpected(total * pMaxOver(THRESHOLD, 1))})`;
     fig.querySelector("svg").setAttribute("aria-label", `${fig.querySelector("b").textContent}: score distribution`);
     fig.querySelector("svg").innerHTML = svg;
     return fig;
@@ -509,6 +513,16 @@ function renderFinds(totalFinds) {
     : (totalFinds > finds.length ? `top ${finds.length} of ${fmtInt(totalFinds)} by score` : `${finds.length} so far`) + shown;
 }
 $("finds-sort").onchange = (e) => { view.sort = e.target.value; renderFinds(DATA.totalFinds); };
+
+// Chance that pure static puts the strongest of `k` independent tests at or
+// above `z` sigma (upper normal tail, Abramowitz-Stegun 26.2.17).
+function pMaxOver(z, k) {
+  const t = 1 / (1 + 0.2316419 * z);
+  const tail = Math.exp(-z * z / 2) / Math.sqrt(2 * Math.PI) *
+    t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+  return 1 - Math.pow(1 - tail, k);
+}
+function fmtExpected(x) { return x >= 10 ? fmtInt(Math.round(x)) : x >= 1 ? x.toFixed(1) : x.toFixed(2); }
 
 // ---------------------------------------------------------------- leaderboards
 // share of frames at or above `z` for one test, from its histogram

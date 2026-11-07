@@ -7,6 +7,12 @@ mean / std of each raw statistic. Optionally, real frames downloaded from
 Babelia are scored with the result to confirm simulation and reality agree.
 
     python -m babel_surfer.calibrate --frames 400 --real-dir path/to/jpgs
+
+With a score log from real scanning (``data/scores.npy``), learn each test's
+null distribution from real frames instead (see ``nullmap.py``). This is the
+calibration the live detector uses:
+
+    python -m babel_surfer.calibrate --from-log public/data/scores.npy
 """
 
 from __future__ import annotations
@@ -24,7 +30,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from . import classifier
+from . import classifier, nullmap
 from .classifier import CALIBRATION_FILE, TESTS, raw_scores, tone_histogram
 
 W, H = 640, 416
@@ -62,7 +68,13 @@ def main(argv=None) -> int:
     ap.add_argument("--seed", type=int, default=20261104)
     ap.add_argument("--real-dir", type=Path)
     ap.add_argument("--out", type=Path, default=CALIBRATION_FILE)
+    ap.add_argument("--from-log", type=Path,
+                    help="fit empirical null maps from a real-frame score log (scores.npy)")
     args = ap.parse_args(argv)
+    if args.from_log:
+        report = calibrate_from_log(args.from_log, args.out)
+        print(format_report(report))
+        return 0
 
     rng = np.random.default_rng(args.seed)
 
@@ -84,7 +96,9 @@ def main(argv=None) -> int:
             if (i + 1) % 100 == 0:
                 print(f"  simulated {i + 1}/{args.frames}", file=sys.stderr)
 
-    tests = {t: {"mean": statistics.fmean(v), "std": max(statistics.pstdev(v), 1.0),
+    # The true spread: an earlier version floored it at 1.0, which shrank
+    # every sigma (the raw statistics are maxima with spreads of 0.3-0.7).
+    tests = {t: {"mean": statistics.fmean(v), "std": max(statistics.pstdev(v), 1e-6),
                  "max": max(v)} for t, v in samples.items()}
     tone_source = "simulated"
 
@@ -161,6 +175,98 @@ def main(argv=None) -> int:
                                         real_n=len(sig))
     args.out.write_text(json.dumps(result, indent=2) + "\n")
     return 0
+
+
+MIN_LOG_FRAMES = 5000
+
+
+def raw_from_log(log, legacy: dict) -> dict:
+    """Each test's raw statistic for every logged frame. Logs written before
+    raw columns existed hold ``(raw - mean) / std`` under the calibration in
+    ``legacy`` (calibration.json's ``tests``), which is exactly invertible."""
+    from .storage import Store
+    log = Store.upgrade_score_log(log)
+    out = {}
+    for t in TESTS:
+        raw = log[f"raw_{t}"].astype(float)
+        c = legacy.get(t, {"mean": 0.0, "std": 1.0})
+        missing = ~np.isfinite(raw)
+        raw[missing] = log[t][missing].astype(float) * c["std"] + c["mean"]
+        out[t] = raw
+    return out
+
+
+def apply_maps(maps: dict, raw: dict) -> tuple[dict, np.ndarray]:
+    """Per-test sigma arrays and the calibrated combined score."""
+    z = {t: np.round(nullmap.sigma_array(maps[t], raw[t]), 3) for t in TESTS}
+    comb_raw = sum(z[t] for t in TESTS) / np.sqrt(len(TESTS))
+    comb = (nullmap.sigma_array(maps["combined"], comb_raw) if "combined" in maps
+            else comb_raw)
+    return z, comb
+
+
+def _counts(z: np.ndarray, of: int = 1) -> dict:
+    """Exceedance counts vs what N(0,1) predicts (for the max of ``of``
+    independent tests when of > 1)."""
+    z = z[np.isfinite(z)]
+    tail = lambda k: float(len(z) * (1 - statistics.NormalDist().cdf(k) ** of))
+    return {"n": int(len(z)), "sd": round(float(z.std()), 3), "max": round(float(z.max()), 2),
+            **{f"over_{k}": int((z > k).sum()) for k in (2, 3, 4)},
+            **{f"expected_{k}": round(tail(k), 1) for k in (2, 3, 4)}}
+
+
+def calibrate_from_log(log_path: Path, out: Path = CALIBRATION_FILE) -> dict:
+    data = json.loads(out.read_text()) if out.exists() else {}
+    legacy = data.get("tests") or {}
+    log = np.load(log_path)
+    if len(log) < MIN_LOG_FRAMES:
+        raise SystemExit(f"need at least {MIN_LOG_FRAMES} logged frames, got {len(log)}")
+    raw = raw_from_log(log, legacy)
+    odd = (log["location"] % 2).astype(bool)
+
+    def fit_maps(rows):
+        maps = {t: nullmap.fit(raw[t][rows]) for t in TESTS}
+        z, _ = apply_maps(maps, {t: raw[t][rows] for t in TESTS})
+        maps["combined"] = nullmap.fit(sum(z[t] for t in TESTS) / np.sqrt(len(TESTS)))
+        return maps
+
+    # validation: fit on even locations, test on odd ones
+    half = fit_maps(~odd)
+    zv, cv = apply_maps(half, {t: raw[t][odd] for t in TESTS})
+    validation = {t: _counts(zv[t]) for t in TESTS}
+    validation["combined"] = _counts(cv)
+    peak = np.nanmax(np.stack([zv[t] for t in TESTS]), axis=0)
+    validation["headline (max of 10)"] = _counts(peak, of=len(TESTS))
+    # before: the old mean/std standardisation on the same frames
+    before = {t: _counts((raw[t][odd] - legacy.get(t, {}).get("mean", 0.0))
+                         / legacy.get(t, {}).get("std", 1.0)) for t in TESTS}
+
+    maps = fit_maps(np.ones(len(log), bool))          # final: all frames
+    data["maps"] = maps
+    data["maps_source"] = {"frames": int(len(log)), "log": log_path.name,
+                           "method": "empirical CDF + generalised Pareto tail (xi >= 0)",
+                           "validation": validation}
+    out.write_text(_compact_json(data))
+    classifier._calibration_cache = None
+    return {"validation": validation, "before": before}
+
+
+def _compact_json(data) -> str:
+    """Indented JSON with number lists on one line (the maps' knots)."""
+    import re
+    text = json.dumps(data, indent=1)
+    return re.sub(r"\[\s*(-?[\d.e+-]+(?:,\s*-?[\d.e+-]+)*)\s*\]",
+                  lambda m: "[" + re.sub(r"\s+", " ", m.group(1)) + "]", text) + "\n"
+
+
+def format_report(rep: dict) -> str:
+    lines = [f"{'test':22s} {'sd':>5s} {'>2σ':>11s} {'>3σ':>11s} {'>4σ':>9s}   (before: sd, >3σ)"]
+    for t, v in rep["validation"].items():
+        b = rep["before"].get(t)
+        lines.append(f"{t:22s} {v['sd']:5.2f} {v['over_2']:5d}/{v['expected_2']:<5.0f} "
+                     f"{v['over_3']:5d}/{v['expected_3']:<5.1f} {v['over_4']:3d}/{v['expected_4']:<5.2f}"
+                     + (f"   ({b['sd']:.2f}, {b['over_3']})" if b else ""))
+    return "\n".join(lines)
 
 
 if __name__ == "__main__":

@@ -50,6 +50,8 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+from . import nullmap
+
 CHANNELS = ("Y", "Cb", "Cr")
 SHAPE_SCALES = (4, 8, 16, 32, 64)
 BLOB_SCALES = (8, 12, 16, 24, 32, 48)
@@ -114,6 +116,7 @@ class Classification:
     tests: dict = field(default_factory=dict)   # test -> calibrated z
     combined: float = 0.0         # evidence summed over all tests, calibrated
     fingerprint: float = 0.0      # strength of Babelia's 156-row fingerprint (z)
+    raw: dict = field(default_factory=dict)     # test -> raw statistic (for recalibration)
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -402,6 +405,9 @@ def load_calibration(path: Path = CALIBRATION_FILE) -> dict:
         tone = data.get("tone_expected")
         _calibration_cache = {
             "tests": data.get("tests") or {t: {"mean": 0.0, "std": 1.0} for t in TESTS},
+            # empirical null maps learned on real frames (see nullmap.py); when
+            # present they replace the mean/std standardisation
+            "maps": data.get("maps") or {},
             "tone_expected": np.asarray(tone) if tone is not None else None,
         }
     return _calibration_cache
@@ -470,21 +476,40 @@ def combined_raw(tests: dict) -> float:
 
 def classify(image: Image.Image | bytes | str | Path,
              threshold: float = INTERESTING_SIGMA) -> Classification:
-    cal = load_calibration()["tests"]
     extras: dict = {}
     raw = raw_scores(image, extras=extras)
-    tests = {}
-    for t, z in raw.items():
-        c = cal.get(t, {"mean": 0.0, "std": 1.0})
-        tests[t] = round((z - c["mean"]) / max(c["std"], 1e-9), 3)
+    tests = calibrate_scores(raw)
     reason = max(tests, key=tests.get)
     sigma = tests[reason]
-    cc = cal.get("combined", {"mean": 0.0, "std": 1.0})
-    combined = (combined_raw(tests) - cc["mean"]) / max(cc["std"], 1e-9)
+    combined = calibrate_combined(tests)
     return Classification(sigma=round(sigma, 3), label=tier_for(sigma),
                           is_interesting=sigma >= threshold, reason=reason,
                           tests=tests, combined=round(combined, 3),
-                          fingerprint=round(extras.get("fingerprint", 0.0), 2))
+                          fingerprint=round(extras.get("fingerprint", 0.0), 2),
+                          raw={t: round(float(v), 5) for t, v in raw.items()})
+
+
+def calibrate_scores(raw: dict) -> dict:
+    """Raw test statistics -> calibrated sigma per test."""
+    cal = load_calibration()
+    out = {}
+    for t, v in raw.items():
+        m = cal["maps"].get(t)
+        if m:
+            out[t] = round(nullmap.sigma(m, float(v)), 3)
+        else:
+            c = cal["tests"].get(t, {"mean": 0.0, "std": 1.0})
+            out[t] = round((v - c["mean"]) / max(c["std"], 1e-9), 3)
+    return out
+
+
+def calibrate_combined(tests: dict) -> float:
+    cal = load_calibration()
+    m = cal["maps"].get("combined")
+    if m:
+        return nullmap.sigma(m, combined_raw(tests))
+    cc = cal["tests"].get("combined", {"mean": 0.0, "std": 1.0})
+    return (combined_raw(tests) - cc["mean"]) / max(cc["std"], 1e-9)
 
 
 # --------------------------------------------------------------------------

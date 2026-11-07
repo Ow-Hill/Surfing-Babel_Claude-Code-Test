@@ -166,6 +166,10 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
         dropped = store.reconcile(threshold)
         if dropped:
             log.info("%d finds no longer reach %.1fσ under the current detector", dropped, threshold)
+    # After a recalibration: re-score the whole score log and fetch the
+    # frames that now qualify (no-op otherwise).
+    from . import remine
+    remine.mine(store, threshold, workers=max(1, min(workers, 2)))
     store.save()
     start = random.randrange(SLIDESHOW_MAX) if start is None else start
     counter = Location(start, max_frames)
@@ -222,7 +226,10 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
     run["end_location"] = counter.peek()
     run["concurrency"] = {"final": polite.limit, "max_used": max(n for _, n in polite.history),
                           "baseline_latency_s": round(polite.baseline or 0, 2),
-                          "changes": len(polite.history) - 1}
+                          "changes": len(polite.history) - 1,
+                          # (minutes into the run, request slots), to see throughput limits
+                          "history": [[round((t - run["started_at"]) / 60, 1), n]
+                                      for t, n in polite.history[-40:]]}
     store.add_run(run)
     store.save()
     return run

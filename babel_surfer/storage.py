@@ -156,11 +156,13 @@ class Store:
         with self._lock:
             keep = [f for f in self.finds if f["sigma"] >= threshold]
             dropped = len(self.finds) - len(keep)
-            # a near miss whose new score reaches the threshold becomes a find
-            for n in self.near:
+            # a near miss or leader whose new score reaches the threshold becomes a find
+            boards = [e for b in self.leaders.values() for e in b]
+            for n in self.near + boards:
                 if n["sigma"] >= threshold and not any(f["location"] == n["location"] for f in keep):
                     n["tier"] = tier_for(n["sigma"])
                     keep.append(n)
+                    n.setdefault("found_at", time.time())
                     self.stats["finds_total"] = self.stats.get("finds_total", 0) + 1
             self.finds = keep
             self.stats["finds_total"] = max(len(keep), self.stats.get("finds_total", 0) - dropped)
@@ -252,14 +254,17 @@ class Store:
                 e["maps"] = None
 
     # ------------------------------------------------------------------
-    def record(self, location: str, image: bytes, result, run: dict) -> str | None:
-        """Account for one classified frame. Returns 'find', 'near' or None."""
+    def record(self, location: str, image: bytes, result, run: dict,
+               count: bool = True) -> str | None:
+        """Account for one classified frame. Returns 'find', 'near' or None.
+        ``count=False`` for a frame that was already counted when it was first
+        scanned (re-mining): it can be kept, but totals and logs don't change."""
         entry = {"location": location, "sigma": result.sigma, "tier": result.label,
                  "reason": result.reason, "tests": result.tests,
                  "combined": getattr(result, "combined", 0.0),
                  "found_at": time.time(), "image": f"images/{location}.jpg",
                  "maps": None, "mask": None, "description": None}
-        kind = self._account(location, entry, result, run)
+        kind = self._account(location, entry, result, run, count)
         leader = self._board(location, entry, result)
         if kind or leader:
             fields = self._write_assets(location, image, result)
@@ -296,63 +301,72 @@ class Store:
                         self._drop_image(g["location"])
         return placed
 
-    def _account(self, location: str, entry: dict, result, run: dict) -> str | None:
+    def _account(self, location: str, entry: dict, result, run: dict,
+                 count: bool = True) -> str | None:
         """Bookkeeping under the lock; decides whether the frame is kept."""
         with self._lock:
-            self.stats["scanned"] += 1
-            self.stats["hist"][hist_bin(result.sigma)] += 1
-            self.stats["hist_current"]["counts"][hist_bin(result.sigma)] += 1
-            # every frame's scores: per-test histograms (kept forever, tiny) and a
-            # rolling raw log (for recalibration and research)
-            counts = self.stats["test_hist"]["counts"]
-            combined = getattr(result, "combined", 0.0)
-            fp = getattr(result, "fingerprint", 0.0)
-            for t, z in list(result.tests.items()) + [("combined", combined)]:
-                counts.setdefault(t, [0] * TEST_HIST_BINS)[test_hist_bin(z)] += 1
-            f = self.stats["fingerprint"]
-            f["n"] += 1
-            f["sum"] += fp
-            f["sumsq"] += fp * fp
-            if f["min"] is None or fp < f["min"]["value"]:
-                f["min"] = {"value": fp, "location": location}
-            try:
-                self._score_log.append((int(location),
-                                        *[result.tests.get(t, float("nan")) for t in self.SCORE_COLUMNS[1:-2]],
-                                        combined, fp))
-            except ValueError:
-                pass                                   # non-numeric location (tests)
-            run["scanned"] += 1
-            run["max_sigma"] = max(run.get("max_sigma", float("-inf")), result.sigma)
-            best = self.stats.get("best")
-            if best is None or result.sigma > best["sigma"]:
-                self.stats["best"] = {"location": location, "sigma": result.sigma}
+            if count:
+                self._count(location, result, run)
+            return self._keep(location, entry, result, run)
 
-            if result.is_interesting:
-                if not any(f["location"] == location for f in self.finds):
-                    self.stats["finds_total"] += 1
-                    run["finds"] += 1
-                    lowest = min((f["sigma"] for f in self.finds), default=float("-inf"))
-                    if len(self.finds) >= MAX_FINDS and result.sigma <= lowest:
-                        return "find"      # counted, but not in the top MAX_FINDS
-                    self.finds.append(entry)
-                    run.setdefault("new_finds", []).append(entry)
-                    self._cap_finds()
-                    return "find"
+    def _count(self, location: str, result, run: dict) -> None:
+        self.stats["scanned"] += 1
+        self.stats["hist"][hist_bin(result.sigma)] += 1
+        self.stats["hist_current"]["counts"][hist_bin(result.sigma)] += 1
+        # every frame's scores: per-test histograms (kept forever, tiny) and a
+        # rolling raw log (for recalibration and research)
+        counts = self.stats["test_hist"]["counts"]
+        combined = getattr(result, "combined", 0.0)
+        fp = getattr(result, "fingerprint", 0.0)
+        for t, z in list(result.tests.items()) + [("combined", combined)]:
+            counts.setdefault(t, [0] * TEST_HIST_BINS)[test_hist_bin(z)] += 1
+        f = self.stats["fingerprint"]
+        f["n"] += 1
+        f["sum"] += fp
+        f["sumsq"] += fp * fp
+        if f["min"] is None or fp < f["min"]["value"]:
+            f["min"] = {"value": fp, "location": location}
+        try:
+            raw = getattr(result, "raw", None) or {}
+            self._score_log.append((int(location),
+                                    *[result.tests.get(t, float("nan")) for t in self.SCORE_COLUMNS[1:-2]],
+                                    combined, fp,
+                                    *[raw.get(t, float("nan")) for t in self.SCORE_COLUMNS[1:-2]]))
+        except ValueError:
+            pass                                   # non-numeric location (tests)
+        run["scanned"] += 1
+        run["max_sigma"] = max(run.get("max_sigma", float("-inf")), result.sigma)
+        best = self.stats.get("best")
+        if best is None or result.sigma > best["sigma"]:
+            self.stats["best"] = {"location": location, "sigma": result.sigma}
+
+    def _keep(self, location: str, entry: dict, result, run: dict) -> str | None:
+        if result.is_interesting:
+            if not any(f["location"] == location for f in self.finds):
+                self.stats["finds_total"] += 1
+                run["finds"] += 1
+                lowest = min((f["sigma"] for f in self.finds), default=float("-inf"))
+                if len(self.finds) >= MAX_FINDS and result.sigma <= lowest:
+                    return "find"      # counted, but not in the top MAX_FINDS
+                self.finds.append(entry)
+                run.setdefault("new_finds", []).append(entry)
+                self._cap_finds()
+                return "find"
+            return None
+
+        lowest = min((n["sigma"] for n in self.near), default=float("-inf"))
+        if len(self.near) < NEAR_MISS_KEEP or result.sigma > lowest:
+            if any(n["location"] == location for n in self.near):
                 return None
-
-            lowest = min((n["sigma"] for n in self.near), default=float("-inf"))
-            if len(self.near) < NEAR_MISS_KEEP or result.sigma > lowest:
-                if any(n["location"] == location for n in self.near):
-                    return None
-                self.near.append(entry)
-                self.near.sort(key=lambda n: n["sigma"], reverse=True)
-                gone = self.near[NEAR_MISS_KEEP:]
-                del self.near[NEAR_MISS_KEEP:]
-                refs = self._referenced()
-                for g in gone:
-                    if g["location"] not in refs:      # may still be a find or a leader
-                        self._drop_image(g["location"])
-                return "near" if entry in self.near else None
+            self.near.append(entry)
+            self.near.sort(key=lambda n: n["sigma"], reverse=True)
+            gone = self.near[NEAR_MISS_KEEP:]
+            del self.near[NEAR_MISS_KEEP:]
+            refs = self._referenced()
+            for g in gone:
+                if g["location"] not in refs:      # may still be a find or a leader
+                    self._drop_image(g["location"])
+            return "near" if entry in self.near else None
         return None
 
     def promote(self, threshold: float) -> int:
@@ -406,17 +420,36 @@ class Store:
                                            "contrast", "angled", "repetition", "symmetry"]),
                      "combined", "fingerprint"]
 
-    def _append_score_log(self, rows: list[tuple]) -> None:
-        """Rolling binary log of the last SCORE_LOG_KEEP frames' scores
-        (location as uint64, scores as float16: 32 bytes per frame)."""
+    @classmethod
+    def score_log_dtype(cls):
+        """location (uint64), calibrated scores (float16) and the raw test
+        statistics (float32, ``raw_<test>``): 72 bytes per frame."""
+        return ([("location", "<u8")] + [(c, "<f2") for c in cls.SCORE_COLUMNS[1:]]
+                + [(f"raw_{c}", "<f4") for c in cls.SCORE_COLUMNS[1:-2]])
+
+    @classmethod
+    def upgrade_score_log(cls, old):
+        """Copy an older-format log into the current format (missing columns
+        become NaN), so a format change never throws history away."""
         import numpy as np
-        dtype = [("location", "<u8")] + [(c, "<f2") for c in self.SCORE_COLUMNS[1:]]
-        new = np.array(rows, dtype=dtype)
+        dtype = np.dtype(cls.score_log_dtype())
+        if old.dtype == dtype:
+            return old
+        new = np.zeros(len(old), dtype=dtype)
+        for name in dtype.names:
+            if name in old.dtype.names:
+                new[name] = old[name]
+            elif dtype[name].kind == "f":
+                new[name] = np.nan
+        return new
+
+    def _append_score_log(self, rows: list[tuple]) -> None:
+        """Rolling binary log of the last SCORE_LOG_KEEP frames' scores."""
+        import numpy as np
+        new = np.array(rows, dtype=self.score_log_dtype())
         path = self.dir / "scores.npy"
         try:
-            old = np.load(path)
-            if old.dtype == new.dtype:
-                new = np.concatenate([old, new])
+            new = np.concatenate([self.upgrade_score_log(np.load(path)), new])
         except (FileNotFoundError, ValueError, OSError):
             pass
         tmp = self.dir / "scores.tmp.npy"
