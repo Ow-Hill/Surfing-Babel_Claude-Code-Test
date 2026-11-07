@@ -68,12 +68,13 @@
     const active = runs.find((r) => r.status === "in_progress") || runs.find((r) => r.status !== "completed");
     const waiting = runs.some((r) => r.status === "queued" || r.status === "pending" || r.status === "waiting");
     $("scan-run").hidden = !active;
-    // Hourly scans run most of the time, so the button queues a scan instead
-    // of being disabled; GitHub keeps only one queued run, so it is disabled
-    // only while one is already waiting.
+    // Scans relay into each other, so one is nearly always running and the
+    // next is queued behind it. A click then would only replace that queued
+    // run (GitHub keeps one), so the button is for restarting the relay
+    // when nothing is running.
     busy = !!active;
-    $("scan-btn").disabled = waiting;
-    $("scan-btn").textContent = waiting ? "Scan queued" : active ? "Queue a scan" : "Scan now";
+    $("scan-btn").disabled = waiting || !!active;
+    $("scan-btn").textContent = active ? "Scanning now" : waiting ? "Scan queued" : "Scan now";
     if (active) {
       $("scan-run").href = active.html_url;
       const label = active.status === "in_progress"

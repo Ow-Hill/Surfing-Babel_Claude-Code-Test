@@ -1,7 +1,10 @@
 name: Scan Babel and publish site
 
-# Every hour: pull frames from the Babelia slideshow, classify them, and
-# publish the results to GitHub Pages (served from the gh-pages branch).
+# Pull frames from the Babelia slideshow, classify them, and publish the
+# results to GitHub Pages (served from the gh-pages branch). Each run ends by
+# dispatching the next one (a relay), so scanning is continuous; the hourly
+# cron only restarts the relay if it ever stops. Set the repository variable
+# SCAN_CONTINUOUS to "off" to go back to hourly scans.
 # Concurrency adapts to Babelia's response time (see babel_surfer/scan.py),
 # and long scans publish every 30 minutes instead of only at the end.
 on:
@@ -62,6 +65,7 @@ jobs:
           fi
 
       - name: Scan, build and publish (every 30 minutes)
+        id: scan
         env:
           GH_TOKEN: ${{ github.token }}
           INPUT_MINUTES: ${{ github.event.inputs.minutes }}
@@ -97,6 +101,7 @@ jobs:
           fi
           if [ "$MIN" -gt 300 ]; then MIN=300; fi   # leaves ~55 min of the 355 for builds and pushes
           CHUNK=30
+          echo "minutes=$MIN" >> "$GITHUB_OUTPUT"
 
           git -C public config user.name "github-actions[bot]"
           git -C public config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -159,10 +164,33 @@ jobs:
                git diff --name-only "${{ github.sha }}" FETCH_HEAD | grep -qE '^(babel_surfer/|site/|\.github/|requirements)'; then
               echo "main moved to $(git rev-parse --short FETCH_HEAD): handing $remaining min to a new run"
               gh workflow run scan-and-publish.yml --repo "${{ github.repository }}" --ref main \
-                -f minutes="$remaining" -f publish_first=1 && break
+                -f minutes="$remaining" -f publish_first=1 && echo "handed_off=1" >> "$GITHUB_OUTPUT" && break
               echo "hand-off failed; carrying on with this run"
             fi
           done
+
+      # The relay: start the next run now instead of waiting for the hourly
+      # cron, which GitHub often skips (scanning was idle about half of each
+      # day). Not after a cancel, a hand-off (that run carries on), or a scan
+      # that got no frames at all (Babelia down: let the cron retry hourly).
+      # The concurrency group keeps it to one run at a time, at the same
+      # polite request rate.
+      - name: Keep scanning (start the next run)
+        if: ${{ !cancelled() && steps.scan.outputs.handed_off != '1' && vars.SCAN_CONTINUOUS != 'off' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MINUTES: ${{ steps.scan.outputs.minutes }}
+        run: |
+          if [ "${MINUTES:-0}" -gt 0 ] && ! python -c "
+          import json, sys
+          s = json.load(open('public/data/stats.json'))
+          sys.exit(0 if (s.get('last_run') or {}).get('scanned', 0) > 0 else 1)"; then
+            echo "::warning::the last scan got no frames; not relaying (the hourly cron will retry)"
+            exit 0
+          fi
+          gh workflow run scan-and-publish.yml --repo "${{ github.repository }}" --ref main -f minutes=300 \
+            && echo "next run dispatched" || echo "::warning::could not dispatch the next run"
 
       # GitHub disables scheduled workflows in public repos after 60 days
       # without repository activity. Re-enabling the workflow through the API

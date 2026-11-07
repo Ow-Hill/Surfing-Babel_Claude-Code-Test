@@ -198,6 +198,38 @@ def test_politeness_backs_off_and_recovers():
     assert p.limit == max(1, before - 1)
 
 
+def test_politeness_judges_each_level_on_fresh_requests():
+    """One slow burst steps down once; it must not cascade to a single slot
+    on the same stale samples (the old 5 -> 1 in a minute)."""
+    import threading
+    p = scan_mod.Politeness(start=5, min_workers=1, max_workers=5)
+    stop = threading.Event()
+    for _ in range(12):
+        p.acquire(stop)
+        p.release(4.0)
+    assert p.limit == 5
+    for _ in range(4):                       # a short slow spell
+        p.acquire(stop)
+        p.release(30.0)
+    for _ in range(8):                       # back to normal
+        p.acquire(stop)
+        p.release(4.0)
+    assert p.limit >= 4
+
+
+def test_politeness_baseline_relaxes_after_a_lucky_spell():
+    import threading
+    p = scan_mod.Politeness(start=3, min_workers=1, max_workers=5)
+    stop = threading.Event()
+    for _ in range(8):                       # an unusually quick start
+        p.acquire(stop)
+        p.release(2.0)
+    for _ in range(200):                     # then the server's normal speed
+        p.acquire(stop)
+        p.release(5.0)
+    assert p.limit == 5 and p.baseline > 4
+
+
 def test_reconcile_after_rescoring(tmp_path):
     s = Store(tmp_path)
     run = {"scanned": 0, "finds": 0, "errors": 0}

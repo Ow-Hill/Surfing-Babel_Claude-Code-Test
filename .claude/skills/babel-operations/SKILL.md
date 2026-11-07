@@ -20,12 +20,17 @@ description: Ship and run Surfing Babel. Covers the branch → PR → CI → mer
 ## Never
 - Put tokens or secrets in the repo or on the site. The Scan now token lives only in the
   visitor's localStorage. The external cron uses the owner's own token.
-- Promise a quick deploy while a manual scan is running.
+- Promise a deploy sooner than the end of the current 30-minute chunk.
+  - Scanning is **continuous**: each run dispatches the next 300-minute run (the relay), so
+    one is almost always running. Repository variable `SCAN_CONTINUOUS=off` stops it.
   - The workflow keeps **one pending run**; any newer trigger (push, Scan now, flag issue)
-    cancels it.
+    cancels it. That's harmless: every run relays at its end.
   - The running scan hands over to new code only between its 30-minute chunks.
   - A run that started on older workflow code can't hand over at all, so it runs until it
     finishes or hits the 6-hour limit.
+- Judge search speed by one chunk. Use the 24-hour figures (frames a day and the share of
+  time scanning, both shown on the site under "last scan finished"). The biggest loss was
+  idle time, not slow requests.
 - Remove the `|| echo ::warning::` guards after the scan step. They make every chunk
   publish even if refit, re-mine, build or alerts fail.
 
