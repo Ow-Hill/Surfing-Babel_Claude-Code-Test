@@ -34,6 +34,12 @@ class FakeGitHub:
         self.replies[number] = text
         self.closed.append(number)
 
+    def comment(self, number, text):
+        self.replies[number] = text
+
+    def close(self, number, completed=True):
+        self.closed.append(number)
+
 
 def test_flags_are_scored_kept_and_answered(tmp_path):
     gh = FakeGitHub([
@@ -54,3 +60,31 @@ def test_flags_are_scored_kept_and_answered(tmp_path):
     assert "777" in gh.replies[1] and "σ" in gh.replies[1]
     assert store.stats["scanned"] == 0                               # not counted as scanned
     assert any(f["location"] == "777" for f in store.finds)          # the face also became a find
+
+
+def test_votes_merge_and_authors_are_limited():
+    mk = lambda n, loc, who, up=0: {"number": n, "title": f"Flag: {loc}", "user": {"login": who},
+                                    "reactions": {"+1": up}}
+    issues = [mk(1, 5, "a", 2), mk(2, 5, "b"), mk(3, 6, "spam"), mk(4, 7, "spam"),
+              mk(5, 8, "spam"), mk(6, 9, "spam"), mk(7, 10, "c")]
+    groups = dict(flags.group_flags(issues, limit=20, per_author=3))
+    assert [i["number"] for i in groups["5"]] == [1, 2]          # same frame: one entry
+    assert "9" not in groups and "10" in groups                  # 4th from one author waits
+    assert len(flags.group_flags(issues, limit=2)) == 2
+
+
+def test_failing_frame_does_not_block_others_and_is_closed_after_retries(tmp_path):
+    gh = FakeGitHub([{"number": 1, "title": "Flag: 1", "body": ""},
+                     {"number": 2, "title": "Flag: 2", "body": ""}])
+    good = babel_static(np.random.default_rng(4))
+
+    def fetch(loc):
+        if loc == "1":
+            raise RuntimeError("Babelia down")
+        return good
+    store = Store(tmp_path)
+    for attempt in range(flags.MAX_FAILURES):
+        gh.issues = [i for i in gh.issues if i["number"] not in gh.closed]
+        flags.process(store, gh, fetch)
+    assert 2 in gh.closed and 1 in gh.closed
+    assert "1" not in store.stats["flag_failures"]

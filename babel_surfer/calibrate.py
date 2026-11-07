@@ -150,13 +150,19 @@ def main(argv=None) -> int:
               "tone_source": tone_source,
               "tests": tests, "tone_expected": tone_expected.round(6).tolist()}
 
-    args.out.write_text(json.dumps(result, indent=2) + "\n")
-    classifier._calibration_cache = None
+    # merge: keep the empirical maps (and their sources) already in the file
+    if args.out.exists():
+        merged = json.loads(args.out.read_text())
+        merged.update(result)
+        result = merged
+    args.out.write_text(_compact_json(result))
+    classifier.use_calibration(args.out)
     print(f"wrote {args.out}")
 
     # Null distribution of the final headline sigma on fresh simulated frames.
     rng2 = np.random.default_rng(args.seed + 1)
-    with ProcessPoolExecutor(max_workers=os.cpu_count() or 1) as ex:
+    with ProcessPoolExecutor(max_workers=os.cpu_count() or 1, initializer=classifier.use_calibration,
+                             initargs=(str(args.out),)) as ex:
         sim = list(ex.map(classifier.classify,
                           [babel_static(rng2) for _ in range(max(100, args.frames // 2))],
                           chunksize=8))
@@ -184,7 +190,7 @@ def main(argv=None) -> int:
             result["null_sigma"].update(real_max=max(sig),
                                         real_mean=statistics.fmean(sig),
                                         real_n=len(sig))
-    args.out.write_text(json.dumps(result, indent=2) + "\n")
+    args.out.write_text(_compact_json(result))
     return 0
 
 
@@ -211,7 +217,9 @@ def apply_maps(maps: dict, raw: dict, combined_tests=None) -> tuple[dict, np.nda
     """Per-test sigma arrays (NaN for tests without a map or a value) and the
     calibrated combined score, pooled over ``combined_tests``."""
     n = len(next(iter(raw.values())))
-    z = {t: (np.round(nullmap.sigma_array(maps[t], raw[t]), 3) if t in maps
+    # rounded and clipped exactly like classify(), so the log stays finite in
+    # float16 and re-scoring gives the same numbers a live scan would
+    z = {t: (np.round(np.clip(nullmap.sigma_array(maps[t], raw[t]), -9.0, 6.0e4), 3) if t in maps
              else np.full(n, np.nan)) for t in TESTS}
     names = [t for t in (combined_tests or classifier.CORE_TESTS) if t in maps]
     stack = np.stack([z[t] for t in names]) if names else np.zeros((1, n))
@@ -219,7 +227,7 @@ def apply_maps(maps: dict, raw: dict, combined_tests=None) -> tuple[dict, np.nda
     comb_raw = np.where(k > 0, np.nansum(stack, axis=0) / np.sqrt(np.maximum(k, 1)), np.nan)
     comb = (nullmap.sigma_array(maps["combined"], comb_raw) if "combined" in maps
             else comb_raw)
-    return z, comb
+    return z, np.round(np.clip(comb, -9.0, 6.0e4), 3)
 
 
 def _counts(z: np.ndarray, of: int = 1) -> dict:

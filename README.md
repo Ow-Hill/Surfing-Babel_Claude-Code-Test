@@ -235,8 +235,26 @@ It adds results to the data already on the `gh-pages` branch, rebuilds the site 
 **every 30 minutes** during long scans, so results appear sooner and a failed run loses at most
 one chunk. GitHub Pages serves that branch.
 
+Other triggers and safeguards:
+- **Fast republishing.** A push that changes only the site, docs or tests republishes without
+  scanning (0 minutes).
+- **Flags.** A new issue titled `Flag: <location>` starts a short run that scores the frame.
+- **Hand-off.** If code or site files change on `main` during a long scan, the scan hands its
+  remaining minutes to a fresh run on the new code, which publishes before it scans.
+- **Failures don't lose data.** Every step after the scan (refit, re-mine, build, alerts) may
+  fail without losing the chunk: the data is always published, with the previous site if the
+  build broke.
+- **Inputs are checked.** The `minutes` input must be a whole number and is capped at 300.
+
 Frames scored by an older detector version are re-fetched and re-scored automatically at the start
-of the next scan. Each saved frame records its `detector` id.
+of the next scan. The same happens when the analysis code changes (descriptions, maps,
+visibility). Each saved frame records its `detector` and `assets` ids.
+
+Re-mining the score log runs once per calibration, recorded as `log_calibration` in `stats.json`,
+not on every scan.
+
+Dependencies are pinned in `requirements.txt`, because a different Pillow could change decoded
+pixels. Development tools are listed in `requirements-dev.txt`.
 
 **Keep-alive:** GitHub turns off scheduled workflows in public repos after 60 days without
 activity. The last step of every run re-enables the workflow through GitHub's API, which resets

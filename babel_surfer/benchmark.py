@@ -24,6 +24,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from .calibrate import LEVELS, encode_like_babelia
 from .classifier import INTERESTING_SIGMA, classify
+from .storage import make_thumb
 
 W, H = 640, 416
 
@@ -238,7 +239,10 @@ def _classify_many(frames: list[bytes]) -> list:
     workers = max(1, os.cpu_count() or 1)
     if workers == 1 or len(frames) < 4:
         return [classify(f) for f in frames]
-    with ProcessPoolExecutor(max_workers=workers) as ex:
+    from . import classifier
+    # workers score with the same calibration as this process (package or live)
+    with ProcessPoolExecutor(max_workers=workers, initializer=classifier.use_calibration,
+                             initargs=(str(classifier.CALIBRATION_FILE),)) as ex:
         return list(ex.map(classify, frames, chunksize=4))
 
 
@@ -269,13 +273,16 @@ def run(trials: int, null_frames: int, out: Path | None, seed: int = 7) -> dict:
             examples.append((kind, frames[0]))
     null_frames_b = [babel_static(rng) for _ in range(null_frames)]
 
-    flat = [f for _, _, fr in cases for f in fr] + null_frames_b + [d for _, d in examples]
+    # examples are each case's first frame: reuse their scores, don't classify twice
+    flat = [f for _, _, fr in cases for f in fr] + null_frames_b
     results = _classify_many(flat)
     pos = 0
     rows = []
+    first: dict = {}
     for name, strength, frames in cases:
         res = results[pos:pos + len(frames)]
         pos += len(frames)
+        first[id(frames[0])] = res[0]
         sig = [r.sigma for r in res]
         vis = _visibility(frames[0])
         rows.append({
@@ -290,7 +297,7 @@ def run(trials: int, null_frames: int, out: Path | None, seed: int = 7) -> dict:
               f"eye {vis['ratio']:.2f} ({vis['label']})", file=sys.stderr)
     null = results[pos:pos + null_frames]
     pos += null_frames
-    ex_res = results[pos:]
+    ex_res = [first[id(d)] for _, d in examples]
 
     null_sig = [c.sigma for c in null]
     from .storage import HIST_EDGES, hist_bin
@@ -315,7 +322,10 @@ def run(trials: int, null_frames: int, out: Path | None, seed: int = 7) -> dict:
         for i, ((label, data), c) in enumerate(zip(examples, ex_res)):
             fn = f"example_{i:02d}.jpg"
             (out / fn).write_bytes(data)
-            ex.append({"label": label, "file": fn, "sigma": c.sigma,
+            # the site shows ~170 px tiles: a ~30 KB preview, full frame on click
+            thumb = f"example_{i:02d}.thumb.jpg"
+            (out / thumb).write_bytes(make_thumb(data))
+            ex.append({"label": label, "file": fn, "thumb": thumb, "sigma": c.sigma,
                        "tier": c.label, "reason": c.reason})
         result["examples"] = ex
         (out / "benchmark.json").write_text(json.dumps(result, indent=2))

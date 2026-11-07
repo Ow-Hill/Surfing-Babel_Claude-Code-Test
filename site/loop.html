@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="How one request to an AI coding agent was processed: prompt, planning, execution, testing, retries and review.">
 <title>Anatomy of One Loop</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   /* Layout: one reading column on a dark "whiteboard"; the redrawn diagram up top,
      then the loop walked node by node, numbered in the order it ran. */
@@ -21,9 +19,10 @@
     --fail: #ff4d6a;       /* red: fail, retry with error context */
     --review: #ff6ad5;     /* pink: human review */
     --harness: #e6b97a;    /* orange dashed: the harness, memory traffic */
-    --hand: "Kalam", "Comic Sans MS", cursive;
-    --body: "IBM Plex Sans", system-ui, sans-serif;
-    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    /* system fonts only: no third-party requests */
+    --hand: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+    --body: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     color-scheme: dark;
   }
   * { box-sizing: border-box; }
@@ -89,7 +88,7 @@
 <div class="wrap">
   <p style="margin:0 0 10px;font-size:.9rem"><a href="agent.html">← How this was built</a></p>
   <h1>Anatomy of one loop</h1>
-  <p class="lede">One request to the AI coding agent on Surfing Babel, traced through your harness diagram, box by box. This is
+  <p class="lede">One request to the AI coding agent on Surfing Babel, traced through the project owner's diagram of an agent harness, box by box. This is
     the loop that became pull request #11. It has explicit sub-goals and several real fail-and-retry cycles.</p>
 
   <div class="prompt"><small>The prompt</small>build this plan and do a round of error fixing<br>make clicking off an image take you back to the home page</div>
@@ -113,7 +112,7 @@
       <!-- human review -->
       <rect x="805" y="18" width="170" height="80" rx="10" fill="none" stroke="#ff6ad5" stroke-width="2.5"/>
       <text x="890" y="52" fill="#ecebe6" font-size="21" text-anchor="middle">Human review</text>
-      <text x="890" y="80" fill="#ff6ad5" font-size="15" text-anchor="middle">PR #11 → your next prompt</text>
+      <text x="890" y="80" fill="#ff6ad5" font-size="15" text-anchor="middle">PR #11 → the next prompt</text>
       <circle cx="958" cy="18" r="13" fill="#1f1f21" stroke="#ff6ad5" stroke-width="2"/><text x="958" y="24" fill="#ff6ad5" font-size="15" text-anchor="middle">8</text>
 
       <!-- harness -->
@@ -218,7 +217,7 @@
           <li><b>Measured data on disk:</b> 147 real Babelia frames downloaded earlier for calibration.</li>
           <li><b>Session rules:</b> develop on one named branch, commit format, open a pull request and merge.</li>
         </ul>
-        <p class="note">No skills or rules files were loaded for this loop. In your diagram's terms, the
+        <p class="note">No skills or rules files were loaded for this loop. In the diagram's terms, the
           injection was code, docs and conversation history.</p>
       </div>
     </li>
@@ -327,12 +326,12 @@
       <span class="num">8</span>
       <div class="step-body">
         <span class="kicker">All goals done → human review</span>
-        <h2>One commit, one pull request, then you</h2>
+        <h2>One commit, one pull request, then the human</h2>
         <p>All five sub-goals closed, so it committed, opened <a href="https://github.com/Ow-Hill/Surfing-Babel_Claude-Code-Test/pull/11">PR #11</a>,
-          merged it and watched the deploy publish. Your next message, "improve the demo feature",
+          merged it and watched the deploy publish. The owner's next message, "improve the demo feature",
           was the human-review step, and it opened the next loop.</p>
-        <p class="note">One difference from your diagram: here the human review came after the merge, not before,
-          because earlier you had asked for changes to go straight to <code>main</code>. The next loop added CI on
+        <p class="note">One difference from the diagram: here the human review came after the merge, not before,
+          because earlier the owner had asked for changes to go straight to <code>main</code>. The next loop added CI on
           pull requests, so a green check now stands in front of every merge.</p>
       </div>
     </li>

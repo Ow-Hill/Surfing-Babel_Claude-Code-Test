@@ -4,7 +4,6 @@ import json
 from statistics import NormalDist
 
 import numpy as np
-import pytest
 
 from babel_surfer import calibrate, classifier, nullmap, remine, storage
 from babel_surfer.classifier import TESTS, Classification
@@ -118,3 +117,26 @@ def test_calibrate_from_log_and_remine(tmp_path, monkeypatch):
     assert "raw_shape" in new.dtype.names and np.isfinite(new["raw_shape"]).all()
     # second run: the log already matches the calibration
     assert remine.mine(store, 4.0, fetch=fake_fetch, classify=fake_classify) is None
+    # ...and stays a no-op after a scan logs more frames: nothing re-fetched, totals stable
+    total, n_fetched = store.stats["finds_total"], len(fetched)
+    store._score_log.append(tuple([10**13] + [0.5] * (len(Store.SCORE_COLUMNS) - 1)
+                                  + [1.0] * (len(Store.SCORE_COLUMNS) - 3)))
+    store.save()
+    assert remine.mine(store, 4.0, fetch=fake_fetch, classify=fake_classify) is None
+    assert len(fetched) == n_fetched and store.stats["finds_total"] == total
+
+
+def test_tail_fit_ignores_a_real_picture_in_the_log():
+    rng = np.random.default_rng(7)
+    v = max_type(rng, 20000)
+    clean = nullmap.fit(v)
+    dirty = nullmap.fit(np.concatenate([v, [500.0, 1e6]]))   # a picture and a flat frame
+    probe = float(np.quantile(v, 0.9999))
+    assert abs(nullmap.sigma(dirty, probe) - nullmap.sigma(clean, probe)) < 0.3
+
+
+def test_scores_stay_finite():
+    m = nullmap.fit(max_type(np.random.default_rng(8), 5000))
+    out = nullmap.sigma_array(m, np.array([np.inf, -np.inf, np.nan, 1e9]))
+    assert out[0] == nullmap.Z_MAX and out[1] == nullmap.Z_FLOOR and np.isnan(out[2])
+    assert out[3] <= nullmap.Z_MAX and np.isfinite(np.float16(out[3]))

@@ -65,7 +65,7 @@
       </button>
       <div class="live-side">
         <div class="mono" id="live-loc">–</div>
-        <div class="muted small" id="live-status" aria-live="polite">starting…</div>
+        <div class="muted small" id="live-status">starting…</div>
         <button id="live-toggle" class="btn ghost">Pause</button>
         <a id="live-flag" class="btn ghost" target="_blank" rel="noopener" hidden
            title="Flag this frame: opens a pre-filled GitHub issue; the next scan scores it">I see something</a>
@@ -133,7 +133,7 @@
         <b>σ</b>: how many standard deviations the frame is from what static produces. Ten are classic statistical
         tests; six are modelled on what people notice first (soft spots, curves, flat strokes, few-colour areas,
         photo-like texture, face-like layouts). 0σ is typical static; in real scans 4σ or more turns up
-        <span class="rate-text">about 1 in 2,000 frames</span>; real static has never reached 8σ.</p>
+        <span class="rate-text">rarely (the measured rate loads with the data)</span>; real static has never reached 8σ.</p>
 
       <p class="muted" id="fp-note"></p>
       <details>
@@ -176,7 +176,7 @@
   <dialog id="detail" aria-labelledby="d-title">
     <div class="d-bar">
       <button id="d-prev" class="icon-btn" type="button" aria-label="Previous (←)" title="Previous (←)">‹</button>
-      <span id="d-title" class="d-title">Frame</span>
+      <span id="d-title" class="d-title" aria-live="polite">Frame</span>
       <button id="d-next" class="icon-btn" type="button" aria-label="Next (→)" title="Next (→)">›</button>
       <span class="spacer"></span>
       <button id="d-close" class="icon-btn" type="button" aria-label="Close (Esc)" title="Close (Esc)">×</button>
@@ -215,13 +215,13 @@
         <summary>All test scores</summary>
         <div id="d-tests" class="bars"></div>
       </details>
-      <p class="muted small kbd-help">Keys: <kbd>←</kbd> <kbd>→</kbd> previous/next · <kbd>E</kbd> evidence · <kbd>1</kbd>–<kbd>5</kbd> layers · <kbd>Esc</kbd> close</p>
+      <p class="muted small kbd-help">Keys: <kbd>←</kbd> <kbd>→</kbd> previous/next · <kbd>E</kbd> evidence · <kbd>1</kbd>–<kbd>6</kbd> layers · <kbd>Esc</kbd> close</p>
     </div>
   </dialog>
 
-  <dialog id="scan-dialog" class="scan-dialog">
+  <dialog id="scan-dialog" class="scan-dialog" aria-labelledby="scan-h">
     <form id="scan-form">
-      <h2>Start a scan</h2>
+      <h2 id="scan-h">Start a scan</h2>
       <p class="muted">Scans run in GitHub Actions, about 1,900 frames per hour, and publish here when they finish.</p>
       <label for="scan-minutes">Length</label>
       <select id="scan-minutes">

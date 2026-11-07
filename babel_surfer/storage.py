@@ -28,6 +28,18 @@ from PIL import Image
 from . import analysis
 from .classifier import TESTS, detector_id
 
+
+def assets_id() -> str:
+    """Hash of the code that turns a frame into its saved maps, description
+    and visibility. When it changes, saved frames are rebuilt on the next scan
+    (without touching the score histograms, which follow detector_id)."""
+    import hashlib
+    h = hashlib.sha256()
+    pkg = Path(__file__).parent
+    for name in ("analysis.py", "visibility.py", "perceptual.py"):
+        h.update((pkg / name).read_bytes())
+    return h.hexdigest()[:12]
+
 NEAR_MISS_KEEP = 12
 LEADERS_KEEP = 3                 # top frames kept per test (and for "combined")
 SCORE_LOG_KEEP = 100_000         # rolling log of every frame's scores
@@ -104,6 +116,7 @@ class Store:
         self.stats.setdefault("fingerprint", {"n": 0, "sum": 0.0, "sumsq": 0.0, "min": None})
         self._score_log: list[tuple] = []
         self._detector = detector_id()
+        self._assets = assets_id()
         self._init_current_hist()
         self._tidy()
 
@@ -129,7 +142,8 @@ class Store:
         self._maps(location).write_text(json.dumps(public, separators=(",", ":")))
         fields = {"maps": f"images/{location}.maps.json", "mask": None,
                   "description": description,
-                  "detector": detector_id(), "visibility": maps.get("visibility")}
+                  "detector": self._detector, "assets": self._assets,
+                  "visibility": maps.get("visibility")}
         if result.reason == "tone" or result.tests.get("tone", 0) >= 3:
             self._mask(location).write_bytes(analysis.tone_mask_png(image, maps))
             fields["mask"] = f"images/{location}.mask.png"
@@ -144,10 +158,11 @@ class Store:
         """Entries that need their full frame again (Babelia regenerates it
         from the location): saved before evidence maps existed, or scored by
         a different detector version."""
-        current = detector_id()
+        current = self._detector
         seen, out = set(), []
         for e in self._all_entries():
-            stale = not self._maps(e["location"]).exists() or e.get("detector") != current
+            stale = (not self._maps(e["location"]).exists() or e.get("detector") != current
+                     or e.get("assets") != self._assets)
             if e["location"] not in seen and stale:
                 seen.add(e["location"])
                 out.append(e)
@@ -170,6 +185,7 @@ class Store:
                     n.setdefault("found_at", time.time())
                     self.stats["finds_total"] = self.stats.get("finds_total", 0) + 1
             self.finds = keep
+            self._cap_finds()
             self.stats["finds_total"] = max(len(keep), self.stats.get("finds_total", 0) - dropped)
             self.near = sorted([n for n in self.near if n["sigma"] < threshold],
                                key=lambda n: n["sigma"], reverse=True)[:NEAR_MISS_KEEP]
@@ -274,7 +290,12 @@ class Store:
                  "maps": None, "mask": None, "description": None}
         kind = self._account(location, entry, result, run, count)
         leader = self._board(location, entry, result)
-        if kind or leader:
+        if kind == "over_cap":            # counted as a find but not stored
+            kind = "find"
+            stored = leader
+        else:
+            stored = bool(kind or leader)
+        if stored:
             fields = self._write_assets(location, image, result)
             with self._lock:
                 entry.update(fields)
@@ -315,7 +336,7 @@ class Store:
         with self._lock:
             if count:
                 self._count(location, result, run)
-            return self._keep(location, entry, result, run)
+            return self._keep(location, entry, result, run, count)
 
     def _count(self, location: str, result, run: dict) -> None:
         self.stats["scanned"] += 1
@@ -348,14 +369,22 @@ class Store:
         if best is None or result.sigma > best["sigma"]:
             self.stats["best"] = {"location": location, "sigma": result.sigma}
 
-    def _keep(self, location: str, entry: dict, result, run: dict) -> str | None:
+    def _keep(self, location: str, entry: dict, result, run: dict,
+              count: bool = True) -> str | None:
+        """Returns 'find', 'near', 'over_cap' (a find counted but not stored:
+        below the top MAX_FINDS) or None. With ``count=False`` (a frame seen
+        before, e.g. re-mined), only a newly stored find adds to the total, so
+        re-mining the same frames never inflates it."""
         if result.is_interesting:
             if not any(f["location"] == location for f in self.finds):
-                self.stats["finds_total"] += 1
-                run["finds"] += 1
                 lowest = min((f["sigma"] for f in self.finds), default=float("-inf"))
                 if len(self.finds) >= MAX_FINDS and result.sigma <= lowest:
-                    return "find"      # counted, but not in the top MAX_FINDS
+                    if count:
+                        self.stats["finds_total"] += 1
+                        run["finds"] += 1
+                    return "over_cap"
+                self.stats["finds_total"] += 1
+                run["finds"] += 1
                 self.finds.append(entry)
                 run.setdefault("new_finds", []).append(entry)
                 self._cap_finds()
@@ -389,7 +418,8 @@ class Store:
                 prev = next((e for e in self._all_entries()
                              if e["location"] == location and e.get("maps")), None)
             if prev:
-                fields = {k: prev.get(k) for k in ("maps", "mask", "description", "detector", "visibility")}
+                fields = {k: prev.get(k) for k in ("maps", "mask", "description", "detector", "assets",
+                                                   "visibility")}
         if fields is None:
             fields = self._write_assets(location, image, result)
         entry = {"location": location, "sigma": result.sigma, "tier": result.label,

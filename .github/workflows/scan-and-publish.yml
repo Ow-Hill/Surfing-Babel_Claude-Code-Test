@@ -10,8 +10,11 @@ on:
   workflow_dispatch:
     inputs:
       minutes:
-        description: "Minutes to scan (max ~330; the job limit is 6 h)"
+        description: "Minutes to scan (max 300; the job limit is 6 h)"
         default: "25"
+      publish_first:
+        description: "Build and publish before scanning (used when a long run hands over to new code)"
+        default: "0"
   issues:
     types: [opened]               # "I see something" flags get scored within minutes
   push:
@@ -29,7 +32,9 @@ concurrency:
 
 jobs:
   scan:
-    if: github.event_name != 'issues' || startsWith(github.event.issue.title, 'Flag')
+    if: >-
+      github.event_name != 'issues' || startsWith(github.event.issue.title, 'Flag') ||
+      startsWith(github.event.issue.title, 'flag') || startsWith(github.event.issue.title, 'FLAG')
     runs-on: ubuntu-latest
     timeout-minutes: 355
     steps:
@@ -40,8 +45,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
 
-      - run: pip install numpy pillow pytest   # pytest: the demo slot's live checklist
+      - run: pip install -r requirements-dev.txt   # pytest: the demo slot's live checklist
 
       - name: Check out existing site data (gh-pages)
         run: |
@@ -57,8 +64,15 @@ jobs:
       - name: Scan, build and publish (every 30 minutes)
         env:
           GH_TOKEN: ${{ github.token }}
+          INPUT_MINUTES: ${{ github.event.inputs.minutes }}
+          PUBLISH_FIRST: ${{ github.event.inputs.publish_first }}
         run: |
-          MIN="${{ github.event.inputs.minutes }}"
+          # inputs arrive through env (never pasted into the script) and must be whole minutes
+          MIN="$INPUT_MINUTES"
+          if [ -n "$MIN" ] && ! [[ "$MIN" =~ ^[0-9]+$ ]]; then
+            echo "::warning::minutes='$MIN' is not a whole number; using 25"
+            MIN=25
+          fi
           if [ -z "$MIN" ]; then
             case "${{ github.event_name }}" in
               push)
@@ -76,12 +90,12 @@ jobs:
                   fi
                 fi
                 ;;
-              schedule) MIN=45 ;;
-              issues) MIN=0 ;;     # just score the flag, rebuild and publish  # hourly: leaves time for re-scoring, build and publish
+              schedule) MIN=45 ;;  # hourly: leaves time for re-scoring, build and publish
+              issues) MIN=0 ;;     # just score the flag, rebuild and publish
               *) MIN=25 ;;
             esac
           fi
-          if [ "$MIN" -gt 330 ]; then MIN=330; fi
+          if [ "$MIN" -gt 300 ]; then MIN=300; fi   # leaves ~55 min of the 355 for builds and pushes
           CHUNK=30
 
           git -C public config user.name "github-actions[bot]"
@@ -103,35 +117,49 @@ jobs:
           }
 
           # frames visitors flagged ("I see something" issues): score, reply, close
-          python -m babel_surfer.flags --data public/data || echo "flags step failed; continuing"
+          python -m babel_surfer.flags --data public/data || echo "::warning::flags step failed; continuing"
+
+          # A long run handed over to this one because main moved: put the new
+          # code live straight away, then scan.
+          if [ "$PUBLISH_FIRST" = "1" ]; then
+            python -m babel_surfer.build_site --out public && publish || echo "::warning::early publish failed"
+          fi
 
           remaining=$MIN
           while :; do
             this=$(( remaining < CHUNK ? remaining : CHUNK ))
             echo "::group::scan $this min ($remaining min left)"
-            python -m babel_surfer.scan --out public/data --minutes "$this" --workers 3 --max-workers 5
+            # Every step after the scan may fail without losing the chunk: the
+            # data always gets published (with the previous site if the build broke).
+            python -m babel_surfer.scan --out public/data --minutes "$this" --workers 3 --max-workers 5 \
+              || echo "::warning::scan step failed; publishing what was saved"
             echo "::endgroup::"
             # tests still calibrated on simulated static switch to real frames once
             # the scan log has enough of them; re-score the log if that happened
-            python -m babel_surfer.calibrate --refit-live public/data
-            python -m babel_surfer.remine --out public/data
-            python -m babel_surfer.build_site --out public
-            python -m babel_surfer.alerts --data public/data --feed public/feed.xml --alert alert.md
+            python -m babel_surfer.calibrate --refit-live public/data || echo "::warning::refit failed"
+            python -m babel_surfer.remine --out public/data || echo "::warning::re-mine failed"
+            python -m babel_surfer.build_site --out public \
+              || echo "::warning::site build failed; publishing the data with the previous site"
+            python -m babel_surfer.alerts --data public/data --feed public/feed.xml --alert alert.md \
+              || echo "::warning::alerts failed"
             if [ -f alert.md ]; then
               gh issue create --repo "${{ github.repository }}" \
-                --title "Surfing Babel: something reached 8σ" --body-file alert.md
-              rm alert.md
+                --title "Surfing Babel: something reached 8σ" --body-file alert.md \
+                || echo "::warning::could not open the alert issue"
+              rm -f alert.md
             fi
-            publish
+            publish || echo "::error::publish failed"
             remaining=$(( remaining - this ))
             [ "$remaining" -gt 0 ] || break
             # New code on main while this long scan runs? Hand the remaining
             # minutes to a fresh run on it, so a merge goes live within one
             # chunk (30 min) instead of waiting hours behind this run.
-            if git fetch -q origin main && [ "$(git rev-parse FETCH_HEAD)" != "${{ github.sha }}" ]; then
+            # Only code or site changes need the hand-off (not docs or tests).
+            if git fetch -q origin main && [ "$(git rev-parse FETCH_HEAD)" != "${{ github.sha }}" ] && \
+               git diff --name-only "${{ github.sha }}" FETCH_HEAD | grep -qE '^(babel_surfer/|site/|\.github/|requirements)'; then
               echo "main moved to $(git rev-parse --short FETCH_HEAD): handing $remaining min to a new run"
               gh workflow run scan-and-publish.yml --repo "${{ github.repository }}" --ref main \
-                -f minutes="$remaining" && break
+                -f minutes="$remaining" -f publish_first=1 && break
               echo "hand-off failed; carrying on with this run"
             fi
           done
