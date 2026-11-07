@@ -238,3 +238,10 @@ def test_current_histogram_backfills_from_score_log(tmp_path):
     (tmp_path / "stats.json").write_text(json.dumps(stats))
     s2 = Store(tmp_path)
     assert sum(s2.stats["hist_current"]["counts"]) == 4 and s2.stats["hist_current"]["since"] is None
+
+
+def test_unreadable_frame_is_an_error_not_a_dead_worker(tmp_path, monkeypatch):
+    good = babel_static(np.random.default_rng(3))
+    monkeypatch.setattr(scan_mod, "fetch", lambda loc: good[:5000] if int(loc) % 2 else good)
+    run = scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=0, max_frames=6, processes=0)
+    assert run["scanned"] == 3 and run["errors"] == 3

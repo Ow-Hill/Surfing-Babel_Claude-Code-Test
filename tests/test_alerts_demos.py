@@ -26,6 +26,16 @@ def test_alert_only_for_picture_level_finds():
     assert "25.0σ" in body and "#77" in body and "location=77" in body and "#1)" not in body
 
 
+def test_alert_checks_every_run_since_the_last_alert():
+    find = {"location": "9", "sigma": 30.0, "tier": "clear", "reason": "spot"}
+    stats = {"runs": [{"finished_at": 10, "scanned": 500, "new_finds": [find]},
+                      {"finished_at": 20, "scanned": 0, "trigger": "remine", "new_finds": []}],
+             "last_run": {"finished_at": 10, "scanned": 500, "new_finds": [find]}}
+    body = alerts.build_alert(stats, since=5)       # the scan is not the latest run
+    assert body and "#9" in body
+    assert alerts.build_alert(stats, since=20) is None   # already alerted
+
+
 def test_demos_offline_rescore(tmp_path):
     rng = np.random.default_rng(1)
     (tmp_path / "landscape.jpg").write_bytes(babel_static(rng))

@@ -404,7 +404,7 @@ function renderPerTest(stats) {
   };
   const order = [...Object.keys(TEST_INFO), "combined"].filter((t) => th.counts[t]);
   const n = th.counts[order[0]].reduce((a, b) => a + b, 0);
-  $("hist-caption").textContent = `${fmtInt(n)} frames, each scored by all ten tests. Each test is calibrated on ` +
+  $("hist-caption").textContent = `${fmtInt(n)} frames, each scored by all ${N_TESTS} tests. Each test is calibrated on ` +
     `real Babel frames, so on pure static every one should look like the same bell curve, with about ` +
     `${fmtExpected(n * pMaxOver(THRESHOLD, 1))} frames per test at ${THRESHOLD}σ or more.`;
   $("hist-legend").innerHTML = `<span class="key-bar"></span>frames per 1σ band (log scale) <span class="key-thr"></span>${THRESHOLD}σ`;
@@ -577,7 +577,9 @@ function rateAtLeast(th, test, z) {
 function renderLeaders(leaders, stats) {
   const order = [...Object.keys(TEST_INFO), "combined"].filter((t) => (leaders[t] || []).length);
   $("leaders-section").hidden = !order.length;
-  $("leaders").replaceChildren(...order.map((t) => {
+  const EYE = new Set(["spot", "curves", "flat", "colours", "spectrum", "face"]);
+  const heading = (text) => { const h = document.createElement("h3"); h.className = "board-group"; h.textContent = text; return h; };
+  const boards = order.map((t) => {
     const board = leaders[t];
     const name = t === "combined" ? "All tests combined" : testName(t);
     const about = t === "combined" ? "weak evidence spread across several tests, summed" : TEST_INFO[t].about;
@@ -601,8 +603,15 @@ function renderLeaders(leaders, stats) {
                     onClick: () => openDetail(items[i], items, `${name} leader`) });
     }));
     box.append(head, row);
+    box.dataset.test = t;
     return box;
-  }));
+  });
+  // two groups: what the eye might see, then the statistical tests (and combined)
+  const eye = boards.filter((b) => EYE.has(b.dataset.test));
+  const stat = boards.filter((b) => !EYE.has(b.dataset.test));
+  $("leaders").replaceChildren(
+    ...(eye.length ? [heading("What the eye might see"), ...eye] : []),
+    ...(stat.length ? [heading("Statistical tests"), ...stat] : []));
 }
 const tierOf = (s) => s >= 40 ? "striking" : s >= 16 ? "clear" : s >= 8 ? "faint" : s >= THRESHOLD ? "anomaly" : s >= 3 ? "near miss" : "static";
 

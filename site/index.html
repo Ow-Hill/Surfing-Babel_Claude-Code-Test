@@ -129,13 +129,15 @@
     <section id="how" class="card how" aria-labelledby="how-h">
       <h2 id="how-h">How detection works</h2>
       <p>Each Babel pixel is an independent random 12-bit colour, so instead of asking “what is this a picture of?”
-        the detector asks “how unlikely is this frame if it were pure static?”. Ten statistical tests each give a
-        score in <b>σ</b>: how many standard deviations the frame is from what static produces. 0σ is typical
-        static, 4σ happens by chance in about <span class="rate-text">1 in 2,000</span> frames, and real static has never reached 8σ.</p>
+        the detector asks “how unlikely is this frame if it were pure static?”. Sixteen tests each give a score in
+        <b>σ</b>: how many standard deviations the frame is from what static produces. Ten are classic statistical
+        tests; six are modelled on what people notice first (soft spots, curves, flat strokes, few-colour areas,
+        photo-like texture, face-like layouts). 0σ is typical static; in real scans 4σ or more turns up
+        <span class="rate-text">about 1 in 2,000 frames</span>; real static has never reached 8σ.</p>
 
       <p class="muted" id="fp-note"></p>
       <details>
-        <summary>The ten tests</summary>
+        <summary>The sixteen tests</summary>
         <div class="tests" id="tests-list"></div>
       </details>
 
@@ -210,7 +212,7 @@
       <label for="d-loc">Location (seed)</label>
       <div class="loc-row"><textarea id="d-loc" class="mono" rows="2" readonly></textarea><button id="d-copy" class="btn">Copy</button></div>
       <details id="d-tests-box">
-        <summary>All ten test scores</summary>
+        <summary>All test scores</summary>
         <div id="d-tests" class="bars"></div>
       </details>
       <p class="muted small kbd-help">Keys: <kbd>←</kbd> <kbd>→</kbd> previous/next · <kbd>E</kbd> evidence · <kbd>1</kbd>–<kbd>5</kbd> layers · <kbd>Esc</kbd> close</p>

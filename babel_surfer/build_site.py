@@ -45,7 +45,8 @@ def bust_cache(out: Path) -> None:
 def detector_fingerprint() -> str:
     from . import classifier
     h = hashlib.sha256()
-    for name in ("classifier.py", "perceptual.py", "nullmap.py", "benchmark.py", "calibrate.py"):
+    for name in ("classifier.py", "perceptual.py", "nullmap.py", "visibility.py", "benchmark.py",
+                 "calibrate.py"):
         h.update((PKG / name).read_bytes())
     h.update(classifier.CALIBRATION_FILE.read_bytes())       # package or live calibration
     return h.hexdigest()[:16]

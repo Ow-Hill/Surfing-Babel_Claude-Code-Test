@@ -125,6 +125,15 @@ jobs:
             publish
             remaining=$(( remaining - this ))
             [ "$remaining" -gt 0 ] || break
+            # New code on main while this long scan runs? Hand the remaining
+            # minutes to a fresh run on it, so a merge goes live within one
+            # chunk (30 min) instead of waiting hours behind this run.
+            if git fetch -q origin main && [ "$(git rev-parse FETCH_HEAD)" != "${{ github.sha }}" ]; then
+              echo "main moved to $(git rev-parse --short FETCH_HEAD): handing $remaining min to a new run"
+              gh workflow run scan-and-publish.yml --repo "${{ github.repository }}" --ref main \
+                -f minutes="$remaining" && break
+              echo "hand-off failed; carrying on with this run"
+            fi
           done
 
       # GitHub disables scheduled workflows in public repos after 60 days
