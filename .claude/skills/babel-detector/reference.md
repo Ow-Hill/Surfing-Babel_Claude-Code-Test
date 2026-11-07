@@ -98,14 +98,30 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
   4. Remember that more tests mean more false finds; the site shows the expected rate.
 
 ## Visibility (`visibility.py`)
-- **Model:** the frame is blurred to viewing scale and converted to CIELAB. The strongest
-  patch's ΔE is divided by what pure static reaches at the same size (`STATIC_MAX`, measured
-  by `calibrate_constants`).
-- **Labels:** ≥2 likely visible, 1.4–2 "barely visible", otherwise invisible.
-- **Limitation:** it under-rates thin lines.
-- **Finding:** the detector catches almost every benchmark signal while the model rates it
-  invisible. All current finds are invisible statistical tails of static. Say so honestly;
-  never relabel them as pictures.
+- **Model:** three cues in CIELAB, each divided by what pure static reaches at the same size
+  (mean of the strongest patch over 24 simulated frames; `calibrate_constants()` re-measures
+  them all), so static reads about 1 on each:
+  - **colour:** the strongest blurred patch's ΔE from the frame's median (`STATIC_MAX`);
+  - **texture:** a patch (8–64 px, or the whole frame) smoother or busier than static,
+    as |log(detail / static's)|, never judged against less than a 10% change (`WEBER`);
+  - **line:** a 2–4 px × 24–64 px strip at 12 angles whose colour variance is far below
+    static's (`LINE_MAX`). The point and `angle` (strip along (cos, sin) in image
+    coordinates, y down) are drawn by the eye layer of the overlay.
+- **Labels:** ≥2 likely visible, 1.4–2 "barely visible", otherwise invisible. Output keeps
+  `ratio`/`label`, and adds `cue`, `parts`, `x`, `y`, `patch` (and `smoother`, `angle`).
+- **Lesson (2026-11-07):** the old colour-only model rated a full-strength 2 px line, a flat
+  grey 64 px square, greyscale static and dark static all *invisible* (0.6–1.1). A thin
+  line or a smooth patch hardly moves a patch's mean colour; the eye sees them because
+  static varies from pixel to pixel and they don't. **Judge the model by eye:** look at the
+  benchmark example images (gh-pages `benchmark/example_*.jpg`) before trusting its labels.
+- **Check on real frames, at full size.** The site's `data/images/*.jpg` are 320×208
+  re-encodes and read about 0.5 on the old scale; they are not a test set. Fetch a few
+  full 640×416 frames serially (finds and random locations): with the new model they read
+  like simulated static (median 1.1, max 1.43 over 32, both from the unchanged colour cue).
+- **Cost:** about 1.8 s per frame; it runs only on saved frames and the benchmark.
+- **Finding:** finds are still invisible statistical tails of static. Many benchmark signals
+  are caught before they are visible, but lines and smooth patches at the strengths the
+  detector needs are visible too. Say so honestly; never relabel finds as pictures.
 
 ## Benchmark and honesty
 - `python -m babel_surfer.benchmark --trials 8 --null 500` hides signals in simulated

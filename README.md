@@ -56,9 +56,11 @@ GitHub Actions (continuous) ─► scan.py ─► POST babelia.cgi location=N, N
   The headline score is the strongest test. Each find also shows a **frame-wide σ** that
   allows for running all 16 tests (a 4σ reading on one test is about 3.3σ for the whole frame).
   A **visibility** score (`visibility.py`) estimates whether a person would see anything. It
-  compares the strongest patch's colour contrast with static's own flicker, and finds are
-  sorted by it by default. Most finds, and most benchmark signals, are caught well before they
-  are visible.
+  looks for the three things that break static's flicker for the eye: a patch of colour, a
+  patch smoother or busier than static, and a thin line whose colour stays constant along
+  its length. Each is compared with what pure static reaches at the same size, finds are
+  sorted by it by default, and the detail view's eye layer marks the most noticeable spot.
+  Most finds, and many benchmark signals, are caught well before they are visible.
 * **"I see something"** (`babel_surfer/flags.py`): any frame on the site, live frames included,
   can be flagged. The button opens a pre-filled GitHub issue (`Flag: <location>`). The workflow
   then fetches and scores the frame, replies with the scores, closes the issue and lists the

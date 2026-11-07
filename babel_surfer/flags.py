@@ -93,7 +93,7 @@ def reply_text(location: str, result, entry: dict) -> str:
     seen = {"likely": "likely visible at a glance", "faint": "faint", "invisible": "not visible"}
     top = sorted(result.tests.items(), key=lambda kv: kv[1], reverse=True)[:3]
     tests = ", ".join(f"{t} {z:.1f}σ" for t, z in top)
-    ratio = f" ({vis['ratio']}× static's own flicker)" if vis.get("ratio") else ""
+    ratio = f" (stands out {vis['ratio']}× as much as anything in pure static)" if vis.get("ratio") else ""
     verdict = ("a **find**" if result.is_interesting else
                "below the find threshold, but kept in *People noticed*")
     return (f"Thanks for flagging **{location}**. Scored by the scan workflow:\n\n"

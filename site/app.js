@@ -66,6 +66,16 @@ async function getJSON(path, fallback, required = true) {
 
 // "faint" is also a score tier, so the eye labels avoid that word
 const VIS_TEXT = { likely: "visible", faint: "barely visible", invisible: "invisible to the eye" };
+// what stands out most to a person (visibility.py's three cues)
+const visCue = (v) => v.cue === "line" ? "a thin line or edge"
+  : v.cue === "texture" ? (v.patch === 0 ? `the whole frame looks ${v.smoother ? "smoother" : "busier"} than static`
+    : `a patch ${v.smoother ? "smoother" : "busier"} than static`)
+  : v.cue === "colour" ? "a patch of colour" : "";
+function visTitle(v) {
+  const what = v.label !== "invisible" && visCue(v) ? `Most noticeable: ${visCue(v)}. ` : "";
+  return what + (v.ratio != null ? `It stands out ${v.ratio}× as much as anything in pure static ` : "") +
+    "(≥2 likely visible at a glance, 1.4–2 barely visible). A simple model of the eye: colour patches, smooth or busy patches, and thin lines";
+}
 
 function tile({ img, loc, label, sigma, tier, caption, onClick, visibility }) {
   const b = document.createElement("button");
@@ -84,8 +94,7 @@ function tile({ img, loc, label, sigma, tier, caption, onClick, visibility }) {
     const v = document.createElement("span");
     v.className = `vis vis-${visibility.label}`;
     v.textContent = VIS_TEXT[visibility.label] || visibility.label;
-    v.title = (visibility.ratio != null ? `Contrast ${visibility.ratio}× what static itself shows at the same size ` : "") +
-      `(≥2 likely visible at a glance, 1.4–2 barely visible). A simple model: it under-rates thin lines`;
+    v.title = visTitle(visibility);
     b.querySelector(".meta").append(v);
   }
   if (caption) {
@@ -173,7 +182,8 @@ function openDetail(item, list = null, label = "") {
     $("d-reason").textContent = `strongest test: ${testName(item.reason)}` +
       (item.sigma_global != null ? ` · ${fmtSigma(item.sigma_global)} for the whole frame, allowing for ${N_TESTS} tests` : "") +
       (item.visibility ? ` · to the eye: ${({ likely: "likely visible", faint: "barely visible", invisible: "invisible" })[item.visibility.label] || item.visibility.label}` +
-        (item.visibility.ratio != null ? ` (${item.visibility.ratio}× static's flicker)` : "") : "") +
+        (item.visibility.ratio != null ? ` (${item.visibility.ratio}× what static shows` +
+          (item.visibility.label !== "invisible" && visCue(item.visibility) ? `: ${visCue(item.visibility)}` : "") + ")" : "") : "") +
       (item.combined != null ? ` · all tests combined: ${fmtSigma(item.combined)}` : "");
   }
 
@@ -737,7 +747,7 @@ async function load() {
       `<td>${r.visible ? `<span class="vis vis-${r.visible}">${VIS_TEXT[r.visible]}</span> ${r.visibility}×` : "–"}</td></tr>`).join("");
     $("bench-table").innerHTML =
       `<thead><tr><th>Hidden signal</th><th>Strength</th><th>Detected</th><th>Weakest score</th><th>Caught by</th>` +
-      `<th title="Contrast against static's own flicker at the same size; ≥2 likely visible at a glance">To the eye</th></tr></thead><tbody>${rows}</tbody>`;
+      `<th title="How much the strongest colour patch, smooth or busy patch, or thin line stands out, as a multiple of what pure static shows; ≥2 likely visible at a glance">To the eye</th></tr></thead><tbody>${rows}</tbody>`;
     const beaten = bench.signals.filter((r) => r.visible && r.visible !== "likely" && r.detected === r.trials).length;
     if (beaten) $("null-note").textContent += ` Detector vs eye: ${beaten} of these signals are caught every time ` +
       `while still invisible or only faint to a person.`;
