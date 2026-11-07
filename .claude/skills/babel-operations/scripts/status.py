@@ -50,6 +50,15 @@ try:
     print(f"  frames scanned {s.get('scanned', 0):,}  finds {s.get('finds_total', 0)}  best {s.get('best')}")
     print(f"  last scan {when(last.get('finished_at'))}: {last.get('scanned', 0)} frames, "
           f"{last.get('finds', 0)} finds")
+    scans = [r for r in s.get("runs", []) if r.get("scanned") and r.get("finished_at")]
+    if scans:
+        end = scans[-1]["finished_at"]
+        span = min(86400, end - scans[0]["started_at"])
+        day = [r for r in scans if r["finished_at"] > end - span]
+        busy = sum(r["finished_at"] - max(r["started_at"], end - span) for r in day)
+        frames = sum(r["scanned"] for r in day)
+        print(f"  last {span / 3600:.0f} h: {frames:,} frames ({frames * 3600 / span:,.0f}/h), "
+              f"scanning {100 * busy / span:.0f}% of the time (the relay should keep this near 100%)")
     print("  re-mined for the current calibration: "
           + ("yes" if s.get("log_calibration") else "not yet (new code not live, or re-mine pending)"))
 except (ValueError, json.JSONDecodeError):

@@ -351,7 +351,7 @@ function renderOverall(stats, bench) {
   $("hist-caption").textContent =
     `${fmtInt(n)} frames scored by the current detector${since}, each counted by its strongest test.` +
     (total > n ? ` Frames scored by an older version of the detector (${fmtInt(total - n)}) aren't shown.` : "") +
-    (n < 1000 ? " A small sample so far; it fills in as the hourly scans run." : "") +
+    (n < 1000 ? " A small sample so far; it fills in as the scans run." : "") +
     ` Each test is calibrated on real Babel frames, so pure static would put about ${fmtExpected(n * pMaxOver(THRESHOLD, N_TESTS))} ` +
     `frames at ${THRESHOLD}σ or more.`;
 
@@ -581,6 +581,21 @@ function pMaxOver(z, k) {
     t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
   return 1 - Math.pow(1 - tail, k);
 }
+// Frames scanned in the 24 hours up to the latest run, and how much of that
+// time a scan was running (scans relay into each other, so this should be near 100%).
+function scanPace(runs) {
+  const scans = (runs || []).filter((r) => r.scanned && r.finished_at && r.started_at);
+  if (!scans.length) return "";
+  const end = scans[scans.length - 1].finished_at;
+  const span = Math.min(86400, end - scans[0].started_at), from = end - span;
+  if (span < 3600) return "";
+  const day = scans.filter((r) => r.finished_at > from);
+  const frames = day.reduce((n, r) => n + r.scanned, 0);
+  const busy = day.reduce((t, r) => t + (r.finished_at - Math.max(r.started_at, from)), 0);
+  const perDay = Math.round(frames * 86400 / span / 100) * 100;
+  return ` · about ${fmtInt(perDay)} frames a day, scanning ${Math.round(100 * Math.min(1, busy / span))}% of the time`;
+}
+
 function fmtExpected(x) { return x >= 10 ? fmtInt(Math.round(x)) : x >= 1 ? x.toFixed(1) : x.toFixed(2); }
 
 // ---------------------------------------------------------------- leaderboards
@@ -680,6 +695,7 @@ async function load() {
   document.querySelectorAll(".rate-text").forEach((e) => (e.textContent = totalFinds ? `about ${rate}` : "very rarely (the exact rate is still being measured)"));
   $("s-best").textContent = stats.best ? fmtSigma(stats.best.sigma) : "–";
   $("s-last").textContent = ago(stats.last_run && stats.last_run.finished_at);
+  $("s-pace").textContent = scanPace(stats.runs);
   renderHist(stats, bench);
 
   renderFinds(totalFinds);

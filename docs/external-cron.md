@@ -1,5 +1,9 @@
 # Reliable hourly scans with an external cron
 
+> **Optional now.** Each scan run dispatches the next one itself (see the README's Hosting
+> section), so scanning is continuous without this. An external cron only helps restart the
+> relay sooner if it ever stops.
+
 GitHub's own `schedule:` trigger is best-effort. On this repository it has fired only a few
 times a day, sometimes not at all, so most scans came from the **Scan now** button. A free
 external cron service can start the same workflow on time, through GitHub's

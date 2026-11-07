@@ -17,12 +17,17 @@ description: Facts about the Babel Image Archive (babelia.libraryofbabel.info) t
 - **Stay polite.** It is a one-person site. Use `scan.Politeness`: start at 3 concurrent
   requests, go up to 5 while latency stays near its best, back off on errors or when
   responses slow. Identify the client as `SurfingBabel/1.0`, never with personal details.
+- **Judge each concurrency level on its own requests.** Clear the latency window after every
+  change, and let the baseline relax (`DRIFT`). Server latency drifts between about 4 s and
+  14 s over a day. Deciding on stale samples against an all-time-best baseline cascaded
+  5 → 1 in a minute, many times per chunk.
 
 ## Never
 - Expect a faster endpoint or caching to help. Every request is rendered server-side in
   5–30 s, the same location is re-rendered each time, and `imagedl.cgi` and GET are just as
   slow.
-- Add parallel runners or more workers without the owner's agreement and a hard rate cap.
+- Add parallel runners or raise `max_workers` above 5 without the owner's agreement and a
+  hard rate cap. Scanning *longer* (the serial relay) at the same cap is fine.
 - Treat nearby locations as nearby pictures. Hill-climbing and biased start ranges don't
   work.
 - Try to read Babelia pixels in the browser. There is no CORS, so all scoring happens in

@@ -10,7 +10,7 @@ like *something*, along with its location (the seed that regenerates it).
 ## How it works
 
 ```
-GitHub Actions (hourly) ─► scan.py ─► POST babelia.cgi location=N, N+1, … ─► classifier
+GitHub Actions (continuous) ─► scan.py ─► POST babelia.cgi location=N, N+1, … ─► classifier
                                                                                     │
                     gh-pages branch ◄─ build_site.py ◄─ data/*.json + images ◄──────┘
                          │
@@ -229,8 +229,11 @@ changed.
 
 ## Hosting
 
-The workflow `.github/workflows/scan-and-publish.yml` runs **hourly** (45-minute scans), on
-pushes that change the code (1-minute scan, so changes go live in a few minutes) and on demand.
+The workflow `.github/workflows/scan-and-publish.yml` scans **continuously**: each run ends by
+dispatching the next (a 300-minute relay), one run at a time at the same polite request rate. The
+hourly cron (45-minute scans) only restarts the relay if it stops, for example after a scan that
+got no frames because Babelia was down. Set the repository variable `SCAN_CONTINUOUS` to `off`
+to go back to hourly scans. It also runs on pushes that change the code (1-minute scan, so changes go live in a few minutes) and on demand.
 It adds results to the data already on the `gh-pages` branch, rebuilds the site and pushes it,
 **every 30 minutes** during long scans, so results appear sooner and a failed run loses at most
 one chunk. GitHub Pages serves that branch.
@@ -276,9 +279,9 @@ sent only to `api.github.com`. Without a token, the dialog links to the workflow
 page. The site can't scan from your browser because Babelia sends no CORS headers, so browsers
 can't read its pixels.
 
-**Reliable schedule:** GitHub's hourly cron is best-effort and often skips runs. For scans
-that start on time, see [docs/external-cron.md](docs/external-cron.md), which sets up a free
-external cron that calls the dispatch API with your own token.
+**Reliable schedule:** GitHub's hourly cron is best-effort and often skips runs (scanning was
+idle about half of each day before the relay). The relay no longer depends on it. An external
+cron ([docs/external-cron.md](docs/external-cron.md)) is now only an optional extra backup.
 
 The scheduled run only fires once the workflow is on the default branch (`main`). Until then, run
 it from the Actions tab or push to this branch.

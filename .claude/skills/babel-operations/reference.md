@@ -17,7 +17,12 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
 
 ## The scan-and-publish workflow (`.github/workflows/scan-and-publish.yml`)
 - **Triggers:**
-  - hourly cron `:23`, which is unreliable on GitHub and often skipped;
+  - **the relay:** the step "Keep scanning" dispatches the next run (`minutes=300`) at the end
+    of every run. It's skipped after a cancel, after a hand-off, when `vars.SCAN_CONTINUOUS ==
+    'off'`, or when the last scan got 0 frames (Babelia down; the cron retries hourly). The
+    `GITHUB_TOKEN` *can* dispatch workflows (`gh workflow run`), unlike pushes made with it.
+    Before the relay, scanning ran only 48–67% of the time (2026-11-06/07);
+  - hourly cron `:23`, which is unreliable on GitHub and often skipped (now only a backup);
   - `workflow_dispatch` (the Scan now button), with inputs `minutes` (≤300) and `publish_first`;
   - a push to main touching `babel_surfer/`, `site/` or `.github/workflows/`. This scans for
     1 minute, or 0 minutes if only site, docs or tests changed;
@@ -37,9 +42,13 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
     (`-f publish_first=1`). A run that started on older workflow code can't do this.
 - **Keep-alive:** the last step calls `PUT .../workflows/scan-and-publish.yml/enable`, which
   resets GitHub's 60-day schedule shutoff.
-- **Reliable scheduling:** an external cron service calls the dispatch API with the owner's
-  fine-grained token (Actions: read and write); see `docs/external-cron.md`. It was still
-  waiting on the owner's token at last check.
+- **External cron** (`docs/external-cron.md`): optional since the relay. It would only restart
+  a stopped relay sooner.
+- **Scan now button:** disabled while a run is active ("Scanning now"). A click would only
+  replace the queued relay run.
+- **Measuring throughput:** each scan run in `stats.runs` has `scanned`, `started_at`,
+  `finished_at`, `frames_per_hour` and `concurrency.history` ([minute, slots]). To find
+  where time goes, compute the time-weighted average slots and the duty cycle over 24–48 h.
 
 ## Checking what is live (from the cloud sandbox)
 - github.io is **not reachable** from the sandbox: a request returns HTTP 000. Check instead:

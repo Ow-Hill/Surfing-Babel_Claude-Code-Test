@@ -92,11 +92,16 @@ class Politeness:
     number of simultaneous requests to what it handles without slowing down.
 
     Tracks fetch latency. The baseline is the best (lowest) rolling median
-    seen; while the current median stays under 1.3x baseline another request
-    slot opens (up to ``max_workers``); above 2x, or on errors, one closes
-    (down to ``min_workers``)."""
+    seen, relaxing slowly (``DRIFT`` per decision) so one lucky quiet spell
+    doesn't make normal latency look slow for the rest of the run. While the
+    current median stays under 1.3x baseline another request slot opens (up
+    to ``max_workers``); above 2x, or on errors, one closes (down to
+    ``min_workers``). After every change the latency window starts afresh, so
+    the next decision is judged on requests made at the new level (judging
+    on stale samples used to cascade 5 -> 1 in about a minute)."""
 
     WINDOW = 12
+    DRIFT = 1.03
 
     def __init__(self, start: int, min_workers: int = 1, max_workers: int = 5):
         self.limit = max(min_workers, min(start, max_workers))
@@ -127,7 +132,8 @@ class Politeness:
                 self.done += 1
                 if len(self.lat) >= self.WINDOW // 2 and self.done % 4 == 0:
                     med = statistics.median(self.lat)
-                    self.baseline = med if self.baseline is None else min(self.baseline, med)
+                    self.baseline = (med if self.baseline is None
+                                     else min(self.baseline * self.DRIFT, med))
                     if med > 2.0 * self.baseline:
                         self._set(self.limit - 1, f"slow ({med:.1f}s vs {self.baseline:.1f}s)")
                     elif med < 1.3 * self.baseline:
@@ -145,6 +151,7 @@ class Politeness:
         if n != self.limit:
             log.info("concurrency %d -> %d (%s)", self.limit, n, why)
             self.limit = n
+            self.lat = []          # judge the new level on its own requests
             self.history.append((time.time(), n))
 
 
@@ -279,6 +286,8 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
         pool.shutdown()
     run["finished_at"] = time.time()
     run["end_location"] = counter.peek()
+    minutes_run = max((run["finished_at"] - run["started_at"]) / 60, 1e-9)
+    run["frames_per_hour"] = round(run["scanned"] / minutes_run * 60)
     run["concurrency"] = {"final": polite.limit, "max_used": max(n for _, n in polite.history),
                           "baseline_latency_s": round(polite.baseline or 0, 2),
                           "changes": len(polite.history) - 1,
