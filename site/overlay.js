@@ -16,14 +16,17 @@ const Overlay = (() => {
                 hint: "4 px bands of rows or columns that are brighter or darker than static" },
     geometry: { label: "Lines, repeats & symmetry", tests: ["angled", "repetition", "symmetry"], slider: true,
                 hint: "the strongest angled line, repeat offset and mirror axis" },
+    eye:      { label: "What the eye might see", tests: ["spot", "curves", "flat", "colours", "face", "spectrum"], slider: true,
+                hint: "soft spots, lines and curves, flat single-colour runs and few-colour areas, per 16 px cell; a box marks the most face-like layout" },
     tone:     { label: "Colour balance", tests: ["tone", "palette", "texture"], slider: true,
                 hint: "pink: every pixel in the colour range that is most over- or under-represented (chart below); the rest is dimmed. They are spread evenly, so this anomaly has no shape" },
   };
   const DEFAULT_LAYER = {
     shape: "mean", blob: "mean", contrast: "contrast", lines: "rows", angled: "geometry",
     repetition: "geometry", symmetry: "geometry", tone: "tone", palette: "tone", texture: "tone",
+    spot: "eye", curves: "eye", flat: "eye", colours: "eye", face: "eye", spectrum: "eye",
   };
-  const STATIC_LIMIT = { mean: 3, contrast: 3, rows: 3, geometry: 3, tone: 3 };
+  const STATIC_LIMIT = { mean: 3, contrast: 3, rows: 3, geometry: 3, tone: 3, eye: 4.5 };
   // colour key per layer (recognition, not recall)
   const KEYS = {
     mean:     [["hsl(55,95%,55%)", "just over threshold"], ["hsl(0,95%,55%)", "strongest"]],
@@ -31,6 +34,7 @@ const Overlay = (() => {
     rows:     [["hsl(40,95%,55%)", "brighter band"], ["hsl(220,95%,55%)", "darker band"]],
     geometry: [["rgb(255,70,70)", "angled line"], ["rgb(80,220,255)", "repeat offset"], ["rgb(190,110,255)", "mirror axis"]],
     tone:     [["rgb(255,60,210)", "pixels in the flagged colour range"], ["rgb(40,36,50)", "everything else (dimmed)"]],
+    eye:      [["hsl(55,95%,55%)", "just over threshold"], ["hsl(0,95%,55%)", "strongest"], ["rgb(120,255,160)", "face-like layout"]],
   };
   let nameOf = (k) => k;
 
@@ -45,6 +49,7 @@ const Overlay = (() => {
       case "rows": return Math.max(maxAbs(maps.rows), maxAbs(maps.cols));
       case "geometry": return Math.max(Math.abs(maps.angled.z || 0), Math.abs(maps.repeat.z || 0), maps.mirror.z || 0);
       case "tone": return maxAbs(maps.tone.flat());
+      case "eye": return Math.max(maps.eye ? maxAbs(maps.eye) : 0, (maps.face && maps.face.z) || 0);
     }
     return 0;
   }
@@ -195,6 +200,16 @@ const Overlay = (() => {
       if (layer === "geometry") {
         const missing = drawGeometry(ctx, maps, thr);
         if (missing.length) note += `. Below threshold: ${missing.join(", ")}.`;
+      }
+      if (layer === "eye") {
+        if (maps.eye) drawCells(ctx, maps, maps.eye, thr, false);
+        const f = maps.face;
+        if (f && f.size && f.z >= thr) {
+          ctx.strokeStyle = "rgba(120,255,160,.95)"; ctx.lineWidth = 3;
+          ctx.strokeRect(f.x - f.size / 2, f.y - f.size / 2, f.size, f.size);
+          label(ctx, `face-like ${f.z.toFixed(1)}`, f.x - f.size / 2, f.y - f.size / 2 - 8);
+        }
+        if (!maps.eye) note += ". (This frame was saved before these tests existed; it is re-scored on the next scan.)";
       }
       if (layer === "tone") {
         drawTone(ctx, maps, thr);

@@ -23,7 +23,7 @@ import math
 import numpy as np
 from PIL import Image
 
-from . import classifier as C
+from . import classifier as C, perceptual, visibility
 
 CELL = 16                       # px per map cell (640x416 -> 40x26)
 ROW_BAND = 4                    # px per row/column profile entry
@@ -39,7 +39,9 @@ RGB = ("red", "green", "blue")
 # Default overlay thresholds (in sigma) per layer: about where a single cell
 # / bin / row of pure static rarely goes. The site lowers them per find when
 # needed so the find's strongest evidence is always visible.
-LAYER_DEFAULTS = {"mean": 3.0, "contrast": 3.0, "rows": 3.0, "tone": 3.0}
+LAYER_DEFAULTS = {"mean": 3.0, "contrast": 3.0, "rows": 3.0, "tone": 3.0, "eye": 4.5}
+#: the perceptual tests' local evidence, merged into one overlay layer
+EYE_KINDS = ("spot", "curves", "flat", "colours")
 
 
 def _load(image) -> Image.Image:
@@ -146,8 +148,18 @@ def analyze(image) -> dict:
     tex = {"horizontal": C._corr(y[:, :-1], y[:, 1:]), "vertical": C._corr(y[:-1, :], y[1:, :]),
            "diagonal": C._corr(y[:-1, :-1], y[1:, 1:]), "anti-diagonal": C._corr(y[:-1, 1:], y[1:, :-1])}
 
+    # what the eye might see: the perceptual tests' evidence per cell
+    perc = perceptual.local_maps(rgb, CELL)
+    eye = np.stack([np.asarray(perc[k], dtype=float)[: mean_best.shape[0], : mean_best.shape[1]]
+                    for k in EYE_KINDS])
+    eye = np.where(np.isfinite(eye), eye, 0.0)
+
     r1 = lambda a: [round(float(v), 1) for v in np.ravel(a)]   # noqa: E731
     return {
+        "eye": r1(eye.max(axis=0)), "eye_kind": [int(v) for v in np.ravel(eye.argmax(axis=0))],
+        "eye_parts": {k: r1(eye[i]) for i, k in enumerate(EYE_KINDS)},
+        "face": perc["face"],
+        "visibility": visibility.visibility(rgb),
         "size": [w, h], "cell": CELL, "grid": [int(mean_best.shape[1]), int(mean_best.shape[0])],
         "mean": r1(mean_best), "mean_channel": [int(v) for v in np.ravel(mean_ch)],
         "contrast": r1(contrast_best),
@@ -167,17 +179,13 @@ def _round(d: dict) -> dict:
 def _angled_endpoints(h: int, w: int, angle: float, row: float) -> list[float]:
     """Map a row of the rotated frame back to a segment in the original, by
     rotating coordinate images the same way the test did."""
-    ys, xs = np.mgrid[0:h, 0:w].astype(np.float32)
-    rx, _ = C._rotated(xs, angle)
-    ry, m = C._rotated(ys, angle)
-    i = int(round(row))
-    i = max(0, min(i, m.shape[0] - 1))
-    valid = np.nonzero(m[i] > 0)[0]
-    if valid.size < 2:
+    src, rows, cnt = C._rotation_index((h, w), angle)
+    i = max(0, min(int(round(row)), cnt.size - 1))
+    pix = src[rows == i]                     # in output-column order
+    if pix.size < 2:
         return []
-    a, b = valid[0], valid[-1]
-    return [round(float(rx[i, a]), 1), round(float(ry[i, a]), 1),
-            round(float(rx[i, b]), 1), round(float(ry[i, b]), 1)]
+    (ya, xa), (yb, xb) = divmod(int(pix[0]), w), divmod(int(pix[-1]), w)
+    return [float(xa), float(ya), float(xb), float(yb)]
 
 
 def tone_mask_png(image, maps: dict) -> bytes:
@@ -218,6 +226,8 @@ def line_angle(line: list[float]) -> int:
 
 
 def _phrase(test: str, maps: dict, sigma: float) -> str:
+    if test in C.PERCEPTUAL_TESTS:
+        return _eye_phrase(test, maps, sigma)
     w, h = maps["size"]
     gw, gh = maps["grid"]
     cell = maps["cell"]
@@ -282,7 +292,35 @@ def _phrase(test: str, maps: dict, sigma: float) -> str:
     return f"{test} ({s})"
 
 
-GLOBAL_TESTS = {"tone", "palette", "texture"}
+GLOBAL_TESTS = {"tone", "palette", "texture", "spectrum"}
+EYE_WORDS = {
+    "spot": "a soft, round patch",
+    "curves": "a faint line or curve",
+    "flat": "a run of near-identical neighbouring pixels (a flat patch or a single-colour stroke)",
+    "colours": "an area drawn with fewer colours than static allows",
+}
+
+
+def _eye_phrase(test: str, maps: dict, sigma: float) -> str:
+    w, h = maps["size"]
+    gw, gh = maps["grid"]
+    cell = maps["cell"]
+    s = f"{sigma:.1f}σ"
+    if test == "face":
+        f = maps.get("face") or {}
+        if f.get("size"):
+            return (f"a face-like arrangement, two spots above a third, about {int(f['size'])} px across, "
+                    f"around {_where(f['x'], f['y'], w, h)} ({s})")
+        return f"a face-like arrangement of spots ({s})"
+    if test == "spectrum":
+        return f"more large-scale variation than static, like a photo's soft shading; nothing local ({s})"
+    parts = maps.get("eye_parts") or {}
+    m = np.asarray(parts.get(test) or maps.get("eye") or [0] * (gw * gh)).reshape(gh, gw)
+    j = np.unravel_index(int(np.argmax(m)), m.shape)
+    strong = int((m >= max(4.0, 0.6 * m[j])).sum())
+    size = int(round(math.sqrt(max(strong, 1)) * cell / 8) * 8)
+    return (f"{EYE_WORDS[test]} around {_where((j[1] + .5) * cell, (j[0] + .5) * cell, w, h)}, "
+            f"roughly {size} px across ({s})")
 
 
 def describe(tests: dict, maps: dict, sigma: float) -> str:

@@ -50,14 +50,17 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from . import nullmap
+from . import nullmap, perceptual
 
 CHANNELS = ("Y", "Cb", "Cr")
 SHAPE_SCALES = (4, 8, 16, 32, 64)
 BLOB_SCALES = (8, 12, 16, 24, 32, 48)
 LINE_BANDS = (1, 2, 4, 8)
-TESTS = ("shape", "blob", "lines", "texture", "palette", "tone",
-         "contrast", "angled", "repetition", "symmetry")
+CORE_TESTS = ("shape", "blob", "lines", "texture", "palette", "tone",
+              "contrast", "angled", "repetition", "symmetry")
+#: tests modelled on what people notice first (perceptual.py)
+PERCEPTUAL_TESTS = ("spot", "curves", "flat", "colours", "spectrum", "face")
+TESTS = CORE_TESTS + PERCEPTUAL_TESTS
 CONTRAST_SCALES = (8, 16, 32)
 ANGLES = (15, 30, 45, 60, 75, 105, 120, 135, 150, 165)
 ANGLE_BANDS = (2, 4, 8)
@@ -87,7 +90,8 @@ TIERS = (            # (minimum sigma, label)
     (float("-inf"), "static"),
 )
 
-CALIBRATION_FILE = Path(__file__).with_name("calibration.json")
+PACKAGE_CALIBRATION = Path(__file__).with_name("calibration.json")
+CALIBRATION_FILE = PACKAGE_CALIBRATION        # see use_calibration()
 
 
 def detector_id() -> str:
@@ -95,6 +99,8 @@ def detector_id() -> str:
     it, so frames scored by an older detector can be re-scored."""
     import hashlib
     h = hashlib.sha256(Path(__file__).read_bytes())
+    for name in ("perceptual.py", "nullmap.py"):
+        h.update(Path(__file__).with_name(name).read_bytes())
     if CALIBRATION_FILE.exists():
         h.update(CALIBRATION_FILE.read_bytes())
     return h.hexdigest()[:12]
@@ -116,6 +122,7 @@ class Classification:
     tests: dict = field(default_factory=dict)   # test -> calibrated z
     combined: float = 0.0         # evidence summed over all tests, calibrated
     fingerprint: float = 0.0      # strength of Babelia's 156-row fingerprint (z)
+    sigma_global: float = 0.0     # headline after accounting for running every test
     raw: dict = field(default_factory=dict)     # test -> raw statistic (for recalibration)
 
     def to_dict(self) -> dict:
@@ -165,6 +172,17 @@ def _bonferroni_max_z(zs: np.ndarray) -> float:
         return 0.0
     log10_p = _log10_two_sided_p(float(np.max(np.abs(zs)))) + math.log10(m)
     return _z_from_upper_p(min(0.0, log10_p))
+
+
+def _bonferroni_max_z_of(top_abs: float, m: int) -> float:
+    """:func:`_bonferroni_max_z` given the largest |z| and the count."""
+    if m == 0:
+        return 0.0
+    log10_p = _log10_two_sided_p(top_abs) + math.log10(m)
+    return _z_from_upper_p(min(0.0, log10_p))
+
+
+_AUTOCORR_COUNT: dict = {}
 
 
 def _wh_z(chi2, df):
@@ -218,27 +236,34 @@ def _test_shape(ch: np.ndarray, sigma2: float) -> float:
     return best
 
 
-def _window_sums(ch: np.ndarray, kh: int, kw: int, stride: int) -> np.ndarray:
-    """Sums over every kh x kw window (step ``stride``) via an integral image."""
-    ii = np.pad(ch, ((1, 0), (1, 0))).cumsum(0).cumsum(1)
+def _integral(ch: np.ndarray) -> np.ndarray:
+    return np.pad(ch, ((1, 0), (1, 0))).cumsum(0).cumsum(1)
+
+
+def _window_sums(ch: np.ndarray, kh: int, kw: int, stride: int,
+                 ii: np.ndarray | None = None) -> np.ndarray:
+    """Sums over every kh x kw window (step ``stride``) via an integral image
+    (pass ``ii`` to reuse one already built for this channel)."""
+    if ii is None:
+        ii = _integral(ch)
     ys = np.arange(0, ch.shape[0] - kh + 1, stride)
     xs = np.arange(0, ch.shape[1] - kw + 1, stride)
     y0, x0 = np.ix_(ys, xs)
     return ii[y0 + kh, x0 + kw] - ii[y0, x0 + kw] - ii[y0 + kh, x0] + ii[y0, x0]
 
 
-def _test_blob(ch: np.ndarray, mu: float, sigma: float) -> float:
+def _test_blob(ch: np.ndarray, mu: float, sigma: float, ii=None) -> float:
     """Most extreme square window anywhere in the frame (sliding, so a small
     object is never split across a block boundary)."""
     best = 0.0
     for k in BLOB_SCALES:
-        sums = _window_sums(ch, k, k, max(1, k // 4))
+        sums = _window_sums(ch, k, k, max(1, k // 4), ii)
         zs = (sums / (k * k) - mu) / (sigma / k)
         best = max(best, _bonferroni_max_z(zs))
     return best
 
 
-def _test_lines(ch: np.ndarray, mu: float, sigma2: float) -> float:
+def _test_lines(ch: np.ndarray, mu: float, sigma2: float, ii=None) -> float:
     """Rows / columns, and bands of 2-8 adjacent rows or columns."""
     h, w = ch.shape
     sigma = math.sqrt(sigma2)
@@ -246,8 +271,8 @@ def _test_lines(ch: np.ndarray, mu: float, sigma2: float) -> float:
     best = max(_var_ratio_z(float(rows.var()), sigma2 / w, h),
                _var_ratio_z(float(cols.var()), sigma2 / h, w))
     for band in LINE_BANDS:
-        rz = _window_sums(ch, band, w, 1).ravel() / (band * w)
-        cz = _window_sums(ch, h, band, 1).ravel() / (band * h)
+        rz = _window_sums(ch, band, w, 1, ii).ravel() / (band * w)
+        cz = _window_sums(ch, h, band, 1, ii).ravel() / (band * h)
         best = max(best,
                    _bonferroni_max_z((rz - mu) / (sigma / math.sqrt(band * w))),
                    _bonferroni_max_z((cz - mu) / (sigma / math.sqrt(band * h))))
@@ -288,34 +313,65 @@ def _test_tone(rgb: np.ndarray, expected_frac: np.ndarray | None) -> float:
     return _upper_max_z(zs)
 
 
-def _test_contrast(ch: np.ndarray, sigma2: float) -> float:
+def _test_contrast(ch: np.ndarray, sigma2: float, ii=None, ii2=None) -> float:
     """Most extreme local variance (flat or noisy patch) vs. static."""
     best = 0.0
     for k in CONTRAST_SCALES:
         n = k * k
-        s1 = _window_sums(ch, k, k, max(1, k // 2))
-        s2 = _window_sums(ch * ch, k, k, max(1, k // 2))
+        s1 = _window_sums(ch, k, k, max(1, k // 2), ii)
+        s2 = _window_sums(ch * ch, k, k, max(1, k // 2), ii2)
         var = np.maximum((s2 - s1 * s1 / n) / (n - 1), 0.0)
         zs = _wh_z(var / sigma2 * (n - 1), n - 1)
         best = max(best, _bonferroni_max_z(zs))
     return best
 
 
-def _rotated(ch: np.ndarray, angle: float) -> tuple[np.ndarray, np.ndarray]:
-    """Zero-mean channel and its validity mask, rotated (nearest neighbour,
-    which keeps static's per-pixel statistics)."""
-    img = Image.fromarray(ch.astype(np.float32), "F").rotate(
-        angle, resample=Image.NEAREST, expand=True)
-    mask = Image.fromarray(np.ones(ch.shape, np.float32), "F").rotate(
-        angle, resample=Image.NEAREST, expand=True)
-    return np.asarray(img, dtype=np.float64), np.asarray(mask, dtype=np.float64)
+_ROTATION_CACHE: dict = {}
 
 
-def angled_profiles(ch: np.ndarray, sigma: float, angle: float) -> dict:
-    """For the frame rotated by ``angle``: {band: (z of every band of rows,
-    usable mask)}. Bands with too few pixels are ignored."""
-    r, m = _rotated(ch - ch.mean(), angle)
-    rows, cnt = r.sum(axis=1), m.sum(axis=1)
+def _rotation_index(shape: tuple[int, int], angle: float):
+    """Where each pixel lands when the frame is rotated by ``angle`` (PIL
+    nearest neighbour, expand=True), computed once per frame size and angle:
+    (source pixel index, output row) for every covered output pixel, and the
+    pixel count of each output row. Rotating an image of pixel indices gives
+    exactly the mapping PIL uses, so results match rotating the frame itself."""
+    key = (shape, angle)
+    hit = _ROTATION_CACHE.get(key)
+    if hit is None:
+        h, w = shape
+        idx = np.arange(1, h * w + 1, dtype=np.float32).reshape(h, w)   # 0 = outside
+        rot = np.asarray(Image.fromarray(idx, "F").rotate(angle, resample=Image.NEAREST,
+                                                          expand=True))
+        rows = np.broadcast_to(np.arange(rot.shape[0])[:, None], rot.shape)
+        valid = rot > 0
+        src = rot[valid].astype(np.int64) - 1
+        row = rows[valid].astype(np.int64)
+        cnt = np.bincount(row, minlength=rot.shape[0]).astype(np.float64)
+        hit = _ROTATION_CACHE[key] = (src, row, cnt)
+    return hit
+
+
+_ALL_ANGLES_CACHE: dict = {}
+
+
+def _all_angles_index(shape: tuple[int, int]):
+    """Every angle's rotation index joined end to end, so one gather and one
+    bincount give the row sums of all rotated frames at once."""
+    hit = _ALL_ANGLES_CACHE.get(shape)
+    if hit is None:
+        srcs, rows, counts, offset = [], [], [], 0
+        for a in ANGLES:
+            src, row, cnt = _rotation_index(shape, a)
+            srcs.append(src)
+            rows.append(row + offset)
+            counts.append((offset, cnt))
+            offset += cnt.size
+        hit = _ALL_ANGLES_CACHE[shape] = (np.concatenate(srcs), np.concatenate(rows),
+                                          counts, offset)
+    return hit
+
+
+def _band_profiles(rows: np.ndarray, cnt: np.ndarray, sigma: float) -> dict:
     ii, ic = np.concatenate([[0], np.cumsum(rows)]), np.concatenate([[0], np.cumsum(cnt)])
     out = {}
     for band in ANGLE_BANDS:
@@ -327,10 +383,21 @@ def angled_profiles(ch: np.ndarray, sigma: float, angle: float) -> dict:
     return out
 
 
+def angled_profiles(ch: np.ndarray, sigma: float, angle: float) -> dict:
+    """For the frame rotated by ``angle``: {band: (z of every band of rows,
+    usable mask)}. Bands with too few pixels are ignored."""
+    src, row, cnt = _rotation_index(ch.shape, angle)
+    flat = (ch - ch.mean()).ravel()
+    return _band_profiles(np.bincount(row, weights=flat[src], minlength=cnt.size), cnt, sigma)
+
+
 def _test_angled(ch: np.ndarray, sigma: float) -> float:
+    src, row, counts, total = _all_angles_index(ch.shape)
+    flat = (ch - ch.mean()).ravel()
+    sums = np.bincount(row, weights=flat[src], minlength=total)
     best = 0.0
-    for a in ANGLES:
-        for z, ok in angled_profiles(ch, sigma, a).values():
+    for offset, cnt in counts:
+        for z, ok in _band_profiles(sums[offset:offset + cnt.size], cnt, sigma).values():
             best = max(best, _bonferroni_max_z(z[ok]))
     return best
 
@@ -340,29 +407,44 @@ def autocorr_z(ch: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     every (dy, dx), via FFT; and a mask of offsets that count (overlap large
     enough, not a tiny neighbour lag). Index [H-1+dy, W-1+dx]."""
     h, w = ch.shape
-    x = (ch - ch.mean()) / max(ch.std(), 1e-9)
+    # float32 FFT: ~1e-4 error on z, measurably faster on this large transform
+    x = ((ch - ch.mean()) / max(ch.std(), 1e-9)).astype(np.float32)
     fh, fw = 2 * h, 2 * w
     f = np.fft.rfft2(x, (fh, fw))
     ac = np.fft.irfft2(f * np.conj(f), (fh, fw))
     ac = np.fft.fftshift(ac)[1:, 1:]                      # lags -(h-1)..(h-1)
-    oy = h - np.abs(np.arange(-(h - 1), h))
-    ox = w - np.abs(np.arange(-(w - 1), w))
-    overlap = np.outer(oy, ox).astype(np.float64)
-    z = ac / np.sqrt(overlap)                              # r * sqrt(n)
-    dy = np.abs(np.arange(-(h - 1), h))[:, None]
-    dx = np.abs(np.arange(-(w - 1), w))[None, :]
-    use = (overlap >= REPEAT_MIN_OVERLAP * h * w) & ((dy >= REPEAT_MIN_LAG) | (dx >= REPEAT_MIN_LAG))
-    use[: h - 1, :] = False                               # each lag pair once (dy >= 0)
-    use[h - 1, : w - 1] = False
-    for fy, fx in BABELIA_FINGERPRINT_LAGS:
-        if fy < h and abs(fx) < w:
-            use[h - 2 + fy: h + 1 + fy, w - 2 + fx: w + 1 + fx] = False
-    return z, use
+    inv_sqrt_overlap, use = _autocorr_consts(h, w)
+    return ac * inv_sqrt_overlap, use                      # r * sqrt(n)
+
+
+_AUTOCORR_CACHE: dict = {}
+
+
+def _autocorr_consts(h: int, w: int):
+    """Per-lag 1/sqrt(overlap) and the mask of lags that count. They depend
+    only on the frame size, so they are built once."""
+    hit = _AUTOCORR_CACHE.get((h, w))
+    if hit is None:
+        oy = h - np.abs(np.arange(-(h - 1), h))
+        ox = w - np.abs(np.arange(-(w - 1), w))
+        overlap = np.outer(oy, ox).astype(np.float64)
+        dy = np.abs(np.arange(-(h - 1), h))[:, None]
+        dx = np.abs(np.arange(-(w - 1), w))[None, :]
+        use = (overlap >= REPEAT_MIN_OVERLAP * h * w) & ((dy >= REPEAT_MIN_LAG) | (dx >= REPEAT_MIN_LAG))
+        use[: h - 1, :] = False                           # each lag pair once (dy >= 0)
+        use[h - 1, : w - 1] = False
+        for fy, fx in BABELIA_FINGERPRINT_LAGS:
+            if fy < h and abs(fx) < w:
+                use[h - 2 + fy: h + 1 + fy, w - 2 + fx: w + 1 + fx] = False
+        hit = _AUTOCORR_CACHE[(h, w)] = (1.0 / np.sqrt(overlap), use)
+    return hit
 
 
 def _test_repetition(ch: np.ndarray) -> float:
     z, use = autocorr_z(ch)
-    return _bonferroni_max_z(z[use])
+    # the max |z| over the used lags, without materialising z[use]
+    return _bonferroni_max_z_of(float(np.abs(z, out=z).max(where=use, initial=0.0)),
+                                int(_AUTOCORR_COUNT.setdefault(use.shape, int(use.sum()))))
 
 
 def mirror_z(ch: np.ndarray, axis: int) -> tuple[np.ndarray, np.ndarray]:
@@ -375,7 +457,8 @@ def mirror_z(ch: np.ndarray, axis: int) -> tuple[np.ndarray, np.ndarray]:
     h, w = x.shape
     f = np.fft.rfft(x, 2 * w, axis=1)
     g = np.fft.rfft(x[:, ::-1], 2 * w, axis=1)
-    cc = np.fft.irfft(f * np.conj(g), 2 * w, axis=1).sum(axis=0)
+    # the inverse FFT is linear: sum the spectra over rows, invert once
+    cc = np.fft.irfft((f * np.conj(g)).sum(axis=0), 2 * w)
     # cc[s] pairs x[c] with x[w-1-c+s]... mirror line at (w - 1 + s) / 2
     shifts = np.concatenate([np.arange(0, w), np.arange(-w, 0)])
     pairs = h * (w - np.abs(shifts))
@@ -397,10 +480,42 @@ def _test_symmetry(ch: np.ndarray) -> float:
 _calibration_cache: dict | None = None
 
 
-def load_calibration(path: Path = CALIBRATION_FILE) -> dict:
+def package_calibration_hash() -> str:
+    import hashlib
+    return hashlib.sha256(PACKAGE_CALIBRATION.read_bytes()).hexdigest()[:16]
+
+
+def live_calibration_path(data_dir) -> Path | None:
+    """``<data_dir>/calibration.json``, the scan workflow's refit of the
+    package calibration from real frames, if it was built on the current
+    package calibration (a code release with a new calibration replaces it)."""
+    p = Path(data_dir) / "calibration.json"
+    try:
+        if json.loads(p.read_text()).get("base") == package_calibration_hash():
+            return p
+    except (OSError, ValueError):
+        pass
+    return None
+
+
+def use_calibration(path) -> None:
+    """Score with this calibration file from now on (this process)."""
+    global CALIBRATION_FILE, _calibration_cache
+    CALIBRATION_FILE = Path(path)
+    _calibration_cache = None
+
+
+def activate_live_calibration(data_dir) -> Path | None:
+    p = live_calibration_path(data_dir)
+    use_calibration(p or PACKAGE_CALIBRATION)
+    return p
+
+
+def load_calibration(path: Path | None = None) -> dict:
     """Returns {"tests": {test: {mean, std}}, "tone_expected": array|None}."""
     global _calibration_cache
     if _calibration_cache is None:
+        path = path or CALIBRATION_FILE
         data = json.loads(path.read_text()) if path.exists() else {}
         tone = data.get("tone_expected")
         _calibration_cache = {
@@ -408,6 +523,7 @@ def load_calibration(path: Path = CALIBRATION_FILE) -> dict:
             # empirical null maps learned on real frames (see nullmap.py); when
             # present they replace the mean/std standardisation
             "maps": data.get("maps") or {},
+            "combined_tests": tuple(data.get("combined_tests") or CORE_TESTS),
             "tone_expected": np.asarray(tone) if tone is not None else None,
         }
     return _calibration_cache
@@ -441,7 +557,7 @@ def raw_scores(image: Image.Image | bytes | str | Path,
     rgb = np.asarray(image, dtype=np.float64)
     ycc = np.asarray(image.convert("YCbCr"), dtype=np.float64)
 
-    out = {t: 0.0 for t in TESTS}
+    out = {t: 0.0 for t in CORE_TESTS}
     flat = False
     for i in range(3):
         ch = ycc[..., i]
@@ -450,10 +566,11 @@ def raw_scores(image: Image.Image | bytes | str | Path,
             flat = True
             continue
         out["shape"] = max(out["shape"], _test_shape(ch, sigma2))
-        out["blob"] = max(out["blob"], _test_blob(ch, mu, math.sqrt(sigma2)))
-        out["lines"] = max(out["lines"], _test_lines(ch, mu, sigma2))
+        ii, ii2 = _integral(ch), _integral(ch * ch)      # shared by the window tests
+        out["blob"] = max(out["blob"], _test_blob(ch, mu, math.sqrt(sigma2), ii))
+        out["lines"] = max(out["lines"], _test_lines(ch, mu, sigma2, ii))
         out["texture"] = max(out["texture"], _test_texture(ch))
-        out["contrast"] = max(out["contrast"], _test_contrast(ch, sigma2))
+        out["contrast"] = max(out["contrast"], _test_contrast(ch, sigma2, ii, ii2))
         out["angled"] = max(out["angled"], _test_angled(ch, math.sqrt(sigma2)))
         out["repetition"] = max(out["repetition"], _test_repetition(ch))
         out["symmetry"] = max(out["symmetry"], _test_symmetry(ch))
@@ -463,15 +580,21 @@ def raw_scores(image: Image.Image | bytes | str | Path,
     out["tone"] = _test_tone(rgb, tone_expected)
     if flat:  # a perfectly flat channel is the opposite of static
         out["shape"] = max(out["shape"], 1e6)
+        out.update({t: 1e6 if t == "flat" else 0.0 for t in PERCEPTUAL_TESTS})
+    else:
+        out.update(perceptual.raw(rgb))
     if extras is not None:
         extras["fingerprint"] = fingerprint_z(rgb)
     return out
 
 
-def combined_raw(tests: dict) -> float:
+def combined_raw(tests: dict, names=CORE_TESTS) -> float:
     """Stouffer-style sum of the per-test calibrated z (before its own
-    calibration): catches weak structure spread across several tests."""
-    return sum(tests[t] for t in TESTS) / math.sqrt(len(TESTS))
+    calibration): catches weak structure spread across several tests.
+    ``names``: the tests it pools (calibration.json's ``combined_tests``;
+    the original ten until the newer tests are calibrated on real frames)."""
+    zs = [tests[t] for t in names if t in tests and math.isfinite(tests[t])]
+    return sum(zs) / math.sqrt(len(zs)) if zs else 0.0
 
 
 def classify(image: Image.Image | bytes | str | Path,
@@ -486,7 +609,20 @@ def classify(image: Image.Image | bytes | str | Path,
                           is_interesting=sigma >= threshold, reason=reason,
                           tests=tests, combined=round(combined, 3),
                           fingerprint=round(extras.get("fingerprint", 0.0), 2),
+                          sigma_global=round(frame_sigma(sigma, len(tests)), 3),
                           raw={t: round(float(v), 5) for t, v in raw.items()})
+
+
+def frame_sigma(top: float, n_tests: int) -> float:
+    """The strongest of ``n_tests`` per-test sigmas as a whole-frame sigma:
+    the chance that *any* test reaches ``top`` on static (Sidak, treating
+    the tests as independent, which is slightly conservative)."""
+    if top <= 0:
+        return top
+    log_p = math.log(0.5) + _log10_two_sided_p(top) * math.log(10)   # one-sided
+    p = math.exp(log_p)
+    log_frame = math.log(-math.expm1(n_tests * math.log1p(-p))) if p > 1e-15 else log_p + math.log(n_tests)
+    return _z_from_upper_p(min(0.0, log_frame / math.log(10)))
 
 
 def calibrate_scores(raw: dict) -> dict:
@@ -505,11 +641,12 @@ def calibrate_scores(raw: dict) -> dict:
 
 def calibrate_combined(tests: dict) -> float:
     cal = load_calibration()
+    names = cal["combined_tests"]
     m = cal["maps"].get("combined")
     if m:
-        return nullmap.sigma(m, combined_raw(tests))
+        return nullmap.sigma(m, combined_raw(tests, names))
     cc = cal["tests"].get("combined", {"mean": 0.0, "std": 1.0})
-    return (combined_raw(tests) - cc["mean"]) / max(cc["std"], 1e-9)
+    return (combined_raw(tests, names) - cc["mean"]) / max(cc["std"], 1e-9)
 
 
 # --------------------------------------------------------------------------

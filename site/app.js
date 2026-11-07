@@ -18,7 +18,14 @@ const TEST_INFO = {
   symmetry:   { name: "Symmetry", about: "mirror symmetry about any vertical or horizontal axis" },
   tone:       { name: "Colour balance", about: "too many or too few pixels in some colour range (too dark, too bright, too few colours)" },
   palette:    { name: "Colour correlation", about: "colour channels moving together (greyscale or limited palettes)" },
+  spot:       { name: "Soft spots", about: "round or soft patches of any colour, 3–24 px (the eye's blob detector)" },
+  curves:     { name: "Curves & strokes", about: "short line pieces in any direction: arcs, outlines, strokes" },
+  flat:       { name: "Flat runs", about: "neighbouring pixels that nearly match: flat patches, single-colour strokes" },
+  colours:    { name: "Few colours", about: "areas drawn with fewer colours than static allows (cartoons, text)" },
+  spectrum:   { name: "Photo-like", about: "more large-scale variation than static, as in photos and soft shading" },
+  face:       { name: "Face-like", about: "two spots above a third: the layout people read as a face" },
 };
+const N_TESTS = Object.keys(TEST_INFO).length;
 const testName = (k) => (TEST_INFO[k] ? TEST_INFO[k].name : k);
 
 const fmtInt = (n) => Number(n || 0).toLocaleString();
@@ -57,7 +64,9 @@ async function getJSON(path, fallback, required = true) {
   return fallback;
 }
 
-function tile({ img, loc, label, sigma, tier, caption, onClick }) {
+const VIS_TEXT = { likely: "visible", faint: "faint to the eye", invisible: "invisible to the eye" };
+
+function tile({ img, loc, label, sigma, tier, caption, onClick, visibility }) {
   const b = document.createElement("button");
   b.className = "tile";
   b.innerHTML = `<img loading="lazy" alt=""><div class="meta"><span class="tag"></span><span class="loc"></span></div>`;
@@ -69,6 +78,13 @@ function tile({ img, loc, label, sigma, tier, caption, onClick }) {
     tag.textContent = `${tier} · ${fmtSigma(sigma)}`;
     tag.classList.add(tierClass(tier));
   } else tag.remove();
+  if (visibility && visibility.label) {
+    const v = document.createElement("span");
+    v.className = `vis vis-${visibility.label}`;
+    v.textContent = VIS_TEXT[visibility.label] || visibility.label;
+    v.title = `Contrast ${visibility.ratio}× what static itself shows at the same size (≥2 likely visible at a glance, 1.4–2 faint). A simple model: it under-rates thin lines`;
+    b.querySelector(".meta").append(v);
+  }
   if (caption) {
     const c = document.createElement("div");
     c.className = "cap";
@@ -77,6 +93,16 @@ function tile({ img, loc, label, sigma, tier, caption, onClick }) {
   }
   b.onclick = onClick;
   return b;
+}
+
+// "I see something": a pre-filled GitHub issue; the scan workflow scores the
+// frame, replies on the issue and adds it to "People noticed".
+const FLAG_REPO = "Ow-Hill/Surfing-Babel_Claude-Code-Test";
+function flagUrl(loc) {
+  if (!loc || !/^\d{1,40}$/.test(String(loc))) return null;
+  const body = `Location: ${loc}\n\nWhat do you see? (optional)\n\n` +
+    `Seen on ${location.origin}${location.pathname}#${loc}`;
+  return `https://github.com/${FLAG_REPO}/issues/new?` + new URLSearchParams({ title: `Flag: ${loc}`, body });
 }
 
 // ---------------------------------------------------------------- detail view
@@ -137,10 +163,15 @@ function openDetail(item, list = null, label = "") {
     $("d-tier").className = `tag ${tierClass(item.tier)}`;
     $("d-sigma").textContent = fmtSigma(item.sigma);
     $("d-reason").textContent = `strongest test: ${testName(item.reason)}` +
+      (item.sigma_global != null ? ` · ${fmtSigma(item.sigma_global)} for the whole frame, allowing for ${N_TESTS} tests` : "") +
+      (item.visibility ? ` · to the eye: ${({ likely: "likely visible", faint: "faint", invisible: "invisible" })[item.visibility.label] || item.visibility.label} (${item.visibility.ratio}× static's flicker)` : "") +
       (item.combined != null ? ` · all tests combined: ${fmtSigma(item.combined)}` : "");
   }
 
   $("d-loc").value = item.location || item.locationPreview;
+  const flag = flagUrl(item.location);
+  $("d-flag").hidden = !flag;
+  if (flag) $("d-flag").href = flag;
   $("d-dl").hidden = !item.download;
   if (item.download) {
     $("d-dl").href = item.download;
@@ -176,7 +207,7 @@ const findItem = (f, kind = "Find") => ({
   key: f.location, kind, location: f.location, preview: `data/${f.image}`, full: BABELIA + f.location,
   maps: f.maps ? `data/${f.maps}` : null, mask: f.mask ? `data/${f.mask}` : null,
   description: f.description, sigma: f.sigma, tier: f.tier, reason: f.reason, tests: f.tests,
-  combined: f.combined,
+  combined: f.combined, sigma_global: f.sigma_global, visibility: f.visibility,
   download: `data/${f.image}`, downloadName: `babel-${f.location}-preview.jpg`,
 });
 
@@ -204,6 +235,8 @@ function openFromHash() {
     const list = visibleFinds().some((f) => f.location === key) ? visibleFinds() : DATA.finds;
     return openDetail(findItem(fi), list.map((f) => findItem(f)), "Find");
   }
+  const fl = (DATA.flags || []).find((x) => x.location === key);
+  if (fl) return openDetail(findItem(fl, "Flagged"), DATA.flags.map((f) => findItem(f, "Flagged")), "Flagged");
   const ni = DATA.near.find((x) => x.location === key);
   if (ni) return openDetail(findItem(ni, "Near miss"), DATA.near.map((f) => findItem(f, "Near miss")), "Near miss");
   for (const [t, board] of Object.entries(DATA.leaders || {})) {
@@ -262,7 +295,7 @@ $("detail").addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft") { step(-1); e.preventDefault(); }
   else if (e.key === "ArrowRight") { step(1); e.preventDefault(); }
   else if (e.key === "e" || e.key === "E") Overlay.toggle();
-  else if (/^[1-5]$/.test(e.key)) Overlay.setLayerIndex(+e.key - 1);
+  else if (/^[1-6]$/.test(e.key)) Overlay.setLayerIndex(+e.key - 1);
 });
 Overlay.init(testName);
 window.addEventListener("hashchange", openFromHash);
@@ -301,7 +334,7 @@ function renderOverall(stats, bench) {
     `${fmtInt(n)} frames scored by the current detector${since}, each counted by its strongest test.` +
     (total > n ? ` Frames scored by an older version of the detector (${fmtInt(total - n)}) aren't shown.` : "") +
     (n < 1000 ? " A small sample so far; it fills in as the hourly scans run." : "") +
-    ` Each test is calibrated on real Babel frames, so pure static would put about ${fmtExpected(n * pMaxOver(THRESHOLD, 10))} ` +
+    ` Each test is calibrated on real Babel frames, so pure static would put about ${fmtExpected(n * pMaxOver(THRESHOLD, N_TESTS))} ` +
     `frames at ${THRESHOLD}σ or more.`;
 
   // expected for pure static, from the benchmark's simulated frames
@@ -447,6 +480,8 @@ function liveNext() {
       $("live-ph").hidden = true;
       $("live-img").dataset.loc = loc;
       $("live-loc").textContent = `#${loc}`;
+      $("live-flag").href = flagUrl(loc);
+      $("live-flag").hidden = false;
       $("live-status").textContent = "";
       live.history = [loc, ...live.history].slice(0, 6);
       $("live-history").replaceChildren(...live.history.slice(1).map((l) =>
@@ -477,12 +512,15 @@ document.querySelector(".live-frame").onclick = () => {
 };
 
 // ---------------------------------------------------------------- finds: sort + filter
-const view = { sort: "score", filter: "all" };
+const view = { sort: "visible", filter: "all" };
+const visRatio = (f) => (f.visibility && f.visibility.ratio) || 0;
 
 function visibleFinds() {
   let list = [...DATA.finds];
   if (view.filter !== "all") list = list.filter((f) => f.reason === view.filter);
-  list.sort(view.sort === "new" ? (a, b) => b.found_at - a.found_at : (a, b) => b.sigma - a.sigma);
+  list.sort(view.sort === "new" ? (a, b) => b.found_at - a.found_at
+    : view.sort === "visible" ? (a, b) => visRatio(b) - visRatio(a) || b.sigma - a.sigma
+    : (a, b) => b.sigma - a.sigma);
   return list;
 }
 
@@ -492,7 +530,7 @@ function renderFinds(totalFinds) {
   const list = visibleFinds();
   const items = list.map((f) => findItem(f));
   $("finds").replaceChildren(...list.map((f, i) =>
-    tile({ img: `data/${f.image}`, loc: f.location, sigma: f.sigma, tier: f.tier,
+    tile({ img: `data/${f.image}`, loc: f.location, sigma: f.sigma, tier: f.tier, visibility: f.visibility,
            caption: shortDesc(f.description), onClick: () => openDetail(items[i], items, "Find") })));
   $("finds-controls").hidden = finds.length < 2;
   // filter chips by strongest test, with counts
@@ -581,13 +619,21 @@ function renderFingerprint(stats) {
 // ---------------------------------------------------------------- data
 async function load() {
   loadFailed = false;
-  const [stats, finds, near, bench, demos, leaders] = await Promise.all([
+  const [stats, finds, near, bench, demos, leaders, flags] = await Promise.all([
     getJSON("data/stats.json", {}), getJSON("data/finds.json", []),
     getJSON("data/near_misses.json", []), getJSON("benchmark/benchmark.json", null, false),
     getJSON("demo/demo.json", [], false), getJSON("data/leaders.json", {}, false),
+    getJSON("data/flags.json", [], false),
   ]);
   $("load-error").hidden = !loadFailed;
-  DATA = { finds, near, demos, leaders };
+  DATA = { finds, near, demos, leaders, flags };
+  $("flags-section").hidden = !flags.length;
+  const flagItems = flags.map((f) => ({ ...findItem(f, "Flagged"),
+    note: `Flagged by ${f.votes} ${f.votes === 1 ? "person" : "people"}${f.note ? `: “${f.note}”` : ""}.` }));
+  $("flags").replaceChildren(...flags.map((f, i) =>
+    tile({ img: `data/${f.image}`, loc: f.location, sigma: f.sigma, tier: f.tier, visibility: f.visibility,
+           caption: `${f.votes} ${f.votes === 1 ? "vote" : "votes"}${f.note ? ` · ${f.note}` : ""}`,
+           onClick: () => openDetail(flagItems[i], flagItems, "Flagged") })));
   renderLeaders(leaders, stats);
   renderFingerprint(stats);
   if (bench) THRESHOLD = bench.threshold_sigma;
@@ -641,9 +687,14 @@ async function load() {
              onClick: () => window.open(`benchmark/${e.file}`, "_blank") })));
     const rows = bench.signals.map((r) =>
       `<tr><td>${r.signal}</td><td>${r.strength === "-" ? "–" : Math.round(r.strength * 100) + "%"}</td>` +
-      `<td>${r.detected}/${r.trials}</td><td>${fmtSigma(r.min_sigma)}</td><td>${testName(r.reason)}</td></tr>`).join("");
+      `<td>${r.detected}/${r.trials}</td><td>${fmtSigma(r.min_sigma)}</td><td>${testName(r.reason)}</td>` +
+      `<td>${r.visible ? `<span class="vis vis-${r.visible}">${VIS_TEXT[r.visible]}</span> ${r.visibility}×` : "–"}</td></tr>`).join("");
     $("bench-table").innerHTML =
-      `<thead><tr><th>Hidden signal</th><th>Strength</th><th>Detected</th><th>Weakest score</th><th>Caught by</th></tr></thead><tbody>${rows}</tbody>`;
+      `<thead><tr><th>Hidden signal</th><th>Strength</th><th>Detected</th><th>Weakest score</th><th>Caught by</th>` +
+      `<th title="Contrast against static's own flicker at the same size; ≥2 likely visible at a glance">To the eye</th></tr></thead><tbody>${rows}</tbody>`;
+    const beaten = bench.signals.filter((r) => r.visible && r.visible !== "likely" && r.detected === r.trials).length;
+    if (beaten) $("null-note").textContent += ` Detector vs eye: ${beaten} of these signals are caught every time ` +
+      `while still invisible or only faint to a person.`;
   }
   if (!$("detail").open) openFromHash();
 }

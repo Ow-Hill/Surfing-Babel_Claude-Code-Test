@@ -26,7 +26,7 @@ from pathlib import Path
 from PIL import Image
 
 from . import analysis
-from .classifier import detector_id
+from .classifier import TESTS, detector_id
 
 NEAR_MISS_KEEP = 12
 LEADERS_KEEP = 3                 # top frames kept per test (and for "combined")
@@ -35,6 +35,7 @@ SCORE_LOG_KEEP = 100_000         # rolling log of every frame's scores
 TEST_HIST_LO, TEST_HIST_HI, TEST_HIST_STEP = -5.0, 20.0, 0.25
 TEST_HIST_BINS = int((TEST_HIST_HI - TEST_HIST_LO) / TEST_HIST_STEP) + 2
 MAX_FINDS = 100
+MAX_FLAGS = 50                  # frames people flagged ("People noticed")
 THUMB_SIZE = (320, 208)
 THUMB_QUALITY = 75
 THUMB_MAX_BYTES = 100_000      # anything bigger is a full frame -> shrink it
@@ -97,6 +98,7 @@ class Store:
         self.finds = _read(self.dir / "finds.json", [])
         self.near = _read(self.dir / "near_misses.json", [])
         self.leaders = _read(self.dir / "leaders.json", {})
+        self.flags = _read(self.dir / "flags.json", [])       # frames people flagged
         self.stats.setdefault("finds_total", len(self.finds))
         self.stats.setdefault("test_hist", {"lo": TEST_HIST_LO, "step": TEST_HIST_STEP, "counts": {}})
         self.stats.setdefault("fingerprint", {"n": 0, "sum": 0.0, "sumsq": 0.0, "min": None})
@@ -124,7 +126,7 @@ class Store:
         self._maps(location).write_text(json.dumps(maps, separators=(",", ":")))
         fields = {"maps": f"images/{location}.maps.json", "mask": None,
                   "description": analysis.describe(result.tests, maps, result.sigma),
-                  "detector": detector_id()}
+                  "detector": detector_id(), "visibility": maps.get("visibility")}
         if result.reason == "tone" or result.tests.get("tone", 0) >= 3:
             self._mask(location).write_bytes(analysis.tone_mask_png(image, maps))
             fields["mask"] = f"images/{location}.mask.png"
@@ -185,16 +187,18 @@ class Store:
             for e in self._all_entries():          # the same frame may sit on several lists
                 if e["location"] == entry["location"]:
                     e.update(fields, sigma=result.sigma, tests=result.tests, reason=result.reason,
-                             tier=result.label, combined=result.combined)
+                             tier=result.label, combined=result.combined,
+                             sigma_global=getattr(result, "sigma_global", None))
 
     def _referenced(self) -> set[str]:
         refs = {e["location"] for e in self.finds} | {e["location"] for e in self.near}
+        refs |= {e["location"] for e in self.flags}
         for board in self.leaders.values():
             refs |= {e["location"] for e in board}
         return refs
 
     def _all_entries(self) -> list[dict]:
-        out = self.finds + self.near
+        out = self.finds + self.near + self.flags
         for board in self.leaders.values():
             out += board
         return out
@@ -262,6 +266,7 @@ class Store:
         entry = {"location": location, "sigma": result.sigma, "tier": result.label,
                  "reason": result.reason, "tests": result.tests,
                  "combined": getattr(result, "combined", 0.0),
+                 "sigma_global": getattr(result, "sigma_global", None),
                  "found_at": time.time(), "image": f"images/{location}.jpg",
                  "maps": None, "mask": None, "description": None}
         kind = self._account(location, entry, result, run, count)
@@ -369,6 +374,36 @@ class Store:
             return "near" if entry in self.near else None
         return None
 
+    def add_flag(self, location: str, image: bytes, result, votes: int, note: str = "",
+                 url: str | None = None, run: dict | None = None) -> dict:
+        """A frame a person flagged: always kept (with preview, maps and
+        description) in the "People noticed" list, ranked by votes, and also
+        accounted as a find / near miss / leader if it qualifies."""
+        if run is not None:
+            self.record(location, image, result, run, count=False)
+        fields = self._write_assets(location, image, result)
+        entry = {"location": location, "sigma": result.sigma, "tier": result.label,
+                 "reason": result.reason, "tests": result.tests,
+                 "combined": getattr(result, "combined", 0.0),
+                 "sigma_global": getattr(result, "sigma_global", None),
+                 "image": f"images/{location}.jpg", "votes": int(votes), "note": note[:280],
+                 "issue": url, "found_at": time.time(), **fields}
+        with self._lock:
+            old = next((f for f in self.flags if f["location"] == location), None)
+            if old:
+                entry["votes"] = max(entry["votes"], old.get("votes", 0))
+                self.flags.remove(old)
+            self.flags.append(entry)
+            self.flags.sort(key=lambda f: (f.get("votes", 0), (f.get("visibility") or {}).get("ratio", 0),
+                                           f["sigma"]), reverse=True)
+            gone = self.flags[MAX_FLAGS:]
+            del self.flags[MAX_FLAGS:]
+            refs = self._referenced()
+            for g in gone:
+                if g["location"] not in refs:
+                    self._drop_image(g["location"])
+        return entry
+
     def promote(self, threshold: float) -> int:
         """Move stored near misses at/above ``threshold`` into finds (used
         when the threshold is lowered). Returns how many moved."""
@@ -411,14 +446,13 @@ class Store:
             _write(self.dir / "finds.json",
                    sorted(self.finds, key=lambda f: f["found_at"], reverse=True))
             _write(self.dir / "near_misses.json", self.near)
+            _write(self.dir / "flags.json", self.flags)
             _write(self.dir / "leaders.json", self.leaders)
             log, self._score_log = self._score_log, []
         if log:
             self._append_score_log(log)
 
-    SCORE_COLUMNS = ["location", *sorted(["shape", "blob", "lines", "texture", "palette", "tone",
-                                           "contrast", "angled", "repetition", "symmetry"]),
-                     "combined", "fingerprint"]
+    SCORE_COLUMNS = ["location", *sorted(TESTS), "combined", "fingerprint"]
 
     @classmethod
     def score_log_dtype(cls):

@@ -70,7 +70,18 @@ def main(argv=None) -> int:
     ap.add_argument("--out", type=Path, default=CALIBRATION_FILE)
     ap.add_argument("--from-log", type=Path,
                     help="fit empirical null maps from a real-frame score log (scores.npy)")
+    ap.add_argument("--simulate-missing", type=int, metavar="FRAMES",
+                    help="fit null maps on this many simulated frames for tests without one")
+    ap.add_argument("--refit-live", type=Path, metavar="DATA_DIR",
+                    help="(workflow) refit tests whose real-frame log is now large enough")
     args = ap.parse_args(argv)
+    if args.refit_live:
+        refit_live(args.refit_live)
+        return 0
+    if args.simulate_missing:
+        for t, v in calibrate_simulated(args.out, args.simulate_missing).items():
+            print(f"{t:10s} held-out sd {v['sd']:.2f}  >3σ {v['over_3']}/{v['expected_3']}  max {v['max']}")
+        return 0
     if args.from_log:
         report = calibrate_from_log(args.from_log, args.out)
         print(format_report(report))
@@ -196,10 +207,16 @@ def raw_from_log(log, legacy: dict) -> dict:
     return out
 
 
-def apply_maps(maps: dict, raw: dict) -> tuple[dict, np.ndarray]:
-    """Per-test sigma arrays and the calibrated combined score."""
-    z = {t: np.round(nullmap.sigma_array(maps[t], raw[t]), 3) for t in TESTS}
-    comb_raw = sum(z[t] for t in TESTS) / np.sqrt(len(TESTS))
+def apply_maps(maps: dict, raw: dict, combined_tests=None) -> tuple[dict, np.ndarray]:
+    """Per-test sigma arrays (NaN for tests without a map or a value) and the
+    calibrated combined score, pooled over ``combined_tests``."""
+    n = len(next(iter(raw.values())))
+    z = {t: (np.round(nullmap.sigma_array(maps[t], raw[t]), 3) if t in maps
+             else np.full(n, np.nan)) for t in TESTS}
+    names = [t for t in (combined_tests or classifier.CORE_TESTS) if t in maps]
+    stack = np.stack([z[t] for t in names]) if names else np.zeros((1, n))
+    k = np.isfinite(stack).sum(axis=0)
+    comb_raw = np.where(k > 0, np.nansum(stack, axis=0) / np.sqrt(np.maximum(k, 1)), np.nan)
     comb = (nullmap.sigma_array(maps["combined"], comb_raw) if "combined" in maps
             else comb_raw)
     return z, comb
@@ -215,40 +232,124 @@ def _counts(z: np.ndarray, of: int = 1) -> dict:
             **{f"expected_{k}": round(tail(k), 1) for k in (2, 3, 4)}}
 
 
-def calibrate_from_log(log_path: Path, out: Path = CALIBRATION_FILE) -> dict:
-    data = json.loads(out.read_text()) if out.exists() else {}
+def ready_tests(raw: dict) -> list[str]:
+    """Tests with enough real frames in the log to be calibrated on them."""
+    return [t for t in TESTS if int(np.isfinite(raw[t]).sum()) >= MIN_LOG_FRAMES]
+
+
+def calibrate_from_log(log_path: Path, out: Path = CALIBRATION_FILE,
+                       base: Path | None = None) -> dict:
+    """Fit empirical null maps for every test with at least MIN_LOG_FRAMES
+    real frames in the log; other tests keep their current (simulated) maps.
+    ``base``: the calibration to start from (default: ``out`` itself)."""
+    src = base or out
+    data = json.loads(src.read_text()) if src.exists() else {}
     legacy = data.get("tests") or {}
     log = np.load(log_path)
-    if len(log) < MIN_LOG_FRAMES:
-        raise SystemExit(f"need at least {MIN_LOG_FRAMES} logged frames, got {len(log)}")
     raw = raw_from_log(log, legacy)
+    ready = ready_tests(raw)
+    if not ready:
+        raise SystemExit(f"no test has {MIN_LOG_FRAMES} logged frames yet ({len(log)} rows)")
     odd = (log["location"] % 2).astype(bool)
+    keep = {t: m for t, m in (data.get("maps") or {}).items() if t not in ready and t != "combined"}
 
     def fit_maps(rows):
-        maps = {t: nullmap.fit(raw[t][rows]) for t in TESTS}
-        z, _ = apply_maps(maps, {t: raw[t][rows] for t in TESTS})
-        maps["combined"] = nullmap.fit(sum(z[t] for t in TESTS) / np.sqrt(len(TESTS)))
+        maps = dict(keep)
+        maps.update({t: nullmap.fit(raw[t][rows]) for t in ready})
+        z, comb_raw = apply_maps(maps, {t: raw[t][rows] for t in TESTS}, ready)
+        maps["combined"] = nullmap.fit(comb_raw)
         return maps
 
     # validation: fit on even locations, test on odd ones
     half = fit_maps(~odd)
-    zv, cv = apply_maps(half, {t: raw[t][odd] for t in TESTS})
-    validation = {t: _counts(zv[t]) for t in TESTS}
+    zv, cv = apply_maps(half, {t: raw[t][odd] for t in TESTS}, ready)
+    validation = {t: _counts(zv[t]) for t in ready}
     validation["combined"] = _counts(cv)
-    peak = np.nanmax(np.stack([zv[t] for t in TESTS]), axis=0)
-    validation["headline (max of 10)"] = _counts(peak, of=len(TESTS))
-    # before: the old mean/std standardisation on the same frames
-    before = {t: _counts((raw[t][odd] - legacy.get(t, {}).get("mean", 0.0))
-                         / legacy.get(t, {}).get("std", 1.0)) for t in TESTS}
+    peak = np.nanmax(np.stack([zv[t] for t in ready]), axis=0)
+    validation[f"headline (max of {len(ready)})"] = _counts(peak, of=len(ready))
+    # before: the calibration in use until now, on the same frames
+    old_maps = data.get("maps") or {}
+    before = {}
+    for t in ready:
+        if t in old_maps:
+            before[t] = _counts(nullmap.sigma_array(old_maps[t], raw[t][odd]))
+        elif t in legacy:
+            before[t] = _counts((raw[t][odd] - legacy[t]["mean"]) / legacy[t]["std"])
 
-    maps = fit_maps(np.ones(len(log), bool))          # final: all frames
-    data["maps"] = maps
+    data["maps"] = fit_maps(np.ones(len(log), bool))          # final: all frames
+    data["combined_tests"] = ready
+    sources = data.get("map_sources") or {}
+    for t in ready:
+        sources[t] = {"source": "real", "frames": int(np.isfinite(raw[t]).sum())}
+    data["map_sources"] = sources
     data["maps_source"] = {"frames": int(len(log)), "log": log_path.name,
                            "method": "empirical CDF + generalised Pareto tail (xi >= 0)",
                            "validation": validation}
     out.write_text(_compact_json(data))
     classifier._calibration_cache = None
-    return {"validation": validation, "before": before}
+    return {"validation": validation, "before": before, "ready": ready}
+
+
+def _simulated_raw(seed: int, tests: tuple) -> dict:
+    data = babel_static(np.random.default_rng(seed))
+    if set(tests) <= set(classifier.PERCEPTUAL_TESTS):
+        from . import perceptual
+        rgb = np.asarray(Image.open(io.BytesIO(data)).convert("RGB"), dtype=np.float64)
+        r = perceptual.raw(rgb)
+    else:
+        r = raw_scores(data)
+    return {t: r[t] for t in tests}
+
+
+def calibrate_simulated(out: Path = CALIBRATION_FILE, frames: int = 6000, seed: int = 20261107,
+                        tests: list[str] | None = None) -> dict:
+    """Null maps from simulated static for tests that have none yet (new
+    tests, before the scan log has enough real frames for them)."""
+    data = json.loads(out.read_text()) if out.exists() else {}
+    maps = data.get("maps") or {}
+    tests = tuple(tests or [t for t in TESTS if t not in maps])
+    if not tests:
+        return {}
+    with ProcessPoolExecutor(max_workers=os.cpu_count() or 1) as ex:
+        rows = list(ex.map(functools.partial(_simulated_raw, tests=tests),
+                           range(seed, seed + frames), chunksize=16))
+    sources = data.get("map_sources") or {}
+    report = {}
+    for t in tests:
+        v = np.array([r[t] for r in rows])
+        maps[t] = nullmap.fit(v)
+        sources[t] = {"source": "simulated", "frames": frames}
+        held = nullmap.sigma_array(maps[t], v[1::2])
+        report[t] = _counts(held)
+    data["maps"], data["map_sources"] = maps, sources
+    out.write_text(_compact_json(data))
+    classifier._calibration_cache = None
+    return report
+
+
+def refit_live(data_dir: Path) -> bool:
+    """For the scan workflow: once the score log has enough real frames for a
+    test still calibrated on simulated static, refit from the log into
+    ``<data_dir>/calibration.json`` (a live layer over the package's
+    calibration, picked up by the next scan, which then re-mines). Returns
+    True if it wrote a new live calibration."""
+    log_path = data_dir / "scores.npy"
+    if not log_path.exists():
+        return False
+    effective = classifier.live_calibration_path(data_dir) or CALIBRATION_FILE
+    data = json.loads(effective.read_text())
+    sources = data.get("map_sources") or {}
+    raw = raw_from_log(np.load(log_path), data.get("tests") or {})
+    pending = [t for t in ready_tests(raw) if sources.get(t, {}).get("source") != "real"]
+    if not pending:
+        return False
+    live = data_dir / "calibration.json"
+    calibrate_from_log(log_path, live, base=effective)
+    d = json.loads(live.read_text())
+    d["base"] = classifier.package_calibration_hash()
+    live.write_text(_compact_json(d))
+    print(f"live calibration refitted from the scan log: {', '.join(pending)} now real")
+    return True
 
 
 def _compact_json(data) -> str:
