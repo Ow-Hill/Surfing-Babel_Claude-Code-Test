@@ -108,6 +108,12 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
 - **The fix, `strokes`:** the minimum colour variance over 2×16 and 3×32 px strips at 12
   angles, as log(static variance / strip variance). It is calibrated by nullmap: simulated
   first, then switched to real frames by `refit_live` after 5,000 logged frames.
+- **Second run, with strokes:**
+  - 7 of the 9 earlier misses are now caught at the strength a person first sees them;
+  - the pen stroke is now found from 37% strength instead of 60%;
+  - all 23 kinds still detected first.
+  - Still missed: tiny solid marks (filled 8–16 px ellipses and dots with thick edges).
+    `blob`, `spot` and `flat` see them, but not at 4σ. That's the next blind spot.
 - **Calibration hand-over:** the package calibration was set to the live (real-frame) one plus
   the strokes map. A new package calibration invalidates the live layer (`base` hash), and
   this avoids a window where the six perceptual tests fall back to their simulated maps.
