@@ -124,6 +124,10 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
     static (`MARK_NULL`), and the test keeps the most extreme shape.
   - Result: one test instead of two, so no extra look-elsewhere cost. All 14 visible misses
     and the pen stroke score 10–58σ at the strength a person first sees them.
+- **Validation of `marks` before shipping:**
+  - simulated held-out spread 1.00 (7 frames above 3σ where 4.0 are expected);
+  - 32 real full-size frames: mean 0.11, spread 1.01, none above 3σ;
+  - the 7 new blind-spot cases fail on the strokes version.
 - **Lesson: standardise a max-statistic's raw value** to be z-like. Nullmap's floor beyond
   the data rises at most one-for-one with the raw value. A raw value in log-variance units
   (sd 0.04 on static) therefore understated strong marks badly (4–9σ where the standardised

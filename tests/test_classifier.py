@@ -29,11 +29,12 @@ def test_faint_pictures_in_static_are_found(rng, name):
 
 
 def test_small_object_and_line(rng):
-    for name, alpha, reason in [("small square (24px)", 0.5, "blob"),
-                                ("horizon line (2px)", 0.5, "lines")]:
+    # a small flat square is a drawn mark too: the marks test may catch it hardest
+    for name, alpha, reasons in [("small square (24px)", 0.5, ("blob", "marks")),
+                                 ("horizon line (2px)", 0.5, ("lines",))]:
         picture, mask = benchmark.SIGNALS[name][0]()
         c = classify(benchmark._blend(rng, picture, mask, alpha))
-        assert c.is_interesting and c.reason == reason, (name, c)
+        assert c.is_interesting and c.reason in reasons, (name, c)
 
 
 @pytest.mark.parametrize("kind,reason", [("greyscale static", "palette"),

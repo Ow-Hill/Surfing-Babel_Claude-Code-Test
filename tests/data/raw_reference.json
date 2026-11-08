@@ -17,7 +17,7 @@
   "spectrum": 0.81419,
   "face": 2.430122,
   "fingerprint": 0.053683,
-  "strokes": 0.679309
+  "marks": 0.309268
  },
  "static-1": {
   "shape": 1.726518,
@@ -37,7 +37,7 @@
   "spectrum": 0.0,
   "face": 2.219829,
   "fingerprint": 1.847262,
-  "strokes": 0.672655
+  "marks": -0.075642
  },
  "static-2": {
   "shape": 2.018884,
@@ -57,7 +57,7 @@
   "spectrum": 1.529374,
   "face": 2.397167,
   "fingerprint": 0.747007,
-  "strokes": 0.697907
+  "marks": 1.485507
  },
  "static-3": {
   "shape": 0.989726,
@@ -77,7 +77,7 @@
   "spectrum": 0.0,
   "face": 2.344502,
   "fingerprint": -0.625612,
-  "strokes": 0.668355
+  "marks": -0.145371
  },
  "static-4": {
   "shape": 1.174463,
@@ -97,7 +97,7 @@
   "spectrum": 0.0,
   "face": 2.535663,
   "fingerprint": 1.795896,
-  "strokes": 0.72082
+  "marks": 4.086277
  },
  "static-5": {
   "shape": 1.348743,
@@ -117,7 +117,7 @@
   "spectrum": 0.0,
   "face": 3.385811,
   "fingerprint": -0.749556,
-  "strokes": 0.672074
+  "marks": -0.336343
  },
  "static-6": {
   "shape": 1.568245,
@@ -137,7 +137,7 @@
   "spectrum": 0.0,
   "face": 2.122631,
   "fingerprint": -0.345819,
-  "strokes": 0.712331
+  "marks": 1.375396
  },
  "static-7": {
   "shape": 1.098545,
@@ -157,7 +157,7 @@
   "spectrum": 0.875361,
   "face": 1.528011,
   "fingerprint": 0.004553,
-  "strokes": 0.634034
+  "marks": 1.078417
  },
  "static-8": {
   "shape": 1.228826,
@@ -177,7 +177,7 @@
   "spectrum": 0.0,
   "face": 2.341634,
   "fingerprint": -1.884798,
-  "strokes": 0.653383
+  "marks": 0.9803
  },
  "static-9": {
   "shape": 1.379737,
@@ -197,7 +197,7 @@
   "spectrum": 0.0,
   "face": 2.186624,
   "fingerprint": -0.533429,
-  "strokes": 0.734061
+  "marks": 1.233227
  },
  "static-10": {
   "shape": 2.007487,
@@ -217,7 +217,7 @@
   "spectrum": 1.412418,
   "face": 1.555469,
   "fingerprint": 0.87703,
-  "strokes": 0.706856
+  "marks": 0.497758
  },
  "static-11": {
   "shape": 1.202623,
@@ -237,7 +237,7 @@
   "spectrum": 1.653723,
   "face": 1.801397,
   "fingerprint": 0.760625,
-  "strokes": 0.692495
+  "marks": 0.153347
  },
  "disc": {
   "shape": 7.279166,
@@ -257,7 +257,7 @@
   "spectrum": 9.313816,
   "face": 3.042813,
   "fingerprint": 2.379075,
-  "strokes": 0.803358
+  "marks": 5.508185
  },
  "landscape": {
   "shape": 3.873755,
@@ -277,7 +277,7 @@
   "spectrum": 7.038602,
   "face": 3.457556,
   "fingerprint": -0.100846,
-  "strokes": 0.808363
+  "marks": 2.977481
  },
  "line": {
   "shape": 2.85173,
@@ -297,7 +297,7 @@
   "spectrum": 1.773291,
   "face": 2.884653,
   "fingerprint": -0.90879,
-  "strokes": 0.841328
+  "marks": 5.807448
  },
  "square": {
   "shape": 5.057062,
@@ -317,7 +317,7 @@
   "spectrum": 3.358246,
   "face": 10.249496,
   "fingerprint": 0.306352,
-  "strokes": 1.031484
+  "marks": 30.418163
  },
  "grey": {
   "shape": 1.843619,
@@ -337,7 +337,7 @@
   "spectrum": 0.91218,
   "face": 2.217543,
   "fingerprint": -0.30067,
-  "strokes": 1.121599
+  "marks": 32.088653
  },
  "diag": {
   "shape": 1.547896,
@@ -357,7 +357,7 @@
   "spectrum": 0.0,
   "face": 1.52829,
   "fingerprint": 0.36273,
-  "strokes": 0.739987
+  "marks": 6.172636
  },
  "tiled": {
   "shape": 1.22262,
@@ -377,7 +377,7 @@
   "spectrum": 0.0,
   "face": 2.593466,
   "fingerprint": -0.440875,
-  "strokes": 0.810594
+  "marks": 2.985456
  },
  "mirror": {
   "shape": 1.423731,
@@ -397,6 +397,6 @@
   "spectrum": 2.351017,
   "face": 3.879187,
   "fingerprint": 0.449671,
-  "strokes": 0.675626
+  "marks": 0.10211
  }
 }
