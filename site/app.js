@@ -24,7 +24,7 @@ const TEST_INFO = {
   colours:    { name: "Few colours", about: "areas drawn with fewer colours than static allows (cartoons, text)" },
   spectrum:   { name: "Photo-like", about: "more large-scale variation than static, as in photos and soft shading" },
   face:       { name: "Face-like", about: "two spots above a third: the layout people read as a face" },
-  strokes:    { name: "Thin strokes", about: "a thin line or outline whose colour stays nearly constant along it, as pen strokes do" },
+  marks:      { name: "Drawn marks", about: "a thin stroke or small blot whose colour stays nearly constant, as pen and paint do" },
 };
 const N_TESTS = Object.keys(TEST_INFO).length;
 const testName = (k) => (TEST_INFO[k] ? TEST_INFO[k].name : k);

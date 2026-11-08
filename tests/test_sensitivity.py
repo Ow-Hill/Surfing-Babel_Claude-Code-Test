@@ -17,8 +17,9 @@ CASES = json.loads((Path(__file__).parent / "data" / "blind_spots.json").read_te
     for c in CASES], ids=[c["signal"] for c in CASES])
 def test_detector_catches_marks_a_person_would_see(case):
     """Each of these random marks was missed (no test at 4 sigma in most
-    trials) at the strength where a person first sees it. The strokes test
-    was added for them; it must keep catching them."""
+    trials) at the strength where a person first sees it. The marks test
+    (thin strips and small squares of near-constant colour) was added for
+    them; it must keep catching them."""
     desc, maker = S.variant(case["id"])
     assert desc == case["signal"]                      # the generator is unchanged
     hits = sum(classifier.classify(maker(np.random.default_rng(700 + k), case["eye"])).is_interesting

@@ -23,6 +23,8 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
 - **Judge the visibility model by eye.** Before trusting a change, look at the benchmark
   example images and check full-size (640×416) real frames, not the site's 320×208 copies.
   Static and real frames must read about 1 on every cue (`parts`).
+- **Group by scan run before calling anything a cluster.** Runs scan consecutive
+  locations, so frames from one run share a location prefix.
 - **Describe finds honestly.** 4–8σ are the statistical tail of static, and the visibility
   model rates them invisible. Never call them pictures.
 
@@ -40,7 +42,7 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
   over the tests run) is shown alongside it.
 - **Tiers:** static < 3σ, near miss 3–4σ, anomaly 4–8σ, faint 8–16σ, clear 16–40σ, striking
   ≥ 40σ.
-- **Speed:** the first 16 tests take about 0.4 s per frame and strokes another 0.4 s. Frames
+- **Speed:** the first 16 tests take about 0.4 s per frame and marks another 0.45 s. Frames
   arrive at about 0.45/s, so classification has several times the headroom it needs. Scans
   classify in a forkserver pool whose initializer is `use_calibration`.
 
@@ -53,7 +55,7 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
   It re-checks earlier misses, moves the ones now caught to `fixed`, and keeps a `history`.
   It lives on the `probe-data` branch, and the site shows it under "Blind spots".
 - **Fix a blind spot with a matched statistic,** then pin it in `tests/data/blind_spots.json`
-  (`tests/test_sensitivity.py`). The visibility model and the strokes test share an idea
+  (`tests/test_sensitivity.py`). The visibility model and the marks test share an idea
   (constant colour along a strip), so judge such fixes by eye too, not only by that model.
 
 ## Recipes

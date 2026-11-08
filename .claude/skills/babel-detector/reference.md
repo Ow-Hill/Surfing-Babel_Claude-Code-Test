@@ -7,7 +7,7 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
    - 10 core tests run per channel on Y, Cb and Cr: shape, blob, lines, texture, palette,
      tone, contrast, angled, repetition, symmetry;
    - 7 perceptual tests (`perceptual.py`) pool the RGB channels: spot, curves, flat,
-     colours, spectrum, face and strokes.
+     colours, spectrum, face and marks.
 2. **`calibrate_scores`** maps each raw statistic to σ through `calibration.json["maps"]`
    using `nullmap.sigma`. When a test has no map it falls back to the legacy mean/std.
 3. **Headline:** `sigma` is the maximum per-test σ. A find is any test reaching 4σ; the owner
@@ -49,11 +49,21 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
     It refits again whenever a test's real frames reach `REFIT_GROWTH`=2× the count it was
     last fitted on (`map_sources[t].frames`): a first fit from 5,000 frames has a rough tail
     (curves: 24 frames above 3σ where 12 were expected).
-- **Open finding: colours clusters by location.** Its tail frames come in groups, about 3 per
-  block (for example 3562822126412…, 781012942002…, 4559865634742…), so neighbouring
-  locations share colour-count structure. Held-out frames above 4σ stay too many (4 where
-  0.3 are expected) whatever the fit. This bears on the location→image mapping research
-  lead in babelia-archive.
+- **Corrected (2026-11-08): no clustering by location.** Each scan run walks *consecutive*
+  locations (N, N+1, …; about 560 frames per run), so tail frames from one run share a
+  12-digit prefix by construction. Proper tests on 72k frames find nothing:
+  - high scores are not over-dispersed across runs (χ² z between −2.2 and +1.5 for colours,
+    face, spectrum, flat, contrast and tone);
+  - adjacent locations (within 3) never score high together more than chance.
+
+  So group by run before calling anything a cluster. The earlier "colours clusters by
+  location" note was this artifact.
+- **Tail drift across runs:** per-run mean raw values vary about 1.8× more than frame noise
+  predicts (face, spectrum), unrelated to location size or scan order.
+  - A fit on early frames over-counts later frames above 3σ (face: 32 against 22), while
+    odd/even interleaved fits match exactly (45 against 44.3).
+  - Judge held-out checks by interleaving, not by an early/late split. The 2× refit pools
+    more runs and narrows the gap.
 - **Rows logged before the raw columns existed** are recovered exactly as
   `raw = z*std + mean`, using the legacy `tests` block.
 
@@ -85,8 +95,8 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
     keeping static white;
   - one FFT per colour channel, shared by every test.
 - **Result:** the first 16 tests run in ~0.42 s per frame, against 0.60 s for the original 10.
-  `strokes` adds ~0.4 s. That cost comes from rotating the frame 12 times and taking
-  cumulative sums along rows. A neighbour-difference version took 0.05 s but was far weaker
+  `marks` adds ~0.45 s. That cost comes from rotating the frame 12 times and taking
+  cumulative sums along rows; the squares add only one 2-D cumulative sum. A neighbour-difference version took 0.05 s but was far weaker
   (σ 0.3–3 against 4–9 on the same marks), so it was rejected.
   `scan` classifies in a forkserver process pool whose initializer calls `use_calibration`.
 - **Matched filters beat generic statistics.** Oriented, elongated Gaussian line filters
@@ -100,22 +110,26 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
      benchmark signal.
   4. Remember that more tests mean more false finds; the site shows the expected rate.
 
-## Blind-spot probe (`sensitivity.py`) and the strokes test
+## Blind-spot probe (`sensitivity.py`) and the marks test
 - **First run (2026-11-08, live calibration, 16 tests):**
   - all 23 signal kinds were detected before a person would see them, at the 50% mark;
   - but 9 of 40 random drawn marks were seen first. They were small, dull-coloured outlines,
     ellipses and short thick lines (8–32 px, 1–4 px wide), which no test reached 4σ on.
-- **The fix, `strokes`:** the minimum colour variance over 2×16 and 3×32 px strips at 12
-  angles, as log(static variance / strip variance). It is calibrated by nullmap: simulated
-  first, then switched to real frames by `refit_live` after 5,000 logged frames.
-- **Second run, with strokes:**
-  - 7 of the 9 earlier misses are now caught at the strength a person first sees them;
-  - the pen stroke is now found from 37% strength instead of 60%;
-  - all 23 kinds still detected first.
-  - Still missed: tiny solid marks (filled 8–16 px ellipses and dots with thick edges).
-    `blob`, `spot` and `flat` see them, but not at 4σ. That's the next blind spot.
+- **The fix, `strokes` (PR #28), replaced the same day by `marks`:**
+  - `strokes`: the minimum colour variance over 2×16 and 3×32 px strips at 12 angles. It
+    caught 7 of the 9 earlier misses, but 5 new visible misses appeared, all small solid
+    8–16 px marks.
+  - `marks` adds 6, 8 and 12 px squares, whose colour variance is pooled over R, G and B.
+    Each window shape's log variance ratio is standardised by its mean and sd on simulated
+    static (`MARK_NULL`), and the test keeps the most extreme shape.
+  - Result: one test instead of two, so no extra look-elsewhere cost. All 14 visible misses
+    and the pen stroke score 10–58σ at the strength a person first sees them.
+- **Lesson: standardise a max-statistic's raw value** to be z-like. Nullmap's floor beyond
+  the data rises at most one-for-one with the raw value. A raw value in log-variance units
+  (sd 0.04 on static) therefore understated strong marks badly (4–9σ where the standardised
+  version gives 10–58σ).
 - **Calibration hand-over:** the package calibration was set to the live (real-frame) one plus
-  the strokes map. A new package calibration invalidates the live layer (`base` hash), and
+  the new test's map. A new package calibration invalidates the live layer (`base` hash), and
   this avoids a window where the six perceptual tests fall back to their simulated maps.
 
 ## Visibility (`visibility.py`)

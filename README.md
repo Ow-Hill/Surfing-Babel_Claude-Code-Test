@@ -52,7 +52,7 @@ GitHub Actions (continuous) ─► scan.py ─► POST babelia.cgi location=N, N
   | colours | areas drawn with few colours: cartoons, text on a background |
   | spectrum | photo-like structure (excess low-frequency power; photos fall off as 1/f) |
   | face | two spots above a third, the layout people read as a face |
-  | strokes | thin lines, outlines and small drawn marks whose colour stays nearly constant along them (2–3 px strips, 16–32 px long, 12 angles); added after the blind-spot probe found the other tests missed such marks before a person would |
+  | marks | drawn marks: thin strokes and outlines (2–3 px strips, 16–32 px long, 12 angles) and small blots (6–12 px squares) whose colour stays nearly constant; added after the blind-spot probe found the other tests missed such marks before a person would |
 
   The headline score is the strongest test. Each find also shows a **frame-wide σ** that
   allows for running all 17 tests (a 4σ reading on one test is about 3.3σ for the whole frame).
@@ -68,7 +68,7 @@ GitHub Actions (continuous) ─► scan.py ─► POST babelia.cgi location=N, N
   frame under **People noticed**. A 👍 on the issue counts as a vote.
 * **Speed:** shared FFTs and integral images, a precomputed rotation index for angled lines,
   half-size copies for large features, and a process pool for scoring. The first 16 tests take
-  about 0.42 s per frame, down from 0.60 s for the original 10; the strokes test adds about
+  about 0.42 s per frame, down from 0.60 s for the original 10; the marks test adds about
   0.4 s, which costs no search speed, since frames arrive from Babelia far slower (about one
   every 2 s) than three processes can score them. A regression test pins the
   original tests' raw statistics, so these speed-ups can't change their calibration.

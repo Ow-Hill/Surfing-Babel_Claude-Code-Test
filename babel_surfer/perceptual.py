@@ -47,11 +47,18 @@ CURVE_LEVEL, CURVE_LONG, CURVE_SHORT, CURVE_DIRECTIONS = 1, 8.0, 1.0, 8   # 16 x
 FLAT_WINDOWS = (8, 16, 32, 64)
 PALETTE_WINDOWS = ((16, 16), (32, 16), (64, 32))   # (size, stride)
 SPECTRUM_RADII = (2, 4, 8, 16, 32)          # cycles per frame
-# strokes: thin strips (width x length px) at 12 angles whose colour barely varies
-STROKE_STRIPS = ((2, 16), (3, 32))
-STROKE_ANGLES = tuple(range(0, 180, 15))
-STROKE_VAR = 3 * 17.0 ** 2 * (16 ** 2 - 1) / 12      # static's colour variance (3 channels)
-PERCEPTUAL_TESTS = ("spot", "curves", "flat", "colours", "spectrum", "face", "strokes")
+# marks: windows whose colour barely varies, where static varies from pixel to
+# pixel. Thin strips (width x length px, 12 angles) catch strokes and outlines;
+# small squares catch compact drawn marks. Each shape's log variance ratio is
+# standardised by its mean and sd on simulated static (the strongest window per
+# frame), and the test keeps the most extreme shape.
+MARK_STRIPS = ((2, 16), (3, 32))
+MARK_SQUARES = (6, 8, 12)
+MARK_ANGLES = tuple(range(0, 180, 15))
+MARK_VAR = 3 * 17.0 ** 2 * (16 ** 2 - 1) / 12      # static's colour variance (3 channels)
+MARK_NULL = {(2, 16): (0.6861, 0.0417), (3, 32): (0.3358, 0.0205),
+             (6, 6): (0.5074, 0.0353), (8, 8): (0.3504, 0.0248), (12, 12): (0.2152, 0.0152)}
+PERCEPTUAL_TESTS = ("spot", "curves", "flat", "colours", "spectrum", "face", "marks")
 LOG10E = math.log10(math.e)
 
 
@@ -324,61 +331,76 @@ def test_face(fr: Frame) -> float:
     return best
 
 
-def stroke_variance(rgb: np.ndarray):
-    """For each angle, the colour variance (summed over R, G, B) of every
-    strip of each STROKE_STRIPS size lying inside the frame; yields
-    (angle, (width, length), variance array in rotated coordinates)."""
+def mark_variance(rgb: np.ndarray):
+    """Colour variance (summed over R, G, B) of every window inside the
+    frame: thin strips at each angle (in rotated coordinates) and small
+    squares. Yields (angle, (height, width), variance array)."""
     h, w = rgb.shape[:2]
     x = (rgb - 127.5).astype(np.float32)        # centred: float32 sums stay exact enough
     ones = Image.fromarray(np.ones((h, w), np.float32), "F")
-    for ang in STROKE_ANGLES:
+    for ang in MARK_ANGLES:
         ch = [np.asarray(Image.fromarray(np.ascontiguousarray(x[..., c]), "F").rotate(
             ang, Image.NEAREST, expand=True)) for c in range(3)]
         valid = np.asarray(ones.rotate(ang, Image.NEAREST, expand=True))
-        # R, G, B, their summed squares and the in-frame mask: the strip's
+        # R, G, B, their summed squares and the in-frame mask: the window's
         # total variance is mean(sum of squares) - sum(mean^2)
         stack = np.stack(ch + [ch[0] * ch[0] + ch[1] * ch[1] + ch[2] * ch[2], valid])
         cs = np.cumsum(np.pad(stack, ((0, 0), (0, 0), (1, 0))), axis=2)
-        for wid, length in STROKE_STRIPS:
+        for wid, length in MARK_STRIPS:
             r = cs[:, :, length:] - cs[:, :, :-length]
             r = sum(r[:, i:r.shape[1] - wid + 1 + i] for i in range(wid)) / (wid * length)
             var = r[3] - (r[0] ** 2 + r[1] ** 2 + r[2] ** 2)
             var[r[4] < 1 - 1e-4] = np.inf                  # strips reaching outside the frame
             yield ang, (wid, length), var
+    xd = x.astype(np.float64)
+    planes = [xd[..., 0], xd[..., 1], xd[..., 2], (xd * xd).sum(axis=-1)]
+    cs2 = [np.cumsum(np.cumsum(np.pad(a, ((1, 0), (1, 0))), 0), 1) for a in planes]
+    for k in MARK_SQUARES:
+        b = [(c[k:, k:] - c[:-k, k:] - c[k:, :-k] + c[:-k, :-k]) / (k * k) for c in cs2]
+        yield 0, (k, k), b[3] - (b[0] ** 2 + b[1] ** 2 + b[2] ** 2)
 
 
-def test_strokes(fr: Frame) -> float:
-    """A thin line or outline: a strip whose colour stays nearly constant
-    along its length, where static varies from pixel to pixel. Raw value:
-    log(static variance / the smallest strip variance), so pen strokes,
-    outlines and small drawn marks the eye follows score high."""
-    best = 0.0
-    for _, _, var in stroke_variance(fr.rgb):
-        best = max(best, math.log(STROKE_VAR / max(float(var.min()), 1.0)))
-    return best
+def _mark_z(shape, var_min: float) -> float:
+    mu, sd = MARK_NULL[shape]
+    return (math.log(MARK_VAR / max(var_min, 1.0)) - mu) / sd
 
 
-def stroke_where(rgb: np.ndarray) -> dict:
-    """The strongest stroke: its raw statistic, centre, direction (degrees,
-    along (cos, sin) in image coordinates, y down) and length in px."""
+def test_marks(fr: Frame) -> float:
+    """A drawn mark: a thin strip (stroke, outline) or small square (dot,
+    blot) whose colour stays nearly constant, where static varies from
+    pixel to pixel. Raw value: the most extreme window shape's standardised
+    log(static variance / window variance)."""
+    return max(_mark_z(shape, float(var.min())) for _, shape, var in mark_variance(fr.rgb))
+
+
+def mark_where(rgb: np.ndarray) -> dict:
+    """The strongest mark: its raw statistic, centre, kind and size; for a
+    strip also its direction (degrees, along (cos, sin) in image
+    coordinates, y down)."""
     h, w = rgb.shape[:2]
     best = {"raw": -math.inf}
-    for ang, (wid, length), var in stroke_variance(rgb):
+    for ang, (a, b), var in mark_variance(rgb):
         j = np.unravel_index(int(np.argmin(var)), var.shape)
-        raw = math.log(STROKE_VAR / max(float(var[j]), 1.0))
-        if raw > best["raw"]:
-            rh, rw = var.shape[0] + wid - 1, var.shape[1] + length
-            cy, cx = j[0] + wid / 2 - rh / 2, j[1] + length / 2 - rw / 2
-            t = math.radians(ang)
-            best = {"raw": round(raw, 4), "x": int(round(w / 2 + cx * math.cos(t) - cy * math.sin(t))),
-                    "y": int(round(h / 2 + cx * math.sin(t) + cy * math.cos(t))),
-                    "angle": int(ang), "length": length}
+        raw = _mark_z((a, b), float(var[j]))
+        if raw <= best["raw"]:
+            continue
+        if a == b:                                          # a square, unrotated
+            best = {"raw": round(raw, 4), "kind": "patch", "x": int(j[1] + b / 2),
+                    "y": int(j[0] + a / 2), "length": b}
+            continue
+        rh, rw = var.shape[0] + a - 1, var.shape[1] + b
+        cy, cx = j[0] + a / 2 - rh / 2, j[1] + b / 2 - rw / 2
+        t = math.radians(ang)
+        best = {"raw": round(raw, 4), "kind": "stroke",
+                "x": int(round(w / 2 + cx * math.cos(t) - cy * math.sin(t))),
+                "y": int(round(h / 2 + cx * math.sin(t) + cy * math.cos(t))),
+                "angle": int(ang), "length": b}
     return best
 
 
 TESTS = {"spot": test_spot, "curves": test_curves, "flat": test_flat,
          "colours": test_colours, "spectrum": test_spectrum, "face": test_face,
-         "strokes": test_strokes}
+         "marks": test_marks}
 
 
 def raw(rgb: np.ndarray) -> dict:
