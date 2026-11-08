@@ -1,5 +1,5 @@
 {
- "about": "Random drawn marks the detector missed (before the strokes test) at the strength where the visibility model first rates them likely visible. Found by: python -m babel_surfer.sensitivity --explore 40 --seed 1 (2026-11-08). 'caught': true once the strokes test caught it in at least 2 of 3 trials at that strength; false = still a blind spot (8 px marks), kept as an expected failure.",
+ "about": "Random drawn marks the detector missed (before the marks test) at the strength where the visibility model first rates them likely visible. Found by python -m babel_surfer.sensitivity --explore 40 with --seed 1 and --seed 2 (2026-11-08). 'caught': the detector must find it in at least 2 of 3 trials.",
  "cases": [
   {
    "id": 100000,
@@ -11,13 +11,13 @@
    "id": 100009,
    "signal": "ellipse 8px w1 rgb(119, 68, 153) at (89,70)",
    "eye": 0.6043,
-   "caught": false
+   "caught": true
   },
   {
    "id": 100020,
    "signal": "ellipse 8px w2 rgb(102, 119, 85) at (341,22)",
    "eye": 0.5233,
-   "caught": false
+   "caught": true
   },
   {
    "id": 100022,
@@ -29,7 +29,7 @@
    "id": 100023,
    "signal": "outline 8px w2 rgb(17, 136, 119) at (42,104)",
    "eye": 0.7499,
-   "caught": false
+   "caught": true
   },
   {
    "id": 100026,
@@ -53,6 +53,36 @@
    "id": 100039,
    "signal": "outline 32px w2 rgb(34, 119, 102) at (358,339)",
    "eye": 0.5233,
+   "caught": true
+  },
+  {
+   "id": 200002,
+   "signal": "ellipse 8px w4 rgb(136, 17, 136) at (57,69)",
+   "eye": 0.5233,
+   "caught": true
+  },
+  {
+   "id": 200005,
+   "signal": "ellipse 16px w3 rgb(255, 187, 119) at (471,322)",
+   "eye": 0.2548,
+   "caught": true
+  },
+  {
+   "id": 200016,
+   "signal": "outline 8px w4 rgb(119, 34, 17) at (86,187)",
+   "eye": 0.4532,
+   "caught": true
+  },
+  {
+   "id": 200033,
+   "signal": "ellipse 8px w4 rgb(34, 187, 170) at (453,191)",
+   "eye": 0.4217,
+   "caught": true
+  },
+  {
+   "id": 200036,
+   "signal": "polyline 8px w3 rgb(238, 51, 102) at (463,189)",
+   "eye": 0.6978,
    "caught": true
   }
  ]

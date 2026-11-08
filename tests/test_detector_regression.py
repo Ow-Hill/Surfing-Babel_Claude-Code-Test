@@ -32,5 +32,5 @@ def test_classify_is_fast():
     t = time.perf_counter()
     for _ in range(3):
         C.classify(data)
-    # the first 16 tests take ~0.42 s (the original 10 took 0.60 s), the strokes test ~0.4 s
+    # the first 16 tests take ~0.42 s (the original 10 took 0.60 s), the marks test ~0.45 s
     assert (time.perf_counter() - t) / 3 < 1.0

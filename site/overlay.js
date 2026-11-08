@@ -16,15 +16,15 @@ const Overlay = (() => {
                 hint: "4 px bands of rows or columns that are brighter or darker than static" },
     geometry: { label: "Lines, repeats & symmetry", tests: ["angled", "repetition", "symmetry"], slider: true,
                 hint: "the strongest angled line, repeat offset and mirror axis" },
-    eye:      { label: "What the eye might see", tests: ["spot", "curves", "flat", "colours", "face", "spectrum", "strokes"], slider: true,
-                hint: "soft spots, lines and curves, flat single-colour runs and few-colour areas, per 16 px cell; a box marks the most face-like layout and a green line the strongest thin stroke" },
+    eye:      { label: "What the eye might see", tests: ["spot", "curves", "flat", "colours", "face", "spectrum", "marks"], slider: true,
+                hint: "soft spots, lines and curves, flat single-colour runs and few-colour areas, per 16 px cell; a box marks the most face-like layout and green the strongest drawn mark (a stroke or small patch)" },
     tone:     { label: "Colour balance", tests: ["tone", "palette", "texture"], slider: true,
                 hint: "pink: every pixel in the colour range that is most over- or under-represented (chart below); the rest is dimmed. They are spread evenly, so this anomaly has no shape" },
   };
   const DEFAULT_LAYER = {
     shape: "mean", blob: "mean", contrast: "contrast", lines: "rows", angled: "geometry",
     repetition: "geometry", symmetry: "geometry", tone: "tone", palette: "tone", texture: "tone",
-    spot: "eye", curves: "eye", flat: "eye", colours: "eye", face: "eye", spectrum: "eye", strokes: "eye",
+    spot: "eye", curves: "eye", flat: "eye", colours: "eye", face: "eye", spectrum: "eye", marks: "eye",
   };
   const STATIC_LIMIT = { mean: 3, contrast: 3, rows: 3, geometry: 3, tone: 3, eye: 4.5 };
   // colour key per layer (recognition, not recall)
@@ -34,7 +34,7 @@ const Overlay = (() => {
     rows:     [["hsl(40,95%,55%)", "brighter band"], ["hsl(220,95%,55%)", "darker band"]],
     geometry: [["rgb(255,70,70)", "angled line"], ["rgb(80,220,255)", "repeat offset"], ["rgb(190,110,255)", "mirror axis"]],
     tone:     [["rgb(255,60,210)", "pixels in the flagged colour range"], ["rgb(40,36,50)", "everything else (dimmed)"]],
-    eye:      [["hsl(55,95%,55%)", "just over threshold"], ["hsl(0,95%,55%)", "strongest"], ["rgb(120,255,160)", "face-like layout or thin stroke"], ["rgba(255,255,255,.95)", "most noticeable to a person"]],
+    eye:      [["hsl(55,95%,55%)", "just over threshold"], ["hsl(0,95%,55%)", "strongest"], ["rgb(120,255,160)", "face-like layout or drawn mark"], ["rgba(255,255,255,.95)", "most noticeable to a person"]],
   };
   let nameOf = (k) => k;
 
@@ -50,7 +50,7 @@ const Overlay = (() => {
       case "geometry": return Math.max(Math.abs(maps.angled.z || 0), Math.abs(maps.repeat.z || 0), maps.mirror.z || 0);
       case "tone": return maxAbs(maps.tone.flat());
       case "eye": return Math.max(maps.eye ? maxAbs(maps.eye) : 0, (maps.face && maps.face.z) || 0,
-                                  (maps.stroke && maps.stroke.z) || 0);
+                                  (maps.mark && maps.mark.z) || 0);
     }
     return 0;
   }
@@ -228,13 +228,15 @@ const Overlay = (() => {
           ctx.strokeRect(f.x - f.size / 2, f.y - f.size / 2, f.size, f.size);
           label(ctx, `face-like ${f.z.toFixed(1)}`, f.x - f.size / 2, f.y - f.size / 2 - 8);
         }
-        const st = maps.stroke;
-        if (st && st.length && st.z >= thr) {
-          // along (cos, sin) of st.angle in image coordinates (y down)
-          const t = st.angle * Math.PI / 180, dx = Math.cos(t) * st.length / 2, dy = Math.sin(t) * st.length / 2;
+        const mk = maps.mark;
+        if (mk && mk.length && mk.z >= thr) {
           ctx.strokeStyle = "rgba(120,255,160,.95)"; ctx.lineWidth = 3;
-          ctx.beginPath(); ctx.moveTo(st.x - dx, st.y - dy); ctx.lineTo(st.x + dx, st.y + dy); ctx.stroke();
-          label(ctx, `stroke ${st.z.toFixed(1)}`, st.x - st.length / 2, st.y - 10);
+          if (mk.kind === "stroke") {
+            // along (cos, sin) of mk.angle in image coordinates (y down)
+            const t = mk.angle * Math.PI / 180, dx = Math.cos(t) * mk.length / 2, dy = Math.sin(t) * mk.length / 2;
+            ctx.beginPath(); ctx.moveTo(mk.x - dx, mk.y - dy); ctx.lineTo(mk.x + dx, mk.y + dy); ctx.stroke();
+          } else ctx.strokeRect(mk.x - mk.length / 2 - 3, mk.y - mk.length / 2 - 3, mk.length + 6, mk.length + 6);
+          label(ctx, `mark ${mk.z.toFixed(1)}`, mk.x - mk.length / 2, mk.y - mk.length / 2 - 10);
         }
         const v = drawNoticeable(ctx, maps.visibility);
         if (v) note += `. Dashed white: ${v}`;

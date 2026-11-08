@@ -11,6 +11,9 @@ description: Ship and run Surfing Babel. Covers the branch → PR → CI → mer
   when pushing the restarted branch is rejected, run
   `git pull --no-rebase --no-edit origin claude/pensive-ritchie-hc4bfy`. The squashed PR
   makes that merge empty, and `git diff origin/main --stat` should show only the new work.
+  If you already committed new work on the restarted branch, that pull conflicts in every
+  file the old PR touched. Resolve with `git checkout --ours -- .` (the local side is main
+  plus the new work), then check that `git diff HEAD~1 HEAD` is empty.
 - Before pushing, run `python -m pytest -q` and `node --check site/*.js`. Then open a PR
   with the GitHub MCP tools, wait for the **Tests** check, and merge (the owner has
   authorised merging to main).
