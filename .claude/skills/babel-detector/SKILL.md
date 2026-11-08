@@ -1,6 +1,6 @@
 ---
 name: babel-detector
-description: Change Surfing Babel's detector without breaking its statistics. Covers the 16 tests, empirical calibration (nullmap), re-mining the score log, live refits, the frame-wide sigma and visibility. Use before editing classifier.py, perceptual.py, nullmap.py, calibrate.py, remine.py, visibility.py or benchmark.py, or when asked to find more artifacts, add a test, explain a find, or check calibration.
+description: Change Surfing Babel's detector without breaking its statistics. Covers the 17 tests, the blind-spot probe, empirical calibration (nullmap), re-mining the score log, live refits, the frame-wide sigma and visibility. Use before editing classifier.py, perceptual.py, nullmap.py, calibrate.py, remine.py, visibility.py or benchmark.py, or when asked to find more artifacts, add a test, explain a find, or check calibration.
 ---
 
 # Surfing Babel: detector
@@ -40,8 +40,21 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
   over the tests run) is shown alongside it.
 - **Tiers:** static < 3σ, near miss 3–4σ, anomaly 4–8σ, faint 8–16σ, clear 16–40σ, striking
   ≥ 40σ.
-- **Speed:** all 16 tests take about 0.4 s per frame. Scans classify in a forkserver pool
-  whose initializer is `use_calibration`.
+- **Speed:** the first 16 tests take about 0.4 s per frame and strokes another 0.4 s. Frames
+  arrive at about 0.45/s, so classification has several times the headroom it needs. Scans
+  classify in a forkserver pool whose initializer is `use_calibration`.
+
+## Find what the detector misses (the learning loop)
+- **Probe:** `python -m babel_surfer.sensitivity --explore 40 --seed N --calibration <live
+  calibration.json>` takes about 10–15 minutes on 4 cores. Per signal kind, it gives the
+  weakest strength found in half the trials and the weakest a person would see (the
+  visibility model). Random drawn marks that are seen but missed land in `misses`.
+- **The probe workflow** (`.github/workflows/probe.yml`) runs daily and on detector changes.
+  It re-checks earlier misses, moves the ones now caught to `fixed`, and keeps a `history`.
+  It lives on the `probe-data` branch, and the site shows it under "Blind spots".
+- **Fix a blind spot with a matched statistic,** then pin it in `tests/data/blind_spots.json`
+  (`tests/test_sensitivity.py`). The visibility model and the strokes test share an idea
+  (constant colour along a strip), so judge such fixes by eye too, not only by that model.
 
 ## Recipes
 - **Calibration audit:**

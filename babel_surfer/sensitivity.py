@@ -227,16 +227,19 @@ def _bisect(names, trials, steps, pool, score, seed0):
         for n, s, ok in run(pts):
             (hi if ok else lo)[n] = s
         seed0 += 7919
-    return {n: (round(hi[n], 4) if found[n] else None, samples[n]) for n in names}
+    return {n: (hi[n] if found[n] else None, samples[n]) for n in names}
 
 
 def run(trials: int = 6, steps: int = 6, explore: int = 0, seed: int = 0, families=None,
-        workers: int | None = None, calibration: Path | None = None) -> dict:
+        workers: int | None = None, calibration: Path | None = None, recheck=()) -> dict:
+    """Probe ``families`` (default: all), ``explore`` new random variants
+    and the variant ids in ``recheck`` (earlier misses)."""
     from . import classifier
     if calibration:
         classifier.use_calibration(str(calibration))
-    names = list(families or FAMILIES)
-    variants = [f"variant#{seed * 100000 + i}" for i in range(explore)]
+    names = list(FAMILIES if families is None else families)
+    variants = list(dict.fromkeys([f"variant#{seed * 100000 + i}" for i in range(explore)]
+                                  + [f"variant#{int(i)}" for i in recheck]))
     t0 = time.time()
     with ProcessPoolExecutor(max_workers=workers or os.cpu_count() or 1,
                              initializer=classifier.use_calibration,
@@ -259,31 +262,42 @@ def run(trials: int = 6, steps: int = 6, explore: int = 0, seed: int = 0, famili
                         by[t] = by.get(t, 0) + 1
         e = eye[n][0]
         row = {"signal": n if n in FAMILIES else variant(int(n.split("#")[1]))[0],
-               "detect": s, "eye": e,
+               "detect": round(s, 4) if s else None, "eye": round(e, 4) if e else None,
                "by": sorted(by, key=by.get, reverse=True)[:3],
                "eye_at_detect": round(eye_at[n], 2) if n in eye_at else None,
                "blind": e is not None and (s is None or e < s)}
+        if n not in FAMILIES:
+            row["id"] = int(n.split("#")[1])
         (rows if n in FAMILIES else misses).append(row)
+    checked = [m["id"] for m in misses]
     misses = [m for m in misses if m["blind"]]
     return {"generated": int(time.time()), "seconds": round(time.time() - t0),
             "trials": trials, "steps": steps, "seed": seed, "threshold_sigma": classifier.INTERESTING_SIGMA,
-            "families": rows, "explored": explore, "misses": misses,
+            "families": rows, "explored": explore, "checked": checked, "misses": misses,
             "summary": {"families": len(rows), "blind": sum(r["blind"] for r in rows),
                         "never_detected": sum(r["detect"] is None for r in rows)}}
 
 
 def merge_history(old: dict | None, new: dict, keep: int = 60) -> dict:
-    """Carry forward what earlier runs learned: a per-run summary line, and the
-    union of explored misses (newest first, deduplicated by description)."""
-    hist = (old or {}).get("history", [])
+    """Carry forward what earlier runs learned. Each run re-checks the earlier
+    misses: those it no longer misses move to ``fixed``; the rest, and this
+    run's new misses, stay in ``misses`` (newest first). ``history`` keeps a
+    summary line per run, so the trend shows whether the detector improves."""
+    old = old or {}
+    now = {m["id"]: m for m in new["misses"]}
+    misses = list(new["misses"])
+    fixed = list(old.get("fixed", []))
+    for m in old.get("misses", []):
+        if m.get("id") in now:
+            continue
+        if m.get("id") in new.get("checked", []):
+            fixed.insert(0, {**m, "fixed": new["generated"]})
+        else:
+            misses.append(m)                       # not re-checked this run: keep
+    hist = old.get("history", [])
     hist.append({"generated": new["generated"], **new["summary"], "explored": new["explored"],
-                 "new_misses": len(new["misses"])})
-    seen, misses = set(), []
-    for m in new["misses"] + (old or {}).get("misses", []):
-        if m["signal"] not in seen:
-            seen.add(m["signal"])
-            misses.append(m)
-    return {**new, "history": hist[-keep:], "misses": misses[:keep]}
+                 "misses": len(misses), "fixed": len(fixed) - len(old.get("fixed", []))})
+    return {**new, "misses": misses[:keep], "fixed": fixed[:keep], "history": hist[-keep:]}
 
 
 def report(res: dict) -> str:
@@ -296,8 +310,8 @@ def report(res: dict) -> str:
                    + ("   << BLIND SPOT" if r["blind"] else ""))
     s = res["summary"]
     out.append(f"{s['blind']} of {s['families']} families are seen by eye before the detector finds them; "
-               f"{s['never_detected']} are never detected. Explored {res['explored']} random variants: "
-               f"{len(res['misses'])} visible misses.")
+               f"{s['never_detected']} are never detected. Explored {res['explored']} random variants and "
+               f"re-checked earlier misses: {len(res['misses'])} visible misses, {len(res.get('fixed', []))} fixed.")
     return "\n".join(out)
 
 
@@ -309,11 +323,18 @@ def main(argv=None) -> int:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--family", action="append", help="only these families")
     ap.add_argument("--calibration", type=Path, help="calibration.json to score with (default: package)")
+    ap.add_argument("--data", type=Path, help="score with the scan's live calibration in this data "
+                                              "directory when it matches this code (else the package's)")
     ap.add_argument("--out", type=Path, help="write (and merge history into) this JSON file")
     a = ap.parse_args(argv)
-    res = run(a.trials, a.steps, a.explore, a.seed, a.family, calibration=a.calibration)
+    old = json.loads(a.out.read_text()) if a.out and a.out.exists() else None
+    recheck = [m["id"] for m in (old or {}).get("misses", []) if "id" in m]
+    cal = a.calibration
+    if a.data:
+        from .classifier import live_calibration_path
+        cal = live_calibration_path(a.data) or cal
+    res = run(a.trials, a.steps, a.explore, a.seed, a.family, calibration=cal, recheck=recheck)
     if a.out:
-        old = json.loads(a.out.read_text()) if a.out.exists() else None
         res = merge_history(old, res)
         a.out.parent.mkdir(parents=True, exist_ok=True)
         a.out.write_text(json.dumps(res, indent=1))

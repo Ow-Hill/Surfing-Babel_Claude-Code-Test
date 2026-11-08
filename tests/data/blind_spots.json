@@ -1,0 +1,50 @@
+{
+ "about": "Random drawn marks the detector missed (before the strokes test) at the strength where the visibility model first rates them likely visible. Found by: python -m babel_surfer.sensitivity --explore 40 --seed 1 (2026-11-08).",
+ "cases": [
+  {
+   "id": 100000,
+   "signal": "line 8px w4 rgb(34, 102, 119) at (36,321)",
+   "eye": 0.5623
+  },
+  {
+   "id": 100009,
+   "signal": "ellipse 8px w1 rgb(119, 68, 153) at (89,70)",
+   "eye": 0.6043
+  },
+  {
+   "id": 100020,
+   "signal": "ellipse 8px w2 rgb(102, 119, 85) at (341,22)",
+   "eye": 0.5233
+  },
+  {
+   "id": 100022,
+   "signal": "polyline 32px w4 rgb(85, 68, 136) at (132,362)",
+   "eye": 0.5233
+  },
+  {
+   "id": 100023,
+   "signal": "outline 8px w2 rgb(17, 136, 119) at (42,104)",
+   "eye": 0.7499
+  },
+  {
+   "id": 100026,
+   "signal": "outline 16px w3 rgb(102, 238, 34) at (559,363)",
+   "eye": 0.4532
+  },
+  {
+   "id": 100032,
+   "signal": "outline 32px w4 rgb(34, 85, 170) at (204,22)",
+   "eye": 0.3652
+  },
+  {
+   "id": 100033,
+   "signal": "arc 64px w4 rgb(34, 170, 136) at (263,114)",
+   "eye": 0.5233
+  },
+  {
+   "id": 100039,
+   "signal": "outline 32px w2 rgb(34, 119, 102) at (358,339)",
+   "eye": 0.5233
+  }
+ ]
+}

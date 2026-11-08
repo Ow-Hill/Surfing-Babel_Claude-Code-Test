@@ -161,6 +161,7 @@ def analyze(image) -> dict:
         "eye": r1(eye.max(axis=0)), "eye_kind": [int(v) for v in np.ravel(eye.argmax(axis=0))],
         "eye_parts": {k: r1(eye[i]) for i, k in enumerate(EYE_KINDS)},
         "face": perc["face"],
+        "stroke": _stroke(rgb),
         "visibility": visibility.visibility(rgb),
         "size": [w, h], "cell": CELL, "grid": [int(mean_best.shape[1]), int(mean_best.shape[0])],
         "mean": r1(mean_best), "mean_channel": [int(v) for v in np.ravel(mean_ch)],
@@ -225,6 +226,13 @@ def line_angle(line: list[float]) -> int:
     clockwise as seen on screen)."""
     x0, y0, x1, y1 = line
     return int(round(math.degrees(math.atan2(-(y1 - y0), x1 - x0)))) % 180
+
+
+def _stroke(rgb) -> dict:
+    """The strongest thin stroke, with its calibrated sigma (for the overlay)."""
+    st = perceptual.stroke_where(rgb)
+    st["z"] = C.calibrate_scores({"strokes": st["raw"]})["strokes"]
+    return st
 
 
 def _phrase(test: str, maps: dict, sigma: float) -> str:
@@ -316,6 +324,12 @@ def _eye_phrase(test: str, maps: dict, sigma: float) -> str:
         return f"a face-like arrangement of spots ({s})"
     if test == "spectrum":
         return f"more large-scale variation than static, like a photo's soft shading; nothing local ({s})"
+    if test == "strokes":
+        st = maps.get("stroke") or {}
+        if st.get("length"):
+            return (f"a thin stroke whose colour hardly changes along it, at least {st['length']} px long, "
+                    f"around {_where(st['x'], st['y'], w, h)} ({s})")
+        return f"a thin stroke whose colour hardly changes along it ({s})"
     parts = maps.get("eye_parts") or {}
     m = np.asarray(parts.get(test) or maps.get("eye") or [0] * (gw * gh)).reshape(gh, gw)
     j = np.unravel_index(int(np.argmax(m)), m.shape)

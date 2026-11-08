@@ -34,6 +34,7 @@ from __future__ import annotations
 import math
 
 import numpy as np
+from PIL import Image
 
 LUMA = np.array([0.299, 0.587, 0.114])
 # (pyramid level, sigma at that level): level k is the frame averaged over
@@ -46,7 +47,11 @@ CURVE_LEVEL, CURVE_LONG, CURVE_SHORT, CURVE_DIRECTIONS = 1, 8.0, 1.0, 8   # 16 x
 FLAT_WINDOWS = (8, 16, 32, 64)
 PALETTE_WINDOWS = ((16, 16), (32, 16), (64, 32))   # (size, stride)
 SPECTRUM_RADII = (2, 4, 8, 16, 32)          # cycles per frame
-PERCEPTUAL_TESTS = ("spot", "curves", "flat", "colours", "spectrum", "face")
+# strokes: thin strips (width x length px) at 12 angles whose colour barely varies
+STROKE_STRIPS = ((2, 16), (3, 32))
+STROKE_ANGLES = tuple(range(0, 180, 15))
+STROKE_VAR = 3 * 17.0 ** 2 * (16 ** 2 - 1) / 12      # static's colour variance (3 channels)
+PERCEPTUAL_TESTS = ("spot", "curves", "flat", "colours", "spectrum", "face", "strokes")
 LOG10E = math.log10(math.e)
 
 
@@ -319,8 +324,61 @@ def test_face(fr: Frame) -> float:
     return best
 
 
+def stroke_variance(rgb: np.ndarray):
+    """For each angle, the colour variance (summed over R, G, B) of every
+    strip of each STROKE_STRIPS size lying inside the frame; yields
+    (angle, (width, length), variance array in rotated coordinates)."""
+    h, w = rgb.shape[:2]
+    x = (rgb - 127.5).astype(np.float32)        # centred: float32 sums stay exact enough
+    ones = Image.fromarray(np.ones((h, w), np.float32), "F")
+    for ang in STROKE_ANGLES:
+        ch = [np.asarray(Image.fromarray(np.ascontiguousarray(x[..., c]), "F").rotate(
+            ang, Image.NEAREST, expand=True)) for c in range(3)]
+        valid = np.asarray(ones.rotate(ang, Image.NEAREST, expand=True))
+        # R, G, B, their summed squares and the in-frame mask: the strip's
+        # total variance is mean(sum of squares) - sum(mean^2)
+        stack = np.stack(ch + [ch[0] * ch[0] + ch[1] * ch[1] + ch[2] * ch[2], valid])
+        cs = np.cumsum(np.pad(stack, ((0, 0), (0, 0), (1, 0))), axis=2)
+        for wid, length in STROKE_STRIPS:
+            r = cs[:, :, length:] - cs[:, :, :-length]
+            r = sum(r[:, i:r.shape[1] - wid + 1 + i] for i in range(wid)) / (wid * length)
+            var = r[3] - (r[0] ** 2 + r[1] ** 2 + r[2] ** 2)
+            var[r[4] < 1 - 1e-4] = np.inf                  # strips reaching outside the frame
+            yield ang, (wid, length), var
+
+
+def test_strokes(fr: Frame) -> float:
+    """A thin line or outline: a strip whose colour stays nearly constant
+    along its length, where static varies from pixel to pixel. Raw value:
+    log(static variance / the smallest strip variance), so pen strokes,
+    outlines and small drawn marks the eye follows score high."""
+    best = 0.0
+    for _, _, var in stroke_variance(fr.rgb):
+        best = max(best, math.log(STROKE_VAR / max(float(var.min()), 1.0)))
+    return best
+
+
+def stroke_where(rgb: np.ndarray) -> dict:
+    """The strongest stroke: its raw statistic, centre, direction (degrees,
+    along (cos, sin) in image coordinates, y down) and length in px."""
+    h, w = rgb.shape[:2]
+    best = {"raw": -math.inf}
+    for ang, (wid, length), var in stroke_variance(rgb):
+        j = np.unravel_index(int(np.argmin(var)), var.shape)
+        raw = math.log(STROKE_VAR / max(float(var[j]), 1.0))
+        if raw > best["raw"]:
+            rh, rw = var.shape[0] + wid - 1, var.shape[1] + length
+            cy, cx = j[0] + wid / 2 - rh / 2, j[1] + length / 2 - rw / 2
+            t = math.radians(ang)
+            best = {"raw": round(raw, 4), "x": int(round(w / 2 + cx * math.cos(t) - cy * math.sin(t))),
+                    "y": int(round(h / 2 + cx * math.sin(t) + cy * math.cos(t))),
+                    "angle": int(ang), "length": length}
+    return best
+
+
 TESTS = {"spot": test_spot, "curves": test_curves, "flat": test_flat,
-         "colours": test_colours, "spectrum": test_spectrum, "face": test_face}
+         "colours": test_colours, "spectrum": test_spectrum, "face": test_face,
+         "strokes": test_strokes}
 
 
 def raw(rgb: np.ndarray) -> dict:

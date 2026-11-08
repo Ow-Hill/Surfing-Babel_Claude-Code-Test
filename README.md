@@ -24,7 +24,7 @@ GitHub Actions (continuous) ─► scan.py ─► POST babelia.cgi location=N, N
   5–30 s to render a frame, so concurrency is **adaptive**: it starts at 3 parallel requests,
   opens up to 5 while response time stays near its best, and backs off (down to 1) as soon as
   responses slow or fail.
-* **Classifier** (`babel_surfer/classifier.py`): sixteen tests. Ten are statistical tests, each run on brightness and both colour
+* **Classifier** (`babel_surfer/classifier.py`): seventeen tests. Ten are statistical tests, each run on brightness and both colour
   channels, each expressed in **σ** (standard deviations away from what static produces):
 
   | test | catches |
@@ -40,8 +40,8 @@ GitHub Actions (continuous) ─► scan.py ─► POST babelia.cgi location=N, N
   | repetition | any part of the frame recurring at an offset: tiles, repeated motifs (2-D autocorrelation) |
   | symmetry | mirror symmetry about any vertical or horizontal axis |
 
-  Six more tests (`babel_surfer/perceptual.py`) are modelled on what people notice first. They
-  look at the frame blurred to viewing scale and pool the three colour channels, so a coloured
+  Seven more tests (`babel_surfer/perceptual.py`) are modelled on what people notice first. Most
+  look at the frame blurred to viewing scale, and all pool the three colour channels, so a coloured
   shape that is weak in every channel still adds up:
 
   | test | catches |
@@ -52,9 +52,10 @@ GitHub Actions (continuous) ─► scan.py ─► POST babelia.cgi location=N, N
   | colours | areas drawn with few colours: cartoons, text on a background |
   | spectrum | photo-like structure (excess low-frequency power; photos fall off as 1/f) |
   | face | two spots above a third, the layout people read as a face |
+  | strokes | thin lines, outlines and small drawn marks whose colour stays nearly constant along them (2–3 px strips, 16–32 px long, 12 angles); added after the blind-spot probe found the other tests missed such marks before a person would |
 
   The headline score is the strongest test. Each find also shows a **frame-wide σ** that
-  allows for running all 16 tests (a 4σ reading on one test is about 3.3σ for the whole frame).
+  allows for running all 17 tests (a 4σ reading on one test is about 3.3σ for the whole frame).
   A **visibility** score (`visibility.py`) estimates whether a person would see anything. It
   looks for the three things that break static's flicker for the eye: a patch of colour, a
   patch smoother or busier than static, and a thin line whose colour stays constant along
@@ -66,8 +67,10 @@ GitHub Actions (continuous) ─► scan.py ─► POST babelia.cgi location=N, N
   then fetches and scores the frame, replies with the scores, closes the issue and lists the
   frame under **People noticed**. A 👍 on the issue counts as a vote.
 * **Speed:** shared FFTs and integral images, a precomputed rotation index for angled lines,
-  half-size copies for large features, and a process pool for scoring. All 16 tests take
-  about 0.42 s per frame, down from 0.60 s for the original 10. A regression test pins the
+  half-size copies for large features, and a process pool for scoring. The first 16 tests take
+  about 0.42 s per frame, down from 0.60 s for the original 10; the strokes test adds about
+  0.4 s, which costs no search speed, since frames arrive from Babelia far slower (about one
+  every 2 s) than three processes can score them. A regression test pins the
   original tests' raw statistics, so these speed-ups can't change their calibration.
 
 * **Calibration** (`babel_surfer/calibrate.py`, `nullmap.py`): each test maps its raw statistic
@@ -199,7 +202,7 @@ below 10¹⁶) never reaches them. The demos appear on the site, clearly labelle
 
 ## Per-test leaderboards, combined score and fingerprint monitor
 
-- **Leaderboards:** the top 3 frames for each of the 16 tests and for the combined score, with
+- **Leaderboards:** the top 3 frames for each test and for the combined score, with
   each test's measured 4σ rate on real frames.
 - **Combined score:** a Stouffer sum of the calibrated tests (the original ten until the new ones are calibrated on real frames), calibrated separately, which
   catches weak evidence spread across several tests.

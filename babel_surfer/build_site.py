@@ -81,6 +81,12 @@ def build(out: Path, trials: int = 8, null_frames: int = 500, force_bench: bool 
     else:
         print("benchmark up to date")
 
+    # the blind-spot probe's latest results (its own workflow keeps them on
+    # the probe-data branch, so it never races the scan's pushes to gh-pages)
+    probe = probe_results() if network else None
+    if probe:
+        (out / "data" / "sensitivity.json").write_text(probe)
+
     # seeded demos (fetched from Babelia once, re-scored every build)
     demos = seeded.ensure(out / "demo", network=network)
     print(f"{len(demos)} seeded demo(s)")
@@ -99,6 +105,20 @@ def build(out: Path, trials: int = 8, null_frames: int = 500, force_bench: bool 
     (out / "agent" / "spec_results.json").write_text(json.dumps(spec, ensure_ascii=False))
     print(f"demo slot: {spec['variant']}, spec {spec['status']} "
           f"({spec.get('passed', 0)}/{spec.get('total', 0)})")
+
+
+def probe_results() -> str | None:
+    """sensitivity.json from the probe-data branch, or None."""
+    import subprocess
+    try:
+        subprocess.run(["git", "fetch", "-q", "--depth=1", "origin", "probe-data"],
+                       check=True, capture_output=True, timeout=60)
+        text = subprocess.run(["git", "show", "FETCH_HEAD:sensitivity.json"], check=True,
+                              capture_output=True, text=True, timeout=30).stdout
+        json.loads(text)
+        return text
+    except (subprocess.SubprocessError, OSError, ValueError):
+        return None
 
 
 def demo_slot_result(finds: list[dict], day: date | None = None) -> dict:

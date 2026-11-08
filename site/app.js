@@ -24,6 +24,7 @@ const TEST_INFO = {
   colours:    { name: "Few colours", about: "areas drawn with fewer colours than static allows (cartoons, text)" },
   spectrum:   { name: "Photo-like", about: "more large-scale variation than static, as in photos and soft shading" },
   face:       { name: "Face-like", about: "two spots above a third: the layout people read as a face" },
+  strokes:    { name: "Thin strokes", about: "a thin line or outline whose colour stays nearly constant along it, as pen strokes do" },
 };
 const N_TESTS = Object.keys(TEST_INFO).length;
 const testName = (k) => (TEST_INFO[k] ? TEST_INFO[k].name : k);
@@ -672,14 +673,40 @@ function renderFingerprint(stats) {
 }
 
 // ---------------------------------------------------------------- data
+// The blind-spot probe (sensitivity.py, its own workflow): per signal, the
+// weakest strength the detector finds vs the weakest a person would see.
+function renderProbe(p) {
+  $("probe-section").hidden = !p;
+  if (!p) return;
+  const pct = (v) => (v == null ? "–" : `${Math.round(v * 1000) / 10}%`);
+  const s = p.summary || {};
+  const when = new Date(p.generated * 1000).toISOString().slice(0, 16).replace("T", " ");
+  const fixed = (p.fixed || []).length;
+  $("probe-note").textContent =
+    `Last run ${when} UTC. ${s.blind || 0} of ${s.families || 0} kinds of signal are seen by a person (the visibility model) ` +
+    `before the detector finds them. Each run also tries new random marks and re-checks earlier misses: ` +
+    `${(p.misses || []).length} still missed, ${fixed} fixed since they were found.`;
+  const rows = (p.families || []).map((r) =>
+    `<tr${r.blind ? ' class="blind"' : ""}><td>${r.signal}</td><td>${r.detect == null ? "never" : pct(r.detect)}</td>` +
+    `<td>${r.eye == null ? "never" : pct(r.eye)}</td><td>${(r.by || []).map(testName).join(", ") || "–"}</td></tr>`).join("");
+  const miss = (p.misses || []).slice(0, 12).map((m) =>
+    `<tr class="blind"><td>${m.signal}</td><td>${m.detect == null ? "never" : pct(m.detect)}</td>` +
+    `<td>${pct(m.eye)}</td><td>${(m.by || []).map(testName).join(", ") || "–"}</td></tr>`).join("");
+  $("probe-table").innerHTML =
+    `<thead><tr><th>Hidden signal</th><th title="Weakest strength found in at least half the trials">Detected from</th>` +
+    `<th title="Weakest strength the visibility model rates likely visible">Seen from</th><th>Caught by</th></tr></thead>` +
+    `<tbody>${rows}${miss ? `<tr><th colspan="4">Random marks still missed</th></tr>${miss}` : ""}</tbody>`;
+}
+
 async function load() {
   loadFailed = false;
-  const [stats, finds, near, bench, demos, leaders, flags] = await Promise.all([
+  const [stats, finds, near, bench, demos, leaders, flags, probe] = await Promise.all([
     getJSON("data/stats.json", {}), getJSON("data/finds.json", []),
     getJSON("data/near_misses.json", []), getJSON("benchmark/benchmark.json", null, false),
     getJSON("demo/demo.json", [], false), getJSON("data/leaders.json", {}, false),
-    getJSON("data/flags.json", [], false),
+    getJSON("data/flags.json", [], false), getJSON("data/sensitivity.json", null, false),
   ]);
+  renderProbe(probe);
   $("load-error").hidden = !loadFailed;
   if (bench) THRESHOLD = bench.threshold_sigma;      // before anything that uses it renders
   DATA = { finds, near, demos, leaders, flags };
