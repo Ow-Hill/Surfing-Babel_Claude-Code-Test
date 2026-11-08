@@ -1,0 +1,82 @@
+name: Probe detector blind spots
+
+# The detector's learning loop (babel_surfer/sensitivity.py). Each run hides
+# every kind of test signal in simulated static at ever weaker strengths,
+# tries new random drawn marks, and re-checks the marks earlier runs missed.
+# Results accumulate on the probe-data branch (its own branch, so this never
+# races the scan's pushes to gh-pages); the scan's site build publishes them.
+# It makes no requests to Babelia.
+
+on:
+  schedule:
+    - cron: "17 3 * * *"          # daily
+  workflow_dispatch:
+    inputs:
+      explore:
+        description: "Random marks to try"
+        default: "40"
+  push:
+    branches: [main]
+    paths:                         # the detector changed: measure it again
+      - "babel_surfer/classifier.py"
+      - "babel_surfer/perceptual.py"
+      - "babel_surfer/nullmap.py"
+      - "babel_surfer/calibration.json"
+      - "babel_surfer/sensitivity.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - run: pip install -r requirements.txt
+
+      - name: Earlier results and the scan's live calibration
+        run: |
+          mkdir -p probe live
+          if git fetch -q --depth=1 origin probe-data; then
+            git show FETCH_HEAD:sensitivity.json > probe/sensitivity.json || rm -f probe/sensitivity.json
+          fi
+          if git fetch -q --depth=1 origin gh-pages; then
+            git show FETCH_HEAD:data/calibration.json > live/calibration.json || rm -f live/calibration.json
+          fi
+
+      - name: Probe
+        env:
+          EXPLORE: ${{ github.event.inputs.explore }}
+        run: |
+          N="${EXPLORE:-40}"
+          if ! [[ "$N" =~ ^[0-9]+$ ]] || [ "$N" -gt 200 ]; then N=40; fi
+          python -m babel_surfer.sensitivity --trials 6 --steps 6 --explore "$N" \
+            --seed "${{ github.run_number }}" --data live --out probe/sensitivity.json
+
+      - name: Save results (probe-data branch)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd probe
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -b probe-data
+          git add sensitivity.json
+          git commit -q -m "Probe results $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do
+            git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" probe-data && break
+            sleep $((i * 5))
+          done

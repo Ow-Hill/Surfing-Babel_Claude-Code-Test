@@ -16,7 +16,8 @@
   "colours": 1.954914,
   "spectrum": 0.81419,
   "face": 2.430122,
-  "fingerprint": 0.053683
+  "fingerprint": 0.053683,
+  "strokes": 0.679309
  },
  "static-1": {
   "shape": 1.726518,
@@ -35,7 +36,8 @@
   "colours": 1.927108,
   "spectrum": 0.0,
   "face": 2.219829,
-  "fingerprint": 1.847262
+  "fingerprint": 1.847262,
+  "strokes": 0.672655
  },
  "static-2": {
   "shape": 2.018884,
@@ -54,7 +56,8 @@
   "colours": 1.743331,
   "spectrum": 1.529374,
   "face": 2.397167,
-  "fingerprint": 0.747007
+  "fingerprint": 0.747007,
+  "strokes": 0.697907
  },
  "static-3": {
   "shape": 0.989726,
@@ -73,7 +76,8 @@
   "colours": 2.155583,
   "spectrum": 0.0,
   "face": 2.344502,
-  "fingerprint": -0.625612
+  "fingerprint": -0.625612,
+  "strokes": 0.668355
  },
  "static-4": {
   "shape": 1.174463,
@@ -92,7 +96,8 @@
   "colours": 1.274975,
   "spectrum": 0.0,
   "face": 2.535663,
-  "fingerprint": 1.795896
+  "fingerprint": 1.795896,
+  "strokes": 0.72082
  },
  "static-5": {
   "shape": 1.348743,
@@ -111,7 +116,8 @@
   "colours": 0.706192,
   "spectrum": 0.0,
   "face": 3.385811,
-  "fingerprint": -0.749556
+  "fingerprint": -0.749556,
+  "strokes": 0.672074
  },
  "static-6": {
   "shape": 1.568245,
@@ -130,7 +136,8 @@
   "colours": 0.28608,
   "spectrum": 0.0,
   "face": 2.122631,
-  "fingerprint": -0.345819
+  "fingerprint": -0.345819,
+  "strokes": 0.712331
  },
  "static-7": {
   "shape": 1.098545,
@@ -149,7 +156,8 @@
   "colours": 1.237758,
   "spectrum": 0.875361,
   "face": 1.528011,
-  "fingerprint": 0.004553
+  "fingerprint": 0.004553,
+  "strokes": 0.634034
  },
  "static-8": {
   "shape": 1.228826,
@@ -168,7 +176,8 @@
   "colours": 0.28608,
   "spectrum": 0.0,
   "face": 2.341634,
-  "fingerprint": -1.884798
+  "fingerprint": -1.884798,
+  "strokes": 0.653383
  },
  "static-9": {
   "shape": 1.379737,
@@ -187,7 +196,8 @@
   "colours": 1.007867,
   "spectrum": 0.0,
   "face": 2.186624,
-  "fingerprint": -0.533429
+  "fingerprint": -0.533429,
+  "strokes": 0.734061
  },
  "static-10": {
   "shape": 2.007487,
@@ -206,7 +216,8 @@
   "colours": 1.237758,
   "spectrum": 1.412418,
   "face": 1.555469,
-  "fingerprint": 0.87703
+  "fingerprint": 0.87703,
+  "strokes": 0.706856
  },
  "static-11": {
   "shape": 1.202623,
@@ -225,7 +236,8 @@
   "colours": 0.067692,
   "spectrum": 1.653723,
   "face": 1.801397,
-  "fingerprint": 0.760625
+  "fingerprint": 0.760625,
+  "strokes": 0.692495
  },
  "disc": {
   "shape": 7.279166,
@@ -244,7 +256,8 @@
   "colours": 8.856324,
   "spectrum": 9.313816,
   "face": 3.042813,
-  "fingerprint": 2.379075
+  "fingerprint": 2.379075,
+  "strokes": 0.803358
  },
  "landscape": {
   "shape": 3.873755,
@@ -263,7 +276,8 @@
   "colours": 0.28608,
   "spectrum": 7.038602,
   "face": 3.457556,
-  "fingerprint": -0.100846
+  "fingerprint": -0.100846,
+  "strokes": 0.808363
  },
  "line": {
   "shape": 2.85173,
@@ -282,7 +296,8 @@
   "colours": 0.28608,
   "spectrum": 1.773291,
   "face": 2.884653,
-  "fingerprint": -0.90879
+  "fingerprint": -0.90879,
+  "strokes": 0.841328
  },
  "square": {
   "shape": 5.057062,
@@ -301,7 +316,8 @@
   "colours": 4.425755,
   "spectrum": 3.358246,
   "face": 10.249496,
-  "fingerprint": 0.306352
+  "fingerprint": 0.306352,
+  "strokes": 1.031484
  },
  "grey": {
   "shape": 1.843619,
@@ -320,7 +336,8 @@
   "colours": 24.37774,
   "spectrum": 0.91218,
   "face": 2.217543,
-  "fingerprint": -0.30067
+  "fingerprint": -0.30067,
+  "strokes": 1.121599
  },
  "diag": {
   "shape": 1.547896,
@@ -339,7 +356,8 @@
   "colours": 2.508996,
   "spectrum": 0.0,
   "face": 1.52829,
-  "fingerprint": 0.36273
+  "fingerprint": 0.36273,
+  "strokes": 0.739987
  },
  "tiled": {
   "shape": 1.22262,
@@ -358,7 +376,8 @@
   "colours": 0.0,
   "spectrum": 0.0,
   "face": 2.593466,
-  "fingerprint": -0.440875
+  "fingerprint": -0.440875,
+  "strokes": 0.810594
  },
  "mirror": {
   "shape": 1.423731,
@@ -377,6 +396,7 @@
   "colours": 1.237758,
   "spectrum": 2.351017,
   "face": 3.879187,
-  "fingerprint": 0.449671
+  "fingerprint": 0.449671,
+  "strokes": 0.675626
  }
 }

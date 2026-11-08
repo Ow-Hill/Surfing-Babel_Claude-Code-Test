@@ -59,7 +59,7 @@ LINE_BANDS = (1, 2, 4, 8)
 CORE_TESTS = ("shape", "blob", "lines", "texture", "palette", "tone",
               "contrast", "angled", "repetition", "symmetry")
 #: tests modelled on what people notice first (perceptual.py)
-PERCEPTUAL_TESTS = ("spot", "curves", "flat", "colours", "spectrum", "face")
+PERCEPTUAL_TESTS = ("spot", "curves", "flat", "colours", "spectrum", "face", "strokes")
 TESTS = CORE_TESTS + PERCEPTUAL_TESTS
 CONTRAST_SCALES = (8, 16, 32)
 ANGLES = (15, 30, 45, 60, 75, 105, 120, 135, 150, 165)

@@ -137,7 +137,7 @@
 
       <p class="muted" id="fp-note"></p>
       <details>
-        <summary>The sixteen tests</summary>
+        <summary>The seventeen tests</summary>
         <div class="tests" id="tests-list"></div>
       </details>
 
@@ -163,6 +163,16 @@
           Babel static at a given strength, then scored by the same detector.</p>
         <div id="bench" class="gallery small"></div>
         <div class="table-scroll"><table id="bench-table" class="bench"></table></div>
+      </details>
+
+      <details id="probe-section" hidden>
+        <summary>Blind spots: what the detector might miss</summary>
+        <p class="muted">A probe hides each kind of signal in simulated static at ever weaker strengths
+          (strength = how much of the signal is mixed in) and finds the weakest the detector still catches
+          in half the trials, and the weakest a person would likely see. Rows in red are blind spots:
+          a person sees them before the detector does.</p>
+        <p class="muted" id="probe-note"></p>
+        <div class="table-scroll"><table id="probe-table" class="bench"></table></div>
       </details>
     </section>
   </main>

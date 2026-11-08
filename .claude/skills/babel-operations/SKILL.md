@@ -34,6 +34,10 @@ description: Ship and run Surfing Babel. Covers the branch → PR → CI → mer
 - Judge search speed by one chunk. Use the 24-hour figures (frames a day and the share of
   time scanning, both shown on the site under "last scan finished"). The biggest loss was
   idle time, not slow requests.
+- Push to gh-pages from any workflow but the scan. The scan force-pushes a single commit
+  there and would erase it. The probe workflow (`probe.yml`, daily and on detector changes,
+  no Babelia traffic) keeps its results on its own `probe-data` branch, and the scan's site
+  build copies them in (`build_site.probe_results`).
 - Remove the `|| echo ::warning::` guards after the scan step. They make every chunk
   publish even if refit, re-mine, build or alerts fail.
 

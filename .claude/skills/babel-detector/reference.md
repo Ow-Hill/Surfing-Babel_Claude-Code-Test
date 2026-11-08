@@ -3,11 +3,11 @@
 Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code on 2026-11-07; when in doubt, the code wins.
 
 ## Pipeline
-1. **`classifier.raw_scores`** computes 16 raw statistics:
+1. **`classifier.raw_scores`** computes 17 raw statistics:
    - 10 core tests run per channel on Y, Cb and Cr: shape, blob, lines, texture, palette,
      tone, contrast, angled, repetition, symmetry;
-   - 6 perceptual tests (`perceptual.py`) pool the RGB channels as χ²(3): spot, curves, flat,
-     colours, spectrum, face.
+   - 7 perceptual tests (`perceptual.py`) pool the RGB channels: spot, curves, flat,
+     colours, spectrum, face and strokes.
 2. **`calibrate_scores`** maps each raw statistic to σ through `calibration.json["maps"]`
    using `nullmap.sigma`. When a test has no map it falls back to the legacy mean/std.
 3. **Headline:** `sigma` is the maximum per-test σ. A find is any test reaching 4σ; the owner
@@ -84,7 +84,10 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
   - a block-mean pyramid (`Frame.level(k)`): large features on half- or quarter-size copies,
     keeping static white;
   - one FFT per colour channel, shared by every test.
-- **Result:** all 16 tests run in ~0.42 s per frame, against 0.60 s for the original 10.
+- **Result:** the first 16 tests run in ~0.42 s per frame, against 0.60 s for the original 10.
+  `strokes` adds ~0.4 s. That cost comes from rotating the frame 12 times and taking
+  cumulative sums along rows. A neighbour-difference version took 0.05 s but was far weaker
+  (σ 0.3–3 against 4–9 on the same marks), so it was rejected.
   `scan` classifies in a forkserver process pool whose initializer calls `use_calibration`.
 - **Matched filters beat generic statistics.** Oriented, elongated Gaussian line filters
   (16×2 px at half size) found thin arcs about 5× more strongly than structure-tensor
@@ -96,6 +99,24 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
   3. Add `TEST_INFO` in `site/app.js`, a `describe()` phrase in `analysis.py`, and a
      benchmark signal.
   4. Remember that more tests mean more false finds; the site shows the expected rate.
+
+## Blind-spot probe (`sensitivity.py`) and the strokes test
+- **First run (2026-11-08, live calibration, 16 tests):**
+  - all 23 signal kinds were detected before a person would see them, at the 50% mark;
+  - but 9 of 40 random drawn marks were seen first. They were small, dull-coloured outlines,
+    ellipses and short thick lines (8–32 px, 1–4 px wide), which no test reached 4σ on.
+- **The fix, `strokes`:** the minimum colour variance over 2×16 and 3×32 px strips at 12
+  angles, as log(static variance / strip variance). It is calibrated by nullmap: simulated
+  first, then switched to real frames by `refit_live` after 5,000 logged frames.
+- **Second run, with strokes:**
+  - 7 of the 9 earlier misses are now caught at the strength a person first sees them;
+  - the pen stroke is now found from 37% strength instead of 60%;
+  - all 23 kinds still detected first.
+  - Still missed: tiny solid marks (filled 8–16 px ellipses and dots with thick edges).
+    `blob`, `spot` and `flat` see them, but not at 4σ. That's the next blind spot.
+- **Calibration hand-over:** the package calibration was set to the live (real-frame) one plus
+  the strokes map. A new package calibration invalidates the live layer (`base` hash), and
+  this avoids a window where the six perceptual tests fall back to their simulated maps.
 
 ## Visibility (`visibility.py`)
 - **Model:** three cues in CIELAB, each divided by what pure static reaches at the same size
