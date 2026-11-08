@@ -65,7 +65,13 @@ except (ValueError, json.JSONDecodeError):
     print("  could not read data/stats.json")
 
 print("== code")
-ok = get("/actions/workflows/scan-and-publish.yml/runs?per_page=20&status=success")["workflow_runs"]
+# A running relay scan publishes after every 30-minute chunk, so it counts once a
+# Pages deploy has finished more than 25 minutes after it started.
+iso = lambda t: dt.datetime.fromisoformat(t.replace("Z", "+00:00"))  # noqa: E731
+deployed = iso(pages[0]["updated_at"]) if pages and pages[0]["conclusion"] == "success" else None
+ok = [r for r in get("/actions/workflows/scan-and-publish.yml/runs?per_page=20")["workflow_runs"]
+      if r["conclusion"] == "success" or (r["status"] == "in_progress" and deployed
+                                          and deployed - iso(r["created_at"]) > dt.timedelta(minutes=25))]
 main = git("rev-parse", "origin/main")
 if not ok:
     print("  no successful publish found")
