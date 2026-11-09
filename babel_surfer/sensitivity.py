@@ -358,10 +358,15 @@ def run(trials: int = 6, steps: int = 6, explore: int = 0, seed: int = 0, famili
             row["id"] = int(n.split("#")[1])
         (rows if n in FAMILIES else misses).append(row)
     checked = [m["id"] for m in misses]
+    # the caught variants nearest to being blind spots: detected only at a
+    # strength close to (or above) where a person starts to see them
+    seen = [m for m in misses if not m["blind"] and m["eye"] and m["detect"]]
+    closest = sorted(seen, key=lambda m: m["detect"] / m["eye"], reverse=True)[:5]
     misses = [m for m in misses if m["blind"]]
     return {"generated": int(time.time()), "seconds": round(time.time() - t0),
             "trials": trials, "steps": steps, "seed": seed, "threshold_sigma": classifier.INTERESTING_SIGMA,
             "families": rows, "explored": explore, "checked": checked, "misses": misses,
+            "closest": [{**m, "margin": round(m["eye"] / m["detect"], 2)} for m in closest],
             "summary": {"families": len(rows), "blind": sum(r["blind"] for r in rows),
                         "never_detected": sum(r["detect"] is None for r in rows)}}
 
@@ -400,6 +405,8 @@ def report(res: dict) -> str:
     out.append(f"{s['blind']} of {s['families']} families are seen by eye before the detector finds them; "
                f"{s['never_detected']} are never detected. Explored {res['explored']} random variants and "
                f"re-checked earlier misses: {len(res['misses'])} visible misses, {len(res.get('fixed', []))} fixed.")
+    for m in res.get("closest", []):
+        out.append(f"  closest call: {m['signal']} (seen at {m['margin']:.2f}x the strength it is detected from)")
     return "\n".join(out)
 
 

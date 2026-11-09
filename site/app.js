@@ -684,7 +684,7 @@ function renderProbe(p) {
   const fixed = (p.fixed || []).length;
   $("probe-note").textContent =
     `Last run ${when} UTC. ${s.blind || 0} of ${s.families || 0} kinds of signal are seen by a person (the visibility model) ` +
-    `before the detector finds them. Each run also tries new random marks and re-checks earlier misses: ` +
+    `before the detector finds them. Each run also tries new random marks, text and textures and re-checks earlier misses: ` +
     `${(p.misses || []).length} still missed, ${fixed} fixed since they were found.`;
   const rows = (p.families || []).map((r) =>
     `<tr${r.blind ? ' class="blind"' : ""}><td>${r.signal}</td><td>${r.detect == null ? "never" : pct(r.detect)}</td>` +
@@ -692,10 +692,15 @@ function renderProbe(p) {
   const miss = (p.misses || []).slice(0, 12).map((m) =>
     `<tr class="blind"><td>${m.signal}</td><td>${m.detect == null ? "never" : pct(m.detect)}</td>` +
     `<td>${pct(m.eye)}</td><td>${(m.by || []).map(testName).join(", ") || "–"}</td></tr>`).join("");
+  const close = (p.closest || []).map((m) =>
+    `<tr><td>${m.signal}</td><td>${pct(m.detect)}</td><td>${pct(m.eye)}</td>` +
+    `<td>${(m.by || []).map(testName).join(", ") || "–"}</td></tr>`).join("");
   $("probe-table").innerHTML =
     `<thead><tr><th>Hidden signal</th><th title="Weakest strength found in at least half the trials">Detected from</th>` +
     `<th title="Weakest strength the visibility model rates likely visible">Seen from</th><th>Caught by</th></tr></thead>` +
-    `<tbody>${rows}${miss ? `<tr><th colspan="4">Random marks still missed</th></tr>${miss}` : ""}</tbody>`;
+    `<tbody>${rows}${miss ? `<tr><th colspan="4">Random variants still missed</th></tr>${miss}` : ""}` +
+    `${close ? `<tr><th colspan="4" title="Caught, but only at a strength close to where a person sees them">` +
+    `Closest calls this run</th></tr>${close}` : ""}</tbody>`;
 }
 
 async function load() {
