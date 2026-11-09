@@ -13,7 +13,9 @@ saved with their location.
 from __future__ import annotations
 
 import argparse
+import io
 import logging
+import math
 import multiprocessing
 import os
 import random
@@ -27,8 +29,11 @@ import urllib.request
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 
+from PIL import Image
+
 from . import classifier
-from .classifier import INTERESTING_SIGMA, classify
+from .calibrate import BABELIA_QTABLES
+from .classifier import INTERESTING_SIGMA, TESTS, classify
 from .storage import Store
 
 log = logging.getLogger("babel_surfer.scan")
@@ -38,6 +43,42 @@ ENDPOINT = BASE + "/babelia.cgi"
 SLIDESHOW_MAX = 9007199250000000          # same range the slideshow starts in
 USER_AGENT = ("SurfingBabel/1.0 (+https://github.com/Ow-Hill/"
               "Surfing-Babel_Claude-Code-Test)")
+
+
+FRAME_SIZE = (640, 416)
+# Guard against a runaway find rate (a broken calibration, or Babelia changing
+# its frames): halt the scan when a run's finds exceed what static gives by
+# this many Poisson standard deviations (plus a margin for small runs).
+P_FIND = 1 - (1 - 3.167e-5) ** len(TESTS)         # P(any test >= 4 sigma) on static
+HALT_SD, HALT_MARGIN = 6.0, 4
+
+
+def frame_problem(data: bytes) -> str | None:
+    """Why these bytes are not a genuine Babelia frame, or None. Every real
+    frame is a 640x416 RGB baseline JPEG encoded with Babelia's own
+    quantisation tables; an error page, a resized or re-encoded copy (a proxy
+    or cache) or a damaged download is not, and would score as a striking
+    "find" (a grey error image reads 60,000 sigma)."""
+    try:
+        im = Image.open(io.BytesIO(data))
+        if im.format != "JPEG":
+            return f"not a JPEG ({im.format})"
+        if im.size != FRAME_SIZE or im.mode != "RGB":
+            return f"{im.size[0]}x{im.size[1]} {im.mode}, not 640x416 RGB"
+        q = getattr(im, "quantization", None) or {}
+        if sorted(q) != list(range(len(BABELIA_QTABLES))) or \
+                any(list(q[i]) != list(t) for i, t in enumerate(BABELIA_QTABLES)):
+            return "not encoded with Babelia's JPEG tables"
+        im.load()                                      # truncated data fails here
+    except Exception as e:                             # noqa: BLE001 - any decode failure
+        return f"unreadable ({type(e).__name__}: {e})"
+    return None
+
+
+def implausible_finds(finds: int, scanned: int) -> bool:
+    """True when this many finds in this many frames can't be static's tail."""
+    expected = scanned * P_FIND
+    return finds > expected + HALT_SD * math.sqrt(expected) + HALT_MARGIN
 
 
 def image_url(location: str) -> str:
@@ -157,7 +198,8 @@ class Politeness:
 
 def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
          threshold: float = INTERESTING_SIGMA, max_frames: int | None = None,
-         max_workers: int | None = None, processes: int | None = None) -> dict:
+         max_workers: int | None = None, processes: int | None = None,
+         resume: bool = False) -> dict:
     """Scan for ``minutes``. Fetching happens in threads (the server is the
     bottleneck); classification runs in ``processes`` worker processes
     (default: all cores but one; 0 = in the fetch threads), so scoring never
@@ -167,6 +209,14 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
     if live:
         log.info("using live calibration %s", live)
     store = Store(out)
+    if store.stats.get("halted"):
+        if not resume:
+            log.error("scanning is halted (%s): %s. Run with --resume once it is understood.",
+                      time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(store.stats["halted"]["at"])),
+                      store.stats["halted"]["reason"])
+            return {"scanned": 0, "finds": 0, "errors": 0, "halted": store.stats["halted"]["reason"]}
+        log.info("resuming after a halt: %s", store.stats.pop("halted")["reason"])
+        store.save()
     promoted = store.promote(threshold)
     if promoted:
         log.info("promoted %d earlier near misses to finds (threshold %.1fσ)",
@@ -231,6 +281,32 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
                     p.shutdown(wait=False, cancel_futures=True)
             return classify(data, threshold=threshold)
 
+    def bump(run, key):
+        with pool_lock:
+            run[key] = run.get(key, 0) + 1
+
+    def confirm(loc: str, data: bytes) -> bytes | None:
+        """A second download of ``loc``: ``data`` itself if it matches; if it
+        differs, a third download decides (the copy it matches is returned);
+        None if no two downloads agree (or a download fails)."""
+        for _ in range(2):
+            if not polite.acquire(stop):
+                return None
+            t0 = time.time()
+            try:
+                again = fetch(loc)
+            except Exception as e:
+                polite.release(None)
+                log.warning("could not re-fetch %s: %s", loc, e)
+                return None
+            polite.release(time.time() - t0)
+            if again == data:
+                return data
+            if frame_problem(again):
+                return None
+            data = again
+        return None
+
     def worker():
         while not stop.is_set() and time.time() < deadline:
             if not polite.acquire(stop):
@@ -251,18 +327,48 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
                 store.error(run)
                 continue
             polite.release(time.time() - t0)
+            problem = frame_problem(data)
+            if problem:                 # not a genuine frame: never score it
+                log.warning("rejected %s: %s", loc, problem)
+                bump(run, "rejected")
+                store.error(run)
+                continue
             try:
                 result = score(data)
-            except Exception as e:      # e.g. a truncated JPEG: count it, keep scanning
+            except Exception as e:      # count it, keep scanning
                 log.warning("could not score %s: %s", loc, e)
                 store.error(run)
                 continue
+            if result.is_interesting:
+                # Babelia renders a location identically every time, so a find
+                # must survive a second download byte for byte (a download
+                # damaged in transit can't repeat)
+                again = confirm(loc, data)
+                if again is None:
+                    log.warning("unconfirmed find %s (%.1fσ): a second download differed", loc, result.sigma)
+                    bump(run, "unconfirmed")
+                    store.error(run)
+                    continue
+                if again is not data:   # the first copy was the damaged one
+                    data = again
+                    try:
+                        result = score(data)
+                    except Exception as e:
+                        log.warning("could not score %s: %s", loc, e)
+                        store.error(run)
+                        continue
             try:
                 kind = store.record(loc, data, result, run)
                 if kind == "find":
                     log.info("FIND  location=%s  %.1fσ (%s, %s)", loc, result.sigma,
                              result.label, result.reason)
                     store.save()
+                    if implausible_finds(run["finds"], run["scanned"]):
+                        run["halted"] = (f"{run['finds']} finds in {run['scanned']} frames, far more than "
+                                         f"static gives ({run['scanned'] * P_FIND:.1f} expected): "
+                                         "check the calibration and Babelia's frames before scanning on")
+                        log.error("HALT: %s", run["halted"])
+                        stop.set()
                 else:
                     log.info("frame %s  %.2fσ %s", loc[:6] + "…" + loc[-4:], result.sigma,
                              "(new near miss)" if kind == "near" else "")
@@ -294,6 +400,10 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
                           # (minutes into the run, request slots), to see throughput limits
                           "history": [[round((t - run["started_at"]) / 60, 1), n]
                                       for t, n in polite.history[-40:]]}
+    if run.get("halted"):
+        # the run's finds are not trusted: off the site, out of the totals and
+        # alerts, kept in stats["quarantine"] for a look
+        run["quarantined"] = store.quarantine(run, run["halted"])
     store.add_run(run)
     store.save()
     return run
@@ -313,12 +423,17 @@ def main(argv=None) -> int:
     ap.add_argument("--threshold", type=float, default=INTERESTING_SIGMA)
     ap.add_argument("--processes", type=int, default=None,
                     help="classifier processes (default: cores - 1; 0 = classify in the fetch threads)")
+    ap.add_argument("--resume", action="store_true",
+                    help="clear a halt (an implausible find rate) and scan again")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     run = scan(args.out, args.minutes, args.workers, args.start, args.threshold,
-               args.max_frames, args.max_workers, args.processes)
+               args.max_frames, args.max_workers, args.processes, resume=args.resume)
     print(f"scanned {run['scanned']} frames, {run['finds']} finds, "
-          f"{run['errors']} errors, best {run.get('max_sigma', 0):.2f}σ")
+          f"{run['errors']} errors ({run.get('rejected', 0)} not genuine frames, "
+          f"{run.get('unconfirmed', 0)} unconfirmed finds), best {run.get('max_sigma', 0):.2f}σ")
+    if run.get("halted"):
+        print(f"HALTED: {run['halted']}")
     return 0
 
 

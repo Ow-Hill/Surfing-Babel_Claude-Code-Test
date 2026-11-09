@@ -28,6 +28,22 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
 - **Describe finds honestly.** 4–8σ are the statistical tail of static, and the visibility
   model rates them invisible. Never call them pictures.
 
+## Guards against false positives (keep them)
+- **Integrity** (`scan.frame_problem`): only a 640×416 RGB JPEG with Babelia's exact
+  quantisation tables is scored, in scans, re-mining and flags. A grey error image scored
+  60,000σ, a resized copy 192σ, a re-encoded copy 404σ. All 32 real frames checked pass.
+- **Confirmation:** Babelia renders a location byte-identically every time, so every find is
+  downloaded again and must match. A third download decides if the copies differ. Five
+  flipped bytes made a 347σ "find". Re-mining re-downloads when a score disagrees with the
+  log.
+- **Rate halt** (`scan.implausible_finds`): a run with far more finds than static gives
+  (> expected + 6 sd + 4; about 9 in a 900-frame chunk, where 0.5 are expected) halts.
+  - Its finds are quarantined (`stats["quarantine"]`) and taken out of the totals.
+  - Scanning stays halted (`stats["halted"]`), and the workflow opens an issue.
+  - Resume by running the workflow with `resume=1`.
+- **Refit gate** (`calibrate.too_many`): a test whose refit over-counts its own held-out
+  frames above 3σ or 4σ (> expected + 5 sd + 3) keeps its previous map.
+
 ## Never
 - Floor or fudge a test's spread. `max(std, 1.0)` once shrank every σ, leaving 0 finds where
   about 7 were expected.

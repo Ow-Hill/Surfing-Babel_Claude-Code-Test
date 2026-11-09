@@ -119,6 +119,7 @@ def mine(store: Store, threshold: float = INTERESTING_SIGMA, workers: int = 2,
     scores, peak = res
     if fetch is None:
         from .scan import fetch
+    from .scan import frame_problem
     todo = candidates(scores, peak, threshold, store._referenced())
     log.info("re-mined %d logged frames: %d at/above %.1fσ, fetching %d candidates",
              len(scores), int((peak >= threshold).sum()), threshold, len(todo))
@@ -129,17 +130,26 @@ def mine(store: Store, threshold: float = INTERESTING_SIGMA, workers: int = 2,
         loc, expected = item
         try:
             data = fetch(loc)
+            problem = frame_problem(data)
+            if problem:
+                raise ValueError(f"not a genuine frame: {problem}")
             result = classify(data, threshold=threshold)
+            if abs(result.sigma - expected) > TOLERANCE:
+                # The log and this download disagree. Babelia renders a
+                # location identically every time, so a second download
+                # settles it: if it matches, the log was stale (float16 or an
+                # older code path); if not, this download was damaged.
+                if fetch(loc) != data:
+                    raise ValueError("two downloads differ (damaged in transit)")
+                with lock:
+                    run["mismatches"] += 1
+                log.warning("%s: logged %.2fσ, fetched frame scores %.2fσ", loc, expected, result.sigma)
         except Exception as e:
             log.warning("could not fetch or score %s: %s", loc, e)
             store.error(run)
             return
         with lock:
             run["refetched"] += 1
-            if abs(result.sigma - expected) > TOLERANCE:
-                # Babelia's frame is the truth; the log was float16 or an older code path
-                run["mismatches"] += 1
-                log.warning("%s: logged %.2fσ, fetched frame scores %.2fσ", loc, expected, result.sigma)
         try:
             kind = store.record(loc, data, result, run, count=False)
         except Exception as e:

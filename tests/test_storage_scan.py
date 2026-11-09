@@ -277,3 +277,106 @@ def test_unreadable_frame_is_an_error_not_a_dead_worker(tmp_path, monkeypatch):
     monkeypatch.setattr(scan_mod, "fetch", lambda loc: good[:5000] if int(loc) % 2 else good)
     run = scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=0, max_frames=6, processes=0)
     assert run["scanned"] == 3 and run["errors"] == 3
+
+
+# --- guards against false positives ----------------------------------------------
+
+def _variants():
+    """Bytes that are not a genuine Babelia frame, each of which the detector
+    alone scores as a striking find."""
+    import io
+    from PIL import Image
+    im = Image.open(io.BytesIO(FRAME)).convert("RGB")
+    out = {}
+    buf = io.BytesIO(); Image.new("RGB", (640, 416), (200, 200, 200)).save(buf, "JPEG"); out["grey error image"] = buf.getvalue()
+    buf = io.BytesIO(); im.resize((320, 208)).save(buf, "JPEG", quality=90); out["resized copy"] = buf.getvalue()
+    buf = io.BytesIO(); im.save(buf, "JPEG", quality=75); out["re-encoded copy"] = buf.getvalue()
+    buf = io.BytesIO(); im.save(buf, "PNG"); out["png"] = buf.getvalue()
+    out["truncated"] = FRAME[: len(FRAME) // 2]
+    return out
+
+
+def test_frame_problem_accepts_babelia_frames_and_rejects_the_rest():
+    assert scan_mod.frame_problem(FRAME) is None
+    for name, data in _variants().items():
+        assert scan_mod.frame_problem(data), name
+
+
+def test_scan_never_scores_frames_that_are_not_babelias(tmp_path, monkeypatch):
+    """A grey error page scored 60,000 sigma: it must be an error, not a find."""
+    bad = list(_variants().values())
+    monkeypatch.setattr(scan_mod, "fetch", lambda loc: bad[int(loc) % len(bad)])
+    run = scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=0, max_frames=5, processes=0)
+    assert run["finds"] == 0 and run["rejected"] == 5 and run["scanned"] == 0
+
+
+def _damaged(data: bytes) -> bytes:
+    """A download with a few bytes flipped mid-stream: still a valid-looking
+    Babelia JPEG, but it scores about 350 sigma."""
+    b = bytearray(data)
+    for k in range(5):
+        b[len(b) // 3 + k * 997] ^= 0xFF
+    return bytes(b)
+
+
+def test_a_find_from_a_damaged_download_is_not_kept(tmp_path, monkeypatch):
+    """Babelia renders a location identically every time: the find must
+    survive a second download. Here the first download was damaged."""
+    damaged = _damaged(FRAME)
+    from babel_surfer.classifier import classify
+    assert classify(damaged).is_interesting and not classify(FRAME).is_interesting
+    calls = []
+
+    def fetch(loc):
+        calls.append(loc)
+        return damaged if len(calls) == 1 else FRAME
+    monkeypatch.setattr(scan_mod, "fetch", fetch)
+    run = scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=0, max_frames=1, processes=0)
+    assert run["finds"] == 0 and run["scanned"] == 1      # re-scored on the clean copy
+    assert len(calls) == 3                                # first, then two agreeing re-downloads
+
+
+def test_a_find_no_two_downloads_agree_on_is_dropped(tmp_path, monkeypatch):
+    n = []
+
+    def fetch(loc):                         # damaged differently every time
+        n.append(1)
+        b = bytearray(_damaged(FRAME))
+        b[len(b) // 2 + len(n)] ^= 0x55
+        return bytes(b)
+    monkeypatch.setattr(scan_mod, "fetch", fetch)
+    run = scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=0, max_frames=1, processes=0)
+    assert run["finds"] == 0 and run["unconfirmed"] == 1
+
+
+def test_an_implausible_find_rate_halts_and_quarantines(tmp_path, monkeypatch):
+    """If every frame suddenly 'finds' (a broken calibration, or Babelia
+    changing its frames), scanning halts, the run's finds come off the site
+    and out of the totals, and later scans refuse until resumed."""
+    monkeypatch.setattr(scan_mod, "fetch", lambda loc: FRAME)
+    monkeypatch.setattr(scan_mod, "classify", lambda data, threshold=4.0: fake(9.0, True))
+    run = scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=0, max_frames=50, processes=0)
+    assert run["halted"] and run["scanned"] < 10 and run["quarantined"] == run["finds"]
+    stats = json.loads((tmp_path / "stats.json").read_text())
+    assert stats["halted"] and stats["finds_total"] == 0 and len(stats["quarantine"]) == run["finds"]
+    assert json.loads((tmp_path / "finds.json").read_text()) == []
+    again = scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=100, max_frames=5, processes=0)
+    assert again["scanned"] == 0 and again["halted"]
+    monkeypatch.setattr(scan_mod, "classify", lambda data, threshold=4.0: fake(1.0))
+    resumed = scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=100, max_frames=5, processes=0, resume=True)
+    assert resumed["scanned"] == 5 and "halted" not in json.loads((tmp_path / "stats.json").read_text())
+
+
+def test_find_rate_guard_never_trips_on_static():
+    # a 30-minute chunk (~900 frames) gives ~0.5 finds; 8 is still allowed
+    assert not scan_mod.implausible_finds(8, 900)
+    assert not scan_mod.implausible_finds(2, 2)          # two lucky frames in a row
+    assert scan_mod.implausible_finds(9, 900) and scan_mod.implausible_finds(5, 5)
+
+
+def test_halt_alert_once_per_halt():
+    from babel_surfer.alerts import build_halt_alert
+    stats = {"halted": {"at": 100.0, "reason": "9 finds in 20 frames"},
+             "quarantine": [{"location": "1", "sigma": 9.0, "reason": "shape"}]}
+    assert "9 finds in 20 frames" in build_halt_alert(stats, None)
+    assert build_halt_alert(stats, 100.0) is None and build_halt_alert({}, None) is None

@@ -91,6 +91,25 @@ def build_alert(stats: dict, site_url: str = SITE_URL, since: float | None = Non
     return "\n".join(lines)
 
 
+def build_halt_alert(stats: dict, since_halt: float | None) -> str | None:
+    """Issue body when scanning halted on an implausible find rate (once per
+    halt), or None."""
+    h = stats.get("halted")
+    if not h or (since_halt is not None and h["at"] <= since_halt):
+        return None
+    q = stats.get("quarantine") or []
+    lines = [f"Scanning halted at {_iso(h['at'])}: {h['reason']}.", "",
+             "That many finds can't be the tail of static, so something upstream is wrong: most likely "
+             "a calibration that no longer fits real frames, or Babelia changing how it renders. The "
+             f"run's finds were taken off the site and out of the totals ({len(q)} frame(s) are listed "
+             "in stats.json under `quarantine`).", "",
+             "Once it is understood, resume from the Actions tab: run **Scan Babel and publish site** "
+             "with **resume** set to 1."]
+    for f in q[-10:]:
+        lines.append(f"- `{f['location']}` {f['sigma']:.1f}σ ({f['reason']})")
+    return "\n".join(lines)
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -108,9 +127,18 @@ def main(argv=None) -> int:
     except (OSError, ValueError, KeyError, TypeError):
         last = stats.get("last_run") or {}
         since = (last.get("started_at") or time.time()) - 1      # first time: the latest scan
+    try:
+        halt_seen = json.loads(mark.read_text()).get("halt")
+    except (OSError, ValueError, AttributeError):
+        halt_seen = None
+    halt = build_halt_alert(stats, halt_seen)
+    if halt:
+        args.alert.with_name("alert-halt.md").write_text(halt)
+        print("halt alert written")
     body = build_alert(stats, since=since)
     newest = max([since] + [r.get("finished_at") or 0 for r in stats.get("runs") or []])
-    mark.write_text(json.dumps({"until": newest}))
+    mark.write_text(json.dumps({"until": newest,
+                                "halt": (stats.get("halted") or {}).get("at", halt_seen)}))
     if body:
         args.alert.write_text(body)
         print(f"alert written to {args.alert}")

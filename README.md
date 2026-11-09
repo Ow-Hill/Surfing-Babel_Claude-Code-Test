@@ -62,6 +62,15 @@ GitHub Actions (continuous) ─► scan.py ─► POST babelia.cgi location=N, N
   its length. Each is compared with what pure static reaches at the same size, finds are
   sorted by it by default, and the detail view's eye layer marks the most noticeable spot.
   Most finds, and many benchmark signals, are caught well before they are visible.
+* **Guards against false positives:**
+  - Only genuine Babelia frames are scored: 640×416 and encoded with Babelia's own JPEG tables.
+    An error page or a re-encoded copy would otherwise score as a striking find.
+  - Every find is downloaded a second time and must match byte for byte, because Babelia
+    renders a location identically every time. A download damaged in transit can't repeat.
+  - A scan that finds far more than static can produce halts. Its finds are set aside, the site
+    shows a notice, and an issue is opened; scanning resumes only when someone runs the
+    workflow with `resume=1`.
+  - A refit that over-counts its own held-out frames is rejected.
 * **"I see something"** (`babel_surfer/flags.py`): any frame on the site, live frames included,
   can be flagged. The button opens a pre-filled GitHub issue (`Flag: <location>`). The workflow
   then fetches and scores the frame, replies with the scores, closes the issue and lists the

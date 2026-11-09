@@ -18,6 +18,9 @@ on:
       publish_first:
         description: "Build and publish before scanning (used when a long run hands over to new code)"
         default: "0"
+      resume:
+        description: "Resume scanning after a halt (an implausible find rate); set to 1 once it is understood"
+        default: "0"
   issues:
     types: [opened]               # "I see something" flags get scored within minutes
   push:
@@ -70,6 +73,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           INPUT_MINUTES: ${{ github.event.inputs.minutes }}
           PUBLISH_FIRST: ${{ github.event.inputs.publish_first }}
+          RESUME: ${{ github.event.inputs.resume }}
         run: |
           # inputs arrive through env (never pasted into the script) and must be whole minutes
           MIN="$INPUT_MINUTES"
@@ -136,8 +140,10 @@ jobs:
             echo "::group::scan $this min ($remaining min left)"
             # Every step after the scan may fail without losing the chunk: the
             # data always gets published (with the previous site if the build broke).
+            RESUME_FLAG=""
+            if [ "$RESUME" = "1" ]; then RESUME_FLAG="--resume"; RESUME=0; fi
             python -m babel_surfer.scan --out public/data --minutes "$this" --workers 3 --max-workers 5 \
-              || echo "::warning::scan step failed; publishing what was saved"
+              $RESUME_FLAG || echo "::warning::scan step failed; publishing what was saved"
             echo "::endgroup::"
             # tests still calibrated on simulated static switch to real frames once
             # the scan log has enough of them; re-score the log if that happened
@@ -147,6 +153,12 @@ jobs:
               || echo "::warning::site build failed; publishing the data with the previous site"
             python -m babel_surfer.alerts --data public/data --feed public/feed.xml --alert alert.md \
               || echo "::warning::alerts failed"
+            if [ -f alert-halt.md ]; then
+              gh issue create --repo "${{ github.repository }}" \
+                --title "Surfing Babel: scanning halted (implausible find rate)" --body-file alert-halt.md \
+                || echo "::warning::could not open the halt issue"
+              rm -f alert-halt.md
+            fi
             if [ -f alert.md ]; then
               gh issue create --repo "${{ github.repository }}" \
                 --title "Surfing Babel: something reached 8σ" --body-file alert.md \
@@ -154,6 +166,11 @@ jobs:
               rm -f alert.md
             fi
             publish || echo "::error::publish failed"
+            # an implausible find rate halts scanning until someone resumes it
+            if python -c "import json, sys; sys.exit(0 if json.load(open('public/data/stats.json')).get('halted') else 1)"; then
+              echo "::error::scanning is halted (implausible find rate); see the halt issue, then run with resume=1"
+              break
+            fi
             remaining=$(( remaining - this ))
             [ "$remaining" -gt 0 ] || break
             # New code on main while this long scan runs? Hand the remaining
@@ -185,8 +202,8 @@ jobs:
           if [ "${MINUTES:-0}" -gt 0 ] && ! python -c "
           import json, sys
           s = json.load(open('public/data/stats.json'))
-          sys.exit(0 if (s.get('last_run') or {}).get('scanned', 0) > 0 else 1)"; then
-            echo "::warning::the last scan got no frames; not relaying (the hourly cron will retry)"
+          sys.exit(0 if (s.get('last_run') or {}).get('scanned', 0) > 0 and not s.get('halted') else 1)"; then
+            echo "::warning::the last scan got no frames, or scanning is halted; not relaying (the hourly cron will retry)"
             exit 0
           fi
           gh workflow run scan-and-publish.yml --repo "${{ github.repository }}" --ref main -f minutes=300 \

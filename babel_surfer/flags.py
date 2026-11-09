@@ -133,6 +133,7 @@ def process(store: Store, gh: GitHub, fetch, threshold: float = INTERESTING_SIGM
     """Score open flag issues; returns how many frames were handled. One bad
     flag never blocks the others; a frame Babelia keeps failing on is closed
     after MAX_FAILURES tries."""
+    from .scan import frame_problem
     groups = group_flags(gh.open_flags(), limit)
     run = {"started_at": time.time(), "trigger": "flags", "scanned": 0, "finds": 0, "errors": 0}
     failures = store.stats.setdefault("flag_failures", {})
@@ -140,6 +141,9 @@ def process(store: Store, gh: GitHub, fetch, threshold: float = INTERESTING_SIGM
     for loc, issues in groups:
         try:
             data = fetch(loc)
+            problem = frame_problem(data)
+            if problem:
+                raise ValueError(f"not a genuine Babelia frame: {problem}")
             result = classify(data, threshold=threshold)
         except Exception as e:                       # Babelia down or a bad frame
             log.warning("could not fetch or score flagged %s: %s", loc, e)
