@@ -462,6 +462,26 @@ class Store:
             self._cap_finds()
         return moved
 
+    def quarantine(self, run: dict, reason: str) -> int:
+        """Halt scanning, and take this run's new finds off the site and out
+        of the totals: an implausible find rate means they can't be trusted.
+        They stay listed in stats["quarantine"] for inspection. Returns how
+        many were moved."""
+        with self._lock:
+            locs = {f["location"] for f in run.get("new_finds", [])}
+            moved = [f for f in self.finds if f["location"] in locs]
+            self.finds = [f for f in self.finds if f["location"] not in locs]
+            self.stats["finds_total"] = max(len(self.finds), self.stats.get("finds_total", 0) - len(locs))
+            q = self.stats.setdefault("quarantine", [])
+            q.extend({k: f.get(k) for k in ("location", "sigma", "reason", "found_at")} for f in moved)
+            del q[:-100]
+            self.stats["halted"] = {"at": time.time(), "reason": reason}
+            run["new_finds"] = []
+            for loc in locs:
+                if loc not in self._referenced():
+                    self._drop_image(loc)
+        return len(moved)
+
     def error(self, run: dict) -> None:
         with self._lock:
             self.stats["errors"] += 1

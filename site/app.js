@@ -708,6 +708,7 @@ async function load() {
   ]);
   renderProbe(probe);
   $("load-error").hidden = !loadFailed;
+  $("halt-note").hidden = !stats.halted;     // an implausible find rate paused scanning
   if (bench) THRESHOLD = bench.threshold_sigma;      // before anything that uses it renders
   DATA = { finds, near, demos, leaders, flags };
   $("flags-section").hidden = !flags.length;

@@ -41,6 +41,11 @@ description: Ship and run Surfing Babel. Covers the branch → PR → CI → mer
   there and would erase it. The probe workflow (`probe.yml`, daily and on detector changes,
   no Babelia traffic) keeps its results on its own `probe-data` branch, and the scan's site
   build copies them in (`build_site.probe_results`).
+- Resume a halted scan before the cause is understood. A halt (`stats.halted`, a "scanning
+  halted" issue, a banner on the site) means a run found far more than static can. Check
+  the quarantined frames and the calibration, then run the workflow with `resume=1`. If
+  every frame is "rejected" (not a genuine Babelia frame), Babelia may have changed its
+  JPEG encoder: the scan then gets 0 frames and stops relaying.
 - Remove the `|| echo ::warning::` guards after the scan step. They make every chunk
   publish even if refit, re-mine, build or alerts fail.
 

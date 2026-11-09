@@ -109,7 +109,8 @@ def test_calibrate_from_log_and_remine(tmp_path, monkeypatch):
                               tests={"shape": z})
 
     run = remine.mine(store, 4.0, workers=1, fetch=fake_fetch, classify=fake_classify)
-    assert run and target in fetched and len(fetched) <= remine.MAX_REFETCH
+    # (a frame whose score disagrees with the log is downloaded twice to confirm it)
+    assert run and target in fetched and len(set(fetched)) <= remine.MAX_REFETCH
     assert [f["location"] for f in store.finds] == [target]
     assert store.stats["scanned"] == scanned_before          # nothing double-counted
     assert sum(store.stats["hist_current"]["counts"]) == 6000
@@ -171,3 +172,25 @@ def test_refit_live_refits_when_the_log_doubles(tmp_path, monkeypatch):
     assert calibrate.refit_live(tmp_path)                  # the log doubled
     src = json.loads((tmp_path / "calibration.json").read_text())["map_sources"]["shape"]
     assert src["frames"] == 12000
+
+
+def test_refit_that_fails_its_own_held_out_check_is_rejected(tmp_path):
+    """A refit must not go live if its own held-out frames exceed 3 or 4
+    sigma far more often than static would (here 1% of 'shape' values are
+    off the scale, which the fit excludes as pictures): that test keeps its
+    previous map, the others are refitted."""
+    legacy = {t: {"mean": 1.5, "std": 1.0} for t in TESTS}
+    (tmp_path / "pkg.json").write_text(json.dumps({"tests": legacy}))
+    clean, _ = legacy_log(np.random.default_rng(20), 6000, legacy)
+    np.save(tmp_path / "clean.npy", clean)
+    out = tmp_path / "cal.json"
+    first = calibrate.calibrate_from_log(tmp_path / "clean.npy", out, base=tmp_path / "pkg.json")
+    assert first["rejected"] == []
+    before = json.loads(out.read_text())["maps"]
+    bad, _ = legacy_log(np.random.default_rng(21), 6000, legacy)
+    bad["shape"][::99] = np.inf                        # 1% of frames off the scale
+    np.save(tmp_path / "bad.npy", bad)
+    rep = calibrate.calibrate_from_log(tmp_path / "bad.npy", out)
+    after = json.loads(out.read_text())["maps"]
+    assert rep["rejected"] == ["shape"] and after["shape"] == before["shape"]
+    assert after["blob"] != before["blob"]             # the rest refitted on the new log

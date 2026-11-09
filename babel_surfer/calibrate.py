@@ -21,6 +21,7 @@ import argparse
 import io
 import functools
 import json
+import math
 import os
 import statistics
 import sys
@@ -241,6 +242,12 @@ def _counts(z: np.ndarray, of: int = 1) -> dict:
             **{f"expected_{k}": round(tail(k), 1) for k in (2, 3, 4)}}
 
 
+def too_many(c: dict, sd: float = 5.0) -> bool:
+    """Held-out counts above 3 or 4 sigma implausibly high for static
+    (``sd`` Poisson standard deviations above the expectation, plus 3)."""
+    return any(c[f"over_{k}"] > c[f"expected_{k}"] + sd * math.sqrt(c[f"expected_{k}"]) + 3 for k in (3, 4))
+
+
 def ready_tests(raw: dict) -> list[str]:
     """Tests with enough real frames in the log to be calibrated on them."""
     return [t for t in TESTS if int(np.isfinite(raw[t]).sum()) >= MIN_LOG_FRAMES]
@@ -273,8 +280,20 @@ def calibrate_from_log(log_path: Path, out: Path = CALIBRATION_FILE,
     half = fit_maps(~odd)
     zv, cv = apply_maps(half, {t: raw[t][odd] for t in TESTS}, ready)
     validation = {t: _counts(zv[t]) for t in ready}
+    # Gate: a test whose own held-out frames exceed 3 or 4 sigma far more
+    # often than static should keeps its previous map (a bad fit would flood
+    # the site with false finds). Only a surplus is rejected: a deficit errs
+    # toward missing finds, never toward inventing them.
+    rejected = [t for t in ready if t in (data.get("maps") or {}) and too_many(validation[t])]
+    if rejected:
+        ready = [t for t in ready if t not in rejected]
+        keep.update({t: data["maps"][t] for t in rejected})
+        half = fit_maps(~odd)
+        zv, cv = apply_maps(half, {t: raw[t][odd] for t in TESTS}, ready)
+        validation = {t: _counts(zv[t]) for t in ready}
+        validation["rejected"] = rejected
     validation["combined"] = _counts(cv)
-    peak = np.nanmax(np.stack([zv[t] for t in ready]), axis=0)
+    peak = np.nanmax(np.stack([zv[t] for t in ready]), axis=0) if ready else np.zeros(1)
     validation[f"headline (max of {len(ready)})"] = _counts(peak, of=len(ready))
     # before: the calibration in use until now, on the same frames
     old_maps = data.get("maps") or {}
@@ -296,7 +315,7 @@ def calibrate_from_log(log_path: Path, out: Path = CALIBRATION_FILE,
                            "validation": validation}
     out.write_text(_compact_json(data))
     classifier._calibration_cache = None
-    return {"validation": validation, "before": before, "ready": ready}
+    return {"validation": validation, "before": before, "ready": ready, "rejected": rejected}
 
 
 def _simulated_raw(seed: int, tests: tuple) -> dict:
@@ -359,7 +378,10 @@ def refit_live(data_dir: Path) -> bool:
     if not pending:
         return False
     live = data_dir / "calibration.json"
-    calibrate_from_log(log_path, live, base=effective)
+    rep = calibrate_from_log(log_path, live, base=effective)
+    if rep.get("rejected"):
+        print(f"::warning::refit rejected for {', '.join(rep['rejected'])}: too many held-out frames above "
+              "3 or 4 sigma for static; keeping their previous maps")
     d = json.loads(live.read_text())
     d["base"] = classifier.package_calibration_hash()
     live.write_text(_compact_json(d))

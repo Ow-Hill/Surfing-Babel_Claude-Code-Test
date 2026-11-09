@@ -26,6 +26,10 @@
     </div>
   </header>
 
+  <div id="halt-note" class="wrap banner" role="status" hidden>
+    <span>Scanning is paused: a scan found far more anomalies than random static can produce, so something
+      upstream (the calibration, or Babelia itself) needs checking. That scan's finds were set aside.</span>
+  </div>
   <div id="load-error" class="wrap banner" role="alert" hidden>
     <span>Couldn't load the scan data, so the numbers below may be missing. Check your connection and try again.</span>
     <button id="load-retry" class="btn ghost" type="button">Retry</button>
