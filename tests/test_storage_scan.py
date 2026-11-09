@@ -408,3 +408,37 @@ def test_fetch_errors_are_counted_by_kind(tmp_path, monkeypatch):
     monkeypatch.setattr(scan_mod, "fetch", fetch)
     run = scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=0, max_frames=4, processes=0)
     assert run["error_kinds"] == {"timeout": 2, "HTTP 503": 2}
+
+
+def test_scoring_does_not_hold_a_request_slot(tmp_path, monkeypatch):
+    """Requests in flight never exceed the slots allowed, but a thread that is
+    scoring doesn't block the next request: with 2 slots and scoring as slow
+    as fetching, fetches overlap scoring instead of waiting for it."""
+    import threading
+    import time as _t
+    lock, now, peak = threading.Lock(), [0], [0]
+
+    def fetch(loc):
+        with lock:
+            now[0] += 1
+            peak[0] = max(peak[0], now[0])
+        _t.sleep(0.3)
+        with lock:
+            now[0] -= 1
+        return FRAME
+
+    def classify(data, threshold=None):
+        _t.sleep(0.3)
+        return fake(1.0)
+
+    monkeypatch.setattr(scan_mod, "fetch", fetch)
+    monkeypatch.setattr(scan_mod, "classify", classify)
+    monkeypatch.setattr(scan_mod, "frame_problem", lambda data: None)
+    run = scan_mod.scan(str(tmp_path), minutes=1, workers=2, max_workers=2, start=0,
+                        max_frames=12, processes=0)
+    assert run["scanned"] == 12 and peak[0] <= 2
+    # one thread per slot would need 12 x (0.3 fetch + 0.3 score) / 2 = 3.6 s;
+    # with scoring off the slots, the fetches set the pace (about 2.4 s)
+    assert run["finished_at"] - run["started_at"] < 3.1
+    c = run["concurrency"]
+    assert 0.25 <= c["latency_median_s"] <= c["latency_p90_s"] < 1.5 and 0 < c["in_flight"] <= 2
