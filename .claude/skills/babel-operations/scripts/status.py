@@ -65,6 +65,12 @@ try:
                 kinds[k] = kinds.get(k, 0) + v
             for k in guards:
                 guards[k] += r.get(k) or 0
+        for r in scans[-3:]:
+            c = r.get("concurrency") or {}
+            if "latency_median_s" in c:
+                print(f"  run {when(r['finished_at'])}: {r.get('frames_per_hour')}/h, latency median "
+                      f"{c['latency_median_s']}s p90 {c['latency_p90_s']}s, {c.get('in_flight')} requests "
+                      f"in flight on average (of up to {r.get('max_workers')})")
         if kinds:
             print("  fetch errors by kind: " + ", ".join(f"{k} {v}" for k, v in sorted(kinds.items(), key=lambda kv: -kv[1])))
         print(f"  guards: {guards['rejected']} frames not genuine Babelia frames, "

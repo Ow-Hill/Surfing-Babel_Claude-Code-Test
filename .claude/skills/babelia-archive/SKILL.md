@@ -27,6 +27,13 @@ description: Facts about the Babel Image Archive (babelia.libraryofbabel.info) t
   14 s over a day. Deciding on stale samples against an all-time-best baseline cascaded
   5 → 1 in a minute, many times per chunk.
 
+- **Keep request slots busy, not more of them.** Scoring a frame takes about 0.8 s. When each
+  of 5 threads fetched and then scored, its slot sat idle for that time (about 8% at 9–12 s
+  latency). `scan()` now runs more threads than slots: `Politeness` still caps requests in
+  flight, and the extra threads only score. Each run records `latency_median_s`,
+  `latency_p90_s` and `in_flight` (average requests in flight). Judge throughput by those,
+  not by `baseline_latency_s`, which is the best rolling median, not the typical latency.
+
 ## Never
 - Expect a faster endpoint or caching to help. Every request is rendered server-side in
   5–30 s, the same location is re-rendered each time, and `imagedl.cgi` and GET are just as

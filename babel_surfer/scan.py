@@ -140,6 +140,15 @@ class Location:
             return str(self._n + 1)
 
 
+def latency_summary(lat: list[float]) -> dict:
+    """Median and 90th percentile of the run's request latencies (seconds)."""
+    if not lat:
+        return {}
+    s = sorted(lat)
+    return {"latency_median_s": round(statistics.median(s), 2),
+            "latency_p90_s": round(s[min(len(s) - 1, int(0.9 * len(s)))], 2)}
+
+
 class Politeness:
     """Adaptive concurrency: Babelia is a one-person site, so scale the
     number of simultaneous requests to what it handles without slowing down.
@@ -166,6 +175,8 @@ class Politeness:
         self.baseline: float | None = None
         self.lat: list[float] = []
         self.done = 0
+        self.seen: list[float] = []    # every successful request's latency, for the run's record
+        self.busy = 0.0                # request-seconds in flight (failed ones too)
         self.history: list[tuple[float, int]] = [(time.time(), self.limit)]
         self.changed_at = 0.0          # when the level last changed
         self._cv = threading.Condition()
@@ -185,6 +196,10 @@ class Politeness:
         change of level is not evidence about the current level."""
         with self._cv:
             self.active -= 1
+            if started is not None:
+                self.busy += time.time() - started
+            if latency is not None:
+                self.seen.append(latency)
             if started is not None and started < self.changed_at:
                 pass                                     # judged under the old level
             elif latency is None:                        # error: back off now
@@ -224,8 +239,10 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
          resume: bool = False) -> dict:
     """Scan for ``minutes``. Fetching happens in threads (the server is the
     bottleneck); classification runs in ``processes`` worker processes
-    (default: all cores but one; 0 = in the fetch threads), so scoring never
-    holds up the next request."""
+    (default: all cores but one; 0 = in the fetch threads). There are more
+    threads than request slots, so while some score a frame others fetch:
+    Politeness still caps the requests in flight, but a slot no longer sits
+    idle while its thread waits for a score."""
     # a calibration refitted from this site's own scan log, if there is one
     live = classifier.activate_live_calibration(out)
     if live:
@@ -409,7 +426,9 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
                 log.exception("could not keep %s: %s", loc, e)
                 store.error(run)
 
-    threads = [threading.Thread(target=worker, daemon=True) for _ in range(max_workers)]
+    # request slots stay capped by Politeness; the extra threads only score
+    threads = [threading.Thread(target=worker, daemon=True)
+               for _ in range(max_workers + max(1, processes))]
     for t in threads:
         t.start()
     try:
@@ -428,6 +447,9 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
     run["concurrency"] = {"final": polite.limit, "max_used": max(n for _, n in polite.history),
                           "baseline_latency_s": round(polite.baseline or 0, 2),
                           "changes": len(polite.history) - 1,
+                          **latency_summary(polite.seen),
+                          # average requests in flight: below the slots allowed means idle slots
+                          "in_flight": round(polite.busy / max(run["finished_at"] - run["started_at"], 1e-9), 2),
                           # (minutes into the run, request slots), to see throughput limits
                           "history": [[round((t - run["started_at"]) / 60, 1), n]
                                       for t, n in polite.history[-40:]]}
