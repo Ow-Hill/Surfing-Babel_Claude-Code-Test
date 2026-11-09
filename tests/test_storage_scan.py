@@ -380,3 +380,31 @@ def test_halt_alert_once_per_halt():
              "quarantine": [{"location": "1", "sigma": 9.0, "reason": "shape"}]}
     assert "9 finds in 20 frames" in build_halt_alert(stats, None)
     assert build_halt_alert(stats, 100.0) is None and build_halt_alert({}, None) is None
+
+
+def test_politeness_a_burst_of_failures_steps_down_once():
+    """Babelia hiccups and all five in-flight requests fail together: that is
+    one event, so one step down (5 -> 4), not a collapse to a single slot;
+    failures of requests sent at the new level still back off further."""
+    import threading
+    import time
+    p = scan_mod.Politeness(start=5, min_workers=1, max_workers=5)
+    stop = threading.Event()
+    sent = time.time() - 1
+    for _ in range(5):
+        p.acquire(stop)
+    for _ in range(5):                       # the burst: all sent before any back-off
+        p.release(None, sent)
+    assert p.limit == 4
+    p.acquire(stop)
+    p.release(None, time.time())             # a failure at the new level counts
+    assert p.limit == 3
+
+
+def test_fetch_errors_are_counted_by_kind(tmp_path, monkeypatch):
+    def fetch(loc):
+        raise RuntimeError(f"location {loc}: HTTP Error 503: Service Unavailable" if int(loc) % 2
+                           else f"location {loc}: <urlopen error timed out>")
+    monkeypatch.setattr(scan_mod, "fetch", fetch)
+    run = scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=0, max_frames=4, processes=0)
+    assert run["error_kinds"] == {"timeout": 2, "HTTP 503": 2}

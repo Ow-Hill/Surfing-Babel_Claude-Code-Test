@@ -59,6 +59,17 @@ try:
         frames = sum(r["scanned"] for r in day)
         print(f"  last {span / 3600:.0f} h: {frames:,} frames ({frames * 3600 / span:,.0f}/h), "
               f"scanning {100 * busy / span:.0f}% of the time (the relay should keep this near 100%)")
+        kinds, guards = {}, {"rejected": 0, "unconfirmed": 0}
+        for r in day:
+            for k, v in (r.get("error_kinds") or {}).items():
+                kinds[k] = kinds.get(k, 0) + v
+            for k in guards:
+                guards[k] += r.get(k) or 0
+        if kinds:
+            print("  fetch errors by kind: " + ", ".join(f"{k} {v}" for k, v in sorted(kinds.items(), key=lambda kv: -kv[1])))
+        print(f"  guards: {guards['rejected']} frames not genuine Babelia frames, "
+              f"{guards['unconfirmed']} finds not confirmed by a second download"
+              + ("; SCANNING HALTED: " + s["halted"]["reason"] if s.get("halted") else ""))
     print("  re-mined for the current calibration: "
           + ("yes" if s.get("log_calibration") else "not yet (new code not live, or re-mine pending)"))
 except (ValueError, json.JSONDecodeError):

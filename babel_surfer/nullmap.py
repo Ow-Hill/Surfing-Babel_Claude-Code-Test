@@ -66,8 +66,16 @@ def fit(values: np.ndarray) -> dict:
     if len(v) < 1000:
         raise ValueError(f"need at least 1000 null values, got {len(v)}")
     # Several tests are clipped at zero ("no evidence"), which puts a point
-    # mass at the minimum. Frames there get the mid-point of its probability.
+    # mass at the bottom. Frames there get the mid-point of its probability.
+    # Find it as the most common value among the lowest 1% (not simply the
+    # minimum: two stray values just below it once hid a 42% mass at 0 from
+    # the flat test, which then read -3.3 sigma for every frame there); the
+    # strays count as part of it.
     lo = float(v.min())
+    low = v[v <= np.quantile(v, 0.01)]
+    vals, counts = np.unique(low, return_counts=True)
+    if counts.max() >= 0.01 * len(v):                     # a real point mass
+        lo = float(vals[np.argmax(counts)])
     atom = float(np.mean(v <= lo + 1e-6))
     atom_info = None
     probs = BODY_P

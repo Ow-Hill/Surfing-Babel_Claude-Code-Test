@@ -17,6 +17,11 @@ description: Facts about the Babel Image Archive (babelia.libraryofbabel.info) t
 - **Stay polite.** It is a one-person site. Use `scan.Politeness`: start at 3 concurrent
   requests, go up to 5 while latency stays near its best, back off on errors or when
   responses slow. Identify the client as `SurfingBabel/1.0`, never with personal details.
+- **Judge each concurrency level on its own requests, failures included.** Babelia's
+  errors come in bursts: every in-flight request fails together. Counted one by one, a
+  single burst took 5 → 1 within seconds, several times a chunk on 2026-11-09 (13–18 errors
+  per chunk). Requests sent before the last change of level are now ignored, so a burst
+  steps down once. Each run records `error_kinds` (timeout, HTTP status, …).
 - **Judge each concurrency level on its own requests.** Clear the latency window after every
   change, and let the baseline relax (`DRIFT`). Server latency drifts between about 4 s and
   14 s over a day. Deciding on stale samples against an all-time-best baseline cascaded
