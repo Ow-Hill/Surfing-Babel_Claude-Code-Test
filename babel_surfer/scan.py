@@ -75,6 +75,18 @@ def frame_problem(data: bytes) -> str | None:
     return None
 
 
+def error_kind(e: Exception) -> str:
+    """A short label for a failed fetch: 'timeout', 'HTTP 503', 'not a JPEG', ..."""
+    text = str(e)
+    for label, needle in (("timeout", "timed out"), ("not a JPEG", "not a JPEG"),
+                          ("connection reset", "reset"), ("connection refused", "refused")):
+        if needle in text:
+            return label
+    import re
+    m = re.search(r"HTTP Error (\d+)", text)
+    return f"HTTP {m.group(1)}" if m else "other"
+
+
 def implausible_finds(finds: int, scanned: int) -> bool:
     """True when this many finds in this many frames can't be static's tail."""
     expected = scanned * P_FIND
@@ -139,7 +151,10 @@ class Politeness:
     to ``max_workers``); above 2x, or on errors, one closes (down to
     ``min_workers``). After every change the latency window starts afresh, so
     the next decision is judged on requests made at the new level (judging
-    on stale samples used to cascade 5 -> 1 in about a minute)."""
+    on stale samples used to cascade 5 -> 1 in about a minute). That includes
+    errors: requests already in flight when the level changed say nothing
+    about the new level, so a burst of failures (Babelia hiccups and every
+    in-flight request fails together) backs off one step, not five."""
 
     WINDOW = 12
     DRIFT = 1.03
@@ -152,6 +167,7 @@ class Politeness:
         self.lat: list[float] = []
         self.done = 0
         self.history: list[tuple[float, int]] = [(time.time(), self.limit)]
+        self.changed_at = 0.0          # when the level last changed
         self._cv = threading.Condition()
 
     def acquire(self, stop: threading.Event) -> bool:
@@ -163,10 +179,15 @@ class Politeness:
             self.active += 1
             return True
 
-    def release(self, latency: float | None) -> None:
+    def release(self, latency: float | None, started: float | None = None) -> None:
+        """Hand back a slot: ``latency`` of the request, or None if it failed.
+        ``started``: when the request was sent; one sent before the last
+        change of level is not evidence about the current level."""
         with self._cv:
             self.active -= 1
-            if latency is None:                          # error: back off now
+            if started is not None and started < self.changed_at:
+                pass                                     # judged under the old level
+            elif latency is None:                        # error: back off now
                 self._set(self.limit - 1, "error")
             else:
                 self.lat = (self.lat + [latency])[-self.WINDOW:]
@@ -193,7 +214,8 @@ class Politeness:
             log.info("concurrency %d -> %d (%s)", self.limit, n, why)
             self.limit = n
             self.lat = []          # judge the new level on its own requests
-            self.history.append((time.time(), n))
+            self.changed_at = time.time()
+            self.history.append((self.changed_at, n))
 
 
 def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
@@ -285,6 +307,14 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
         with pool_lock:
             run[key] = run.get(key, 0) + 1
 
+    def bump_error(run, e: Exception):
+        """Count failed fetches by kind (timeout, HTTP status, ...), to see
+        what Babelia's errors are."""
+        kind = error_kind(e)
+        with pool_lock:
+            kinds = run.setdefault("error_kinds", {})
+            kinds[kind] = kinds.get(kind, 0) + 1
+
     def confirm(loc: str, data: bytes) -> bytes | None:
         """A second download of ``loc``: ``data`` itself if it matches; if it
         differs, a third download decides (the copy it matches is returned);
@@ -296,10 +326,10 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
             try:
                 again = fetch(loc)
             except Exception as e:
-                polite.release(None)
+                polite.release(None, t0)
                 log.warning("could not re-fetch %s: %s", loc, e)
                 return None
-            polite.release(time.time() - t0)
+            polite.release(time.time() - t0, t0)
             if again == data:
                 return data
             if frame_problem(again):
@@ -322,11 +352,12 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
             try:
                 data = fetch(loc)
             except Exception as e:
-                polite.release(None)
+                polite.release(None, t0)
                 log.warning("%s", e)
+                bump_error(run, e)
                 store.error(run)
                 continue
-            polite.release(time.time() - t0)
+            polite.release(time.time() - t0, t0)
             problem = frame_problem(data)
             if problem:                 # not a genuine frame: never score it
                 log.warning("rejected %s: %s", loc, problem)

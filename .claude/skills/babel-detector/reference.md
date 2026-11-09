@@ -64,6 +64,13 @@ Detail behind [SKILL.md](SKILL.md). Numbers here were checked against the code o
     odd/even interleaved fits match exactly (45 against 44.3).
   - Judge held-out checks by interleaving, not by an early/late split. The 2× refit pools
     more runs and narrows the gap.
+- **Point masses are found as the mode of the lowest 1%, not the minimum (2026-11-09).**
+  `flat` is exactly 0 on 42% of real frames. Two stray values just below 0 made the old
+  code miss that mass, so all those frames read −3.29σ (audit sd 2.0). The upper tail was
+  unaffected, but the combined score was distorted.
+- **Don't trust one parity split for a small tail.** On the odd-location half, `marks`
+  showed 4 frames above 4σ where 0.9 were expected; 10 random half-splits averaged 0.7.
+  Repeat with random splits before calling a tail miscalibrated.
 - **Rows logged before the raw columns existed** are recovered exactly as
   `raw = z*std + mean`, using the legacy `tests` block.
 

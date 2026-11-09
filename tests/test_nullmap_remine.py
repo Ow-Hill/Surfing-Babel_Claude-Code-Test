@@ -194,3 +194,17 @@ def test_refit_that_fails_its_own_held_out_check_is_rejected(tmp_path):
     after = json.loads(out.read_text())["maps"]
     assert rep["rejected"] == ["shape"] and after["shape"] == before["shape"]
     assert after["blob"] != before["blob"]             # the rest refitted on the new log
+
+
+def test_point_mass_found_despite_stray_values_below_it():
+    """The flat test is 0 ('no evidence') on 42% of real frames; two stray
+    values just below 0 once hid that mass, so every one of those frames
+    read -3.3 sigma (sd 2.0 overall). They must get the mass's mid-point."""
+    rng = np.random.default_rng(30)
+    v = np.where(rng.random(20000) < 0.42, 0.0, rng.exponential(1.0, 20000))
+    v[:2] = [-0.046, -0.019]
+    m = nullmap.fit(v)
+    assert m["atom"] and abs(m["atom"]["p"] - 0.42) < 0.02
+    assert abs(nullmap.sigma(m, 0.0) - NormalDist().inv_cdf(0.21)) < 0.05      # about -0.8
+    z = nullmap.sigma_array(m, v)
+    assert 0.8 < z[z > -2].std() < 1.1 and np.mean(z > 3) < 0.003
