@@ -157,7 +157,10 @@ FAMILIES = {
 
 def variant(seed: int):
     """A random signal: a drawn shape of random kind, size, colour, width and
-    place. Deterministic in ``seed``; returns (description, maker)."""
+    place (from ``V2`` up, also text, scattered dots and textured fills).
+    Deterministic in ``seed``; returns (description, maker)."""
+    if seed >= V2:
+        return _variant2(seed)
     r = np.random.default_rng(seed)
     kind = ["line", "box", "outline", "ellipse", "arc", "polyline"][int(r.integers(6))]
     col = tuple(int(c) for c in LEVELS[r.integers(0, 16, 3)])
@@ -183,6 +186,89 @@ def variant(seed: int):
             d.line(pts, fill=f, width=width)
     desc = f"{kind} {size}px w{width} rgb{col} at ({x0},{y0})"
     return desc, _shape(shape, col)
+
+
+# Ids from V2 up are drawn by the wider generator below; smaller ids keep
+# meaning what they meant (earlier runs' misses and the tests refer to them).
+V2 = 10 ** 8
+WORDS = ("BABEL", "LIBRARY", "HELLO", "42", "EYE", "MAP", "X", "SOS")
+FILLS = ("solid", "grey static", "dark static", "pale static", "coarse static",
+         "blocky static", "one-channel static", "gradient")
+
+
+def _fill(r, kind: str, col) -> np.ndarray:
+    """A full-frame picture to blend in through a shape's mask: a flat
+    colour, or static with something about it changed (what a person might
+    see as a texture rather than an outline)."""
+    if kind == "solid":
+        return np.ones((H, W, 3)) * np.array(col, float)
+    if kind == "grey static":
+        return LEVELS[r.integers(0, 16, (H, W, 1))].astype(float) * np.ones((1, 1, 3))
+    if kind == "dark static":
+        return LEVELS[r.integers(0, 8, (H, W, 3))].astype(float)
+    if kind == "pale static":
+        return LEVELS[r.integers(8, 16, (H, W, 3))].astype(float)
+    if kind == "coarse static":
+        return LEVELS[r.integers(0, 4, (H, W, 3)) * 5].astype(float)
+    if kind == "blocky static":
+        b = LEVELS[r.integers(0, 16, (H // 8, W // 8, 3))].astype(float)
+        return np.repeat(np.repeat(b, 8, 0), 8, 1)
+    if kind == "one-channel static":
+        x = LEVELS[r.integers(0, 16, (H, W, 3))].astype(float)
+        c = int(r.integers(3))
+        x[..., c] = col[c]
+        return x
+    t = np.linspace(0, 1, W)[None, :, None]                 # gradient: col to its opposite
+    return (1 - t) * np.array(col, float) + t * (255 - np.array(col, float)) * np.ones((H, 1, 1))
+
+
+def _variant2(seed: int):
+    """Wider exploration: the drawn marks above plus text and scattered dots,
+    each filled with a flat colour or a changed kind of static."""
+    r = np.random.default_rng(seed)
+    kind = ["line", "box", "outline", "ellipse", "arc", "polyline", "text", "scatter"][int(r.integers(8))]
+    fill = FILLS[int(r.integers(len(FILLS)))]
+    if kind in ("line", "outline", "arc", "polyline") and fill != "solid" and r.random() < 0.5:
+        fill = "solid"                      # thin marks rarely show a texture: keep half solid
+    col = tuple(int(c) for c in LEVELS[r.integers(0, 16, 3)])
+    size = int(r.choice([8, 16, 32, 64, 128]))
+    width = int(r.choice([1, 2, 3, 4]))
+    x0, y0 = int(r.integers(20, W - 20 - size)), int(r.integers(20, H - 20 - size))
+    ang = float(r.uniform(0, math.pi))
+    word = WORDS[int(r.integers(len(WORDS)))]
+    dots = [(x0 + int(r.integers(0, 2 * size)), y0 + int(r.integers(0, size)), int(r.integers(1, 4)))
+            for _ in range(int(r.integers(8, 40)))]
+    pic = _fill(np.random.default_rng(seed + 1), fill, col)
+    pts = [(x0 + size * i / 8, y0 + size / 2 + size / 3 * math.sin(i + ang)) for i in range(9)]
+    box = (x0, y0, x0 + size, y0 + size)
+    mask = Image.new("L", (W, H), 0)
+    d = ImageDraw.Draw(mask)
+    if kind == "line":
+        d.line((x0, y0, x0 + size * 4 * math.cos(ang), y0 + size * 4 * math.sin(ang)), fill=255, width=width)
+    elif kind == "box":
+        d.rectangle(box, fill=255)
+    elif kind == "outline":
+        d.rectangle(box, outline=255, width=width)
+    elif kind == "ellipse":
+        d.ellipse(box, fill=255)
+    elif kind == "arc":
+        d.arc(box, 0, 270, fill=255, width=width)
+    elif kind == "polyline":
+        d.line(pts, fill=255, width=width)
+    elif kind == "text":
+        try:
+            font = ImageFont.load_default(size=max(size, 12))
+        except TypeError:                                    # Pillow < 10.1
+            font = ImageFont.load_default()
+        d.text((x0, y0), word, fill=255, font=font)
+    else:
+        for x, y, rad in dots:
+            d.ellipse((x - rad, y - rad, x + rad, y + rad), fill=255)
+    m = np.asarray(mask, float) / 255
+    what = {"text": f"text '{word}' {max(size, 12)}px", "scatter": f"{len(dots)} dots over {2 * size}x{size}px"}
+    desc = f"{what.get(kind, f'{kind} {size}px w{width}')} {fill}" + (
+        f" rgb{col}" if fill in ("solid", "one-channel static", "gradient") else "") + f" at ({x0},{y0})"
+    return desc, lambda rng, a: _mask_blend(rng, pic, m, a)
 
 
 # --- the probe ------------------------------------------------------------------
@@ -237,8 +323,10 @@ def run(trials: int = 6, steps: int = 6, explore: int = 0, seed: int = 0, famili
     from . import classifier
     if calibration:
         classifier.use_calibration(str(calibration))
+    if explore > 1000:
+        raise ValueError("explore at most 1000 variants a run (ids are V2 + seed*1000 + i)")
     names = list(FAMILIES if families is None else families)
-    variants = list(dict.fromkeys([f"variant#{seed * 100000 + i}" for i in range(explore)]
+    variants = list(dict.fromkeys([f"variant#{V2 + seed * 1000 + i}" for i in range(explore)]
                                   + [f"variant#{int(i)}" for i in recheck]))
     t0 = time.time()
     with ProcessPoolExecutor(max_workers=workers or os.cpu_count() or 1,

@@ -66,7 +66,11 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
 - **Probe:** `python -m babel_surfer.sensitivity --explore 40 --seed N --calibration <live
   calibration.json>` takes about 10–15 minutes on 4 cores. Per signal kind, it gives the
   weakest strength found in half the trials and the weakest a person would see (the
-  visibility model). Random drawn marks that are seen but missed land in `misses`.
+  visibility model). Random variants that are seen but missed land in `misses`. Explored
+  ids are `V2 + seed*1000 + i`: they draw marks, text and scattered dots, filled with a flat
+  colour or a changed static (grey, dark, pale, coarse, blocky, one-channel, gradient). Ids
+  below `V2` are the old marks-only generator; never change what an existing id draws,
+  because misses and `blind_spots.json` refer to ids.
 - **The probe workflow** (`.github/workflows/probe.yml`) runs daily and on detector changes.
   It re-checks earlier misses, moves the ones now caught to `fixed`, and keeps a `history`.
   It lives on the `probe-data` branch, and the site shows it under "Blind spots".

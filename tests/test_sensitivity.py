@@ -44,3 +44,19 @@ def test_merge_keeps_misses_until_a_recheck_fixes_them():
     assert [x["id"] for x in m["misses"]] == [1, 9, 3]        # still missed, new, kept
     assert [x["id"] for x in m["fixed"]] == [2] and m["fixed"][0]["fixed"] == 100
     assert m["history"][-1]["fixed"] == 1 and m["history"][-1]["misses"] == 3
+
+
+def test_wider_variants_are_deterministic_and_cover_every_kind():
+    """From V2 up the explorer also draws text, scattered dots and textured
+    fills; ids below V2 keep their old meaning (the cases above check that)."""
+    descs = [S.variant(S.V2 + i)[0] for i in range(300)]
+    assert descs == [S.variant(S.V2 + i)[0] for i in range(300)]
+    for word in ("text '", " dots over ", "outline ", "box "):
+        assert any(word in d for d in descs), word
+    for fill in S.FILLS:
+        assert any(f" {fill}" in d for d in descs), fill
+    desc, maker = S.variant(S.V2 + 6)
+    a, b = maker(np.random.default_rng(3), 0.4), maker(np.random.default_rng(3), 0.4)
+    assert a == b and a[:2] == b"\xff\xd8"
+    with pytest.raises(ValueError):
+        S.run(explore=1001, families=[])
