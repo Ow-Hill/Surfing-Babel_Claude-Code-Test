@@ -28,14 +28,14 @@ description: Facts about the Babel Image Archive (babelia.libraryofbabel.info) t
   14 s over a day. Deciding on stale samples against an all-time-best baseline cascaded
   5 → 1 in a minute, many times per chunk.
 
-- **Babelia still gains a little past 5 requests at once; judge that on hundreds of requests.**
-  Measured 2026-11-10: 11.0 s at 5 in flight (548 requests), 14.0 s at 8 (878), which is 0.46
-  and 0.57 frames/s, about 6% a step. A first reading from 8 requests per level, all at the
-  start of a run when Babelia answers faster, wrongly said it saturates at 5. A rule that
-  undid any step gaining under 5% then flapped on 12-request windows and cost about 20% of
-  the frames. `Politeness` now undoes a step only when it clearly loses throughput (under
-  `MIN_GAIN`, 0.9, of the frames a second: an overloaded server). It can't tell no gain from
-  a small one, so judge the cap from `concurrency.by_level` over many runs.
+- **Babelia gains a little past 5 requests at once; judge that across runs, not within one.**
+  Measured 2026-11-10 over 39 runs: 11.0 s at 5 in flight, 14.0 s at 8 (hundreds of requests
+  each), about 6% more frames a second per step. A dozen-request window cannot measure 6%, so
+  `Politeness` has no "did that step pay" rule. One (0.9x frames/s, 12 requests, 10 min lock)
+  fired in 24 of 39 runs and cost about a quarter of the frames: 1,543/h at 5.6 in flight
+  against 2,025/h at 7.25, at the same latency. The load is bounded by `max_workers`,
+  `max_rate` and the slow/error back-offs. Judge the cap from `concurrency.by_level`
+  accumulated across runs.
 - **Retry downloads that are cut off.** Babelia sometimes drops the connection part-way
   through a frame, in bursts (`http.client.IncompleteRead`, 7 in 24 s on 2026-11-10). That
   is an `HTTPException`, not an `OSError`, so `fetch()` must catch it explicitly or the frame

@@ -161,3 +161,25 @@ Twister-style tempering. In the weak blocks all four bits are partly disturbed.
 (a left shift, whose sources are already mixed) and a product term (an AND, suggested by the 25%
 density). Useful next data: frames far apart in L at one fixed low-digit pattern, and the two
 demo pictures at known ~961,760-digit locations, where the whole location is known.
+
+## The demo pairs rule out a readable layout (2026-11-10)
+
+The two seeded demos are exact (location, frame) pairs with the whole location known: 961,760
+decimal digits, which is 798,724 base-16 digits for 416 × 640 × 3 = 798,720 values. Four digits
+spare, so **a location is one base-16 digit per value** and the map is a bijection on digits.
+
+The digits are not the values in any reading order. Comparing the location's base-16 digits with
+the frame's recovered levels (JPEG recovery is 82% accurate, so a right order would read about
+0.82) over raster, column-major, planar, 160 px and 320 px strips, boustrophedon, RGB and BGR,
+both directions and offsets 0–4: **every order reads 0.062–0.063, which is chance.**
+
+So the mixing is not a reordering that leaves values intact; it changes the digits themselves,
+everywhere, including the block that is exactly additive between neighbouring locations. Both
+facts hold at once: image(L+1) − image(L) is nearly constant at the top of the stream, while
+image(L) itself shares no digit with L.
+
+**Next:** solve for the map rather than guess it. With two known pairs, if the map were
+image = A·L + B as big numbers, then (image₁ − image₂) = A·(L₁ − L₂) would give A directly; the
+18% JPEG recovery noise makes that division useless as it stands, so it needs a frame whose
+values are known exactly (a location whose frame we can check digit by digit, e.g. by uploading
+a picture Babelia renders losslessly) before the algebra can be run.
