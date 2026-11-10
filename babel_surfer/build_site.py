@@ -52,18 +52,10 @@ def detector_fingerprint() -> str:
     return h.hexdigest()[:16]
 
 
-def build(out: Path, trials: int = 8, null_frames: int = 500, force_bench: bool = False,
-          network: bool = True) -> None:
-    out.mkdir(parents=True, exist_ok=True)
-    from . import classifier
-    classifier.activate_live_calibration(out / "data")    # same calibration as the scan
-    for f in SITE.iterdir():
-        if f.is_file():
-            shutil.copy2(f, out / f.name)
-    (out / ".nojekyll").touch()
-    bust_cache(out)
-    (out / "data").mkdir(exist_ok=True)
-
+def run_benchmark(out: Path, trials: int, null_frames: int, force: bool = False) -> bool:
+    """(Re)run the benchmark if the detector changed. It is built beside
+    ``out`` and swapped in at the end, so a publish meanwhile ships the old
+    one whole, never a half-written one. Returns True if it ran."""
     bench_dir = out / "benchmark"
     fp = detector_fingerprint()
     current = None
@@ -71,15 +63,44 @@ def build(out: Path, trials: int = 8, null_frames: int = 500, force_bench: bool 
         current = json.loads((bench_dir / "benchmark.json").read_text()).get("fingerprint")
     except (FileNotFoundError, json.JSONDecodeError):
         pass
-    if force_bench or current != fp:
-        print(f"running benchmark (detector {fp}, was {current})")
-        if bench_dir.exists():
-            shutil.rmtree(bench_dir)
-        result = benchmark.run(trials, null_frames, bench_dir)
-        result["fingerprint"] = fp
-        (bench_dir / "benchmark.json").write_text(json.dumps(result, indent=2))
-    else:
+    if not force and current == fp:
         print("benchmark up to date")
+        return False
+    print(f"running benchmark (detector {fp}, was {current})")
+    tmp, old = out.parent / f".{out.name}-bench-new", out.parent / f".{out.name}-bench-old"
+    for d in (tmp, old):
+        if d.exists():
+            shutil.rmtree(d)
+    result = benchmark.run(trials, null_frames, tmp)
+    result["fingerprint"] = fp
+    (tmp / "benchmark.json").write_text(json.dumps(result, indent=2))
+    if bench_dir.exists():
+        bench_dir.rename(old)
+    tmp.rename(bench_dir)
+    shutil.rmtree(old, ignore_errors=True)
+    return True
+
+
+def build(out: Path, trials: int = 8, null_frames: int = 500, force_bench: bool = False,
+          network: bool = True, bench: str = "auto") -> None:
+    """``bench``: "auto" re-runs a stale benchmark now; "skip" keeps
+    whatever benchmark is there (the scan workflow runs it in the
+    background with ``--bench only`` so scanning never waits for it)."""
+    out.mkdir(parents=True, exist_ok=True)
+    from . import classifier
+    classifier.activate_live_calibration(out / "data")    # same calibration as the scan
+    if bench == "only":
+        run_benchmark(out, trials, null_frames, force_bench)
+        return
+    for f in SITE.iterdir():
+        if f.is_file():
+            shutil.copy2(f, out / f.name)
+    (out / ".nojekyll").touch()
+    bust_cache(out)
+    (out / "data").mkdir(exist_ok=True)
+
+    if bench == "auto":
+        run_benchmark(out, trials, null_frames, force_bench)
 
     # the blind-spot probe's latest results (its own workflow keeps them on
     # the probe-data branch, so it never races the scan's pushes to gh-pages)
@@ -146,8 +167,11 @@ def main(argv=None) -> int:
     ap.add_argument("--null", type=int, default=500)
     ap.add_argument("--force-bench", action="store_true")
     ap.add_argument("--offline", action="store_true", help="don't fetch seeded demos")
+    ap.add_argument("--bench", choices=("auto", "skip", "only"), default="auto",
+                    help="auto: re-run a stale benchmark first; skip: keep the current one; "
+                         "only: just (re)run the benchmark, nothing else")
     args = ap.parse_args(argv)
-    build(args.out, args.trials, args.null, args.force_bench, network=not args.offline)
+    build(args.out, args.trials, args.null, args.force_bench, network=not args.offline, bench=args.bench)
     return 0
 
 

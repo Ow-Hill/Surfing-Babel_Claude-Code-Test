@@ -94,3 +94,29 @@ def test_bust_cache(tmp_path):
     bust_cache(tmp_path)                        # re-stamped, not stacked
     second = (tmp_path / "index.html").read_text()
     assert second != first and second.count("?v=") == 1
+
+
+def test_benchmark_runs_beside_and_swaps_in_whole(tmp_path, monkeypatch):
+    """--bench only rebuilds a stale benchmark next to the site and swaps it
+    in at the end; --bench skip never runs it (the scan doesn't wait)."""
+    import json
+    from babel_surfer import build_site
+    calls = []
+
+    def fake_run(trials, null_frames, out):
+        calls.append(out)
+        assert not (tmp_path / "public" / "benchmark" / "new.txt").exists()   # old one untouched meanwhile
+        out.mkdir(parents=True)
+        (out / "new.txt").write_text("x")
+        return {"threshold_sigma": 4.0}
+    monkeypatch.setattr(build_site.benchmark, "run", fake_run)
+    monkeypatch.setattr(build_site, "detector_fingerprint", lambda: "fp2")
+    site = tmp_path / "public"
+    (site / "benchmark").mkdir(parents=True)
+    (site / "benchmark" / "benchmark.json").write_text(json.dumps({"fingerprint": "fp1"}))
+    assert build_site.run_benchmark(site, 1, 1) is True
+    assert calls[0].parent == tmp_path and not calls[0].exists()          # built beside, then moved
+    assert json.loads((site / "benchmark" / "benchmark.json").read_text())["fingerprint"] == "fp2"
+    assert (site / "benchmark" / "new.txt").exists()
+    assert sorted(p.name for p in tmp_path.iterdir()) == ["public"]         # no temp dirs left
+    assert build_site.run_benchmark(site, 1, 1) is False                     # now up to date
