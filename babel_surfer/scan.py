@@ -171,14 +171,16 @@ class Politeness:
     about the new level, so a burst of failures (Babelia hiccups and every
     in-flight request fails together) backs off one step, not five.
 
-    A step up must not lose throughput: if the new level delivers under
-    ``MIN_GAIN`` times the frames a second of the one below (an overloaded
-    server), it steps back and waits ``RETRY`` seconds before trying again."""
+    It does not try to judge whether a step up *paid*: Babelia gains about
+    6% a step from 5 to 8 in flight, a window of a dozen requests cannot
+    measure that, and a rule that demanded a gain kept undoing good steps
+    (1,543 frames/h against 2,025 at the same latency, 2026-11-10). What
+    bounds the load is ``max_workers``, ``max_rate`` and the slow/error
+    back-offs. Judge the cap itself from ``concurrency.by_level`` across
+    many runs, not from one window."""
 
     WINDOW = 12
     DRIFT = 1.03
-    MIN_GAIN = 0.9                     # undo a step up that delivers under 90% of the frames a second
-    RETRY = 600.0                      # seconds before trying a level that didn't pay again
     RATE_WINDOW = 60.0                 # seconds: max_rate counts requests started in this window
 
     def __init__(self, start: int, min_workers: int = 1, max_workers: int = 5,
@@ -189,10 +191,6 @@ class Politeness:
         self.max_rate = max_rate
         self.starts: list[float] = []
         self.by_level: dict[int, list[float]] = {}   # latencies judged at each level
-        self.below: tuple[int, float] | None = None  # (level, median) we stepped up from
-        self.cap: int | None = None                  # the level above this one didn't pay...
-        self.cap_until = 0.0                         # ...so stay here until then
-        self.unpaid = 0                              # times a step up gave no more throughput
         self.active = 0
         self.baseline: float | None = None
         self.lat: list[float] = []
@@ -242,25 +240,7 @@ class Politeness:
                                      else min(self.baseline * self.DRIFT, med))
                     if med > 2.0 * self.baseline:
                         self._set(self.limit - 1, f"slow ({med:.1f}s vs {self.baseline:.1f}s)")
-                    elif self.below and self.below[0] == self.limit - 1:
-                        # Just stepped up: did it clearly cost throughput (an
-                        # overloaded server, slower in total)? Then undo it.
-                        # This can't tell "no gain" from a small one: Babelia
-                        # gains about 6% a step from 5 to 8 (11.0 s at 5, 14.0 s
-                        # at 8, hundreds of requests each), a window of 12
-                        # can't measure that, and demanding a gain undid good
-                        # steps and cost about 20% of the frames (2026-11-10).
-                        # by_level, over many runs, is the record to judge by.
-                        if len(self.lat) >= self.WINDOW:
-                            n, was = self.below
-                            self.below = None
-                            if (self.limit / med) < self.MIN_GAIN * (n / was):
-                                self.cap, self.cap_until = n, time.time() + self.RETRY
-                                self.unpaid += 1
-                                self._set(n, f"no gain ({med:.1f}s at {n + 1} vs {was:.1f}s at {n})")
-                    elif med < 1.3 * self.baseline and not (
-                            self.cap == self.limit and time.time() < self.cap_until):
-                        self.below = (self.limit, med) if self.limit < self.max else None
+                    elif med < 1.3 * self.baseline:
                         self._set(self.limit + 1, f"fast ({med:.1f}s)")
             self._cv.notify_all()
 
@@ -516,7 +496,6 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
     run["concurrency"] = {"final": polite.limit, "max_used": max(n for _, n in polite.history),
                           "baseline_latency_s": round(polite.baseline or 0, 2),
                           "changes": len(polite.history) - 1,
-                          "unpaid_steps": polite.unpaid,
                           **latency_summary(polite.seen),
                           # does Babelia slow down when we send more at once? {level: [requests, median s]}
                           "by_level": {str(k): [len(v), round(statistics.median(v), 2)]

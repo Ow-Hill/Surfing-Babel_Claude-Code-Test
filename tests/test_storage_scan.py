@@ -515,40 +515,21 @@ def test_a_download_cut_off_midway_is_retried_and_labelled(monkeypatch):
     assert scan_mod.error_kind(e) == "cut off mid-download"
 
 
-def test_politeness_keeps_a_higher_level_only_if_it_pays(monkeypatch):
-    """On a server that is overloaded past 5 requests at a time (it gets
-    slower in total), the controller must settle at 5 and try again only
-    after RETRY. On one that gains a little per step with
-    noisy latency (Babelia: about 6% a step from 5 to 8), it must not undo
-    good steps."""
+def test_politeness_climbs_on_a_server_that_gains_a_little_per_step():
+    """Babelia as measured on 2026-11-10: about 6% more frames a second per
+    step from 5 to 8 in flight, with noisy latency. The controller must reach
+    the cap and stay there. An earlier rule that undid a step unless it showed
+    a measurable gain fired in 24 of 39 live runs and cost about a quarter of
+    the frames, because a dozen requests cannot measure 6%."""
     import threading
     import time as _t
-    p = scan_mod.Politeness(start=3, min_workers=1, max_workers=8)
-    stop = threading.Event()
-    served = lambda: 8.9 * max(1.0, p.limit / 5) ** 2   # overloaded past 5: fewer frames in total
-    for _ in range(300):
-        p.acquire(stop)
-        p.release(served(), _t.time())
-    assert p.limit == 5 and p.unpaid == 1 and max(n for _, n in p.history) == 6
-    monkeypatch.setattr(scan_mod.Politeness, "RETRY", 0.0)   # the wait is over: one more try
-    p.cap_until = 0.0
-    for _ in range(60):
-        p.acquire(stop)
-        p.release(served(), _t.time())
-    assert p.limit == 5 and p.unpaid >= 2
-    # a server that does scale keeps climbing
-    q = scan_mod.Politeness(start=3, min_workers=1, max_workers=8)
-    for _ in range(300):
-        q.acquire(stop)
-        q.release(8.9, _t.time())
-    assert q.limit == 8 and q.unpaid == 0
-    # Babelia as measured: 11 s at 5 rising to 14.4 s at 8, noisy
     rng = np.random.default_rng(0)
-    high = []
-    for seed in range(6):
-        b = scan_mod.Politeness(start=3, min_workers=1, max_workers=8)
+    stop = threading.Event()
+    ends = []
+    for _ in range(6):
+        p = scan_mod.Politeness(start=3, min_workers=1, max_workers=8)
         for _ in range(400):
-            b.acquire(stop)
-            b.release((7.4 + 0.88 * b.limit) * rng.lognormal(0, 0.3), _t.time())
-        high.append(b.limit)
-    assert sum(h >= 7 for h in high) >= 5
+            p.acquire(stop)
+            p.release((7.4 + 0.88 * p.limit) * rng.lognormal(0, 0.3), _t.time())
+        ends.append(p.limit)
+    assert sum(e >= 7 for e in ends) >= 5
