@@ -142,7 +142,7 @@ jobs:
             # data always gets published (with the previous site if the build broke).
             RESUME_FLAG=""
             if [ "$RESUME" = "1" ]; then RESUME_FLAG="--resume"; RESUME=0; fi
-            python -m babel_surfer.scan --out public/data --minutes "$this" --workers 3 --max-workers 5 \
+            python -m babel_surfer.scan --out public/data --minutes "$this" --workers 3 --max-workers 8 --max-rate 40 \
               $RESUME_FLAG || echo "::warning::scan step failed; publishing what was saved"
             echo "::endgroup::"
             # tests still calibrated on simulated static switch to real frames once
