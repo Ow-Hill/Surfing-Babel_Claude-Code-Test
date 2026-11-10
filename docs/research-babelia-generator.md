@@ -61,3 +61,38 @@ possible?
      (plan item 1.6) becomes possible.
 
 Status: **promising lead, not resolved.** Time box used.
+
+## Follow-up (2026-11-10): an exactly additive region
+
+Six frames, fetched one at a time: L = 1,000,000,000 + {0, 1, 2} and L' = 7,345,678,901,234 + {0, 1, 2}.
+
+- **The step is global.** The first difference image(L+1) − image(L) (mod 16) agrees with
+  image(L'+1) − image(L') at 0.089 over the whole frame (chance 0.0625), although L' is 7×10¹²
+  away. Adding 1 to a location adds the same thing everywhere in location space.
+- **The structure is spatially concentrated.** The second-difference rate is about 0.08 in the
+  top half and 0.11 in rows 210–370. It is **0.36** in a sharply bounded block: the last ~36 rows
+  (y ≥ 380) by the right quarter (x ≥ 480). Columns 480–639 are raised in every row (0.13 vs
+  0.07–0.08).
+- **Digit order (from carries).** A second difference of ±1 at a value is explained by a change
+  of overflow at its less significant neighbour. The correlation is 0.48–0.56 for one neighbour
+  and below 0.03 for the rest. The carry into green comes from blue of the same pixel, into red
+  from green, and into blue from red of the pixel **to the left**. So a row reads as one
+  big number with significance rising left to right, and within a pixel blue < green < red.
+- **In the block it is exact addition.** Predicting frame L+2 from L and L+1 by big-number
+  addition (step a = d1 − d0 − carry, then d1 + a + carry, carries propagated from the
+  prediction itself) gets **0.576 and 0.568** of values right. The ceiling, with three
+  JPEG-recovered frames at 82.4% each, is 0.587. On a top-left control patch the same model
+  scores 0.11 (chance). In the far pairs, block steps agree within ±1 for 88% of values
+  (chance 19%).
+
+**So:** Babelia's map is affine in location (image(L + k) = image(L) + k·A as a big number), and
+some further step mixes most of the frame but leaves this high-order block untouched. That is the
+foothold for recovering the rest.
+
+**Next:**
+1. Fetch L … L+31 at two or three bases, serially (~100 requests, ~20 minutes).
+2. Map every region's second-difference rate at full resolution to find the mixing step's
+   boundaries. The raised column band and the row bands suggest tiles.
+3. Model what the mixing does to an exactly additive number, using the block as ground truth.
+4. Any formula must reproduce whole frames at the 82% recovery ceiling. Then the slideshow range
+   can be generated locally, at CPU speed and with no load on Babelia.

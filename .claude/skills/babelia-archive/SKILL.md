@@ -51,8 +51,12 @@ description: Facts about the Babel Image Archive (babelia.libraryofbabel.info) t
 - **Fingerprint:** in every real frame, red at row y correlates with green at row y+156, and
   green with blue (about +14σ). `classifier.fingerprint_z` measures it, and the repetition
   test excludes that offset. A frame without the fingerprint would itself be news.
-- **Equally spaced locations share partly affine structure.** Recovering Babelia's mapping is
-  the only route to directed search or local generation. It remains an open research lead.
+- **Babelia's map is affine in location, and one block is exactly additive.**
+  image(L+k) = image(L) + k·A, read as a big number: a row runs from least to most significant
+  left to right, blue < green < red within a pixel. In the block y ≥ 380, x ≥ 480 this predicts
+  frame L+2 from L and L+1 at the JPEG recovery ceiling (0.57 vs 0.587). Elsewhere a mixing step
+  hides it. See `docs/research-babelia-generator.md`. Recovering that mixing is the only route
+  to local generation, which would make search CPU-bound and put no load on Babelia.
 
 ## Reference
 [reference.md](reference.md) covers:
