@@ -513,3 +513,31 @@ def test_a_download_cut_off_midway_is_retried_and_labelled(monkeypatch):
     assert scan_mod.fetch("1") == FRAME and len(calls) == 2
     e = RuntimeError(f"location 1: {http.client.IncompleteRead(b'x' * 65511)!r}")
     assert scan_mod.error_kind(e) == "cut off mid-download"
+
+
+def test_politeness_keeps_a_higher_level_only_if_it_pays(monkeypatch):
+    """Babelia serves about 5 requests at a time: beyond that, latency grows
+    in step (measured 8.9 s at 5, 11.5 s at 6, 14.5 s at 8) and no more frames
+    arrive. The controller must settle at 5, not climb to 8, and try again
+    only after RETRY."""
+    import threading
+    import time as _t
+    p = scan_mod.Politeness(start=3, min_workers=1, max_workers=8)
+    stop = threading.Event()
+    served = lambda: 8.9 * max(1.0, p.limit / 5)        # a server with 5 lanes
+    for _ in range(300):
+        p.acquire(stop)
+        p.release(served(), _t.time())
+    assert p.limit == 5 and p.unpaid == 1 and max(n for _, n in p.history) == 6
+    monkeypatch.setattr(scan_mod.Politeness, "RETRY", 0.0)   # the wait is over: one more try
+    p.cap_until = 0.0
+    for _ in range(60):
+        p.acquire(stop)
+        p.release(served(), _t.time())
+    assert p.limit == 5 and p.unpaid >= 2
+    # a server that does scale keeps climbing
+    q = scan_mod.Politeness(start=3, min_workers=1, max_workers=8)
+    for _ in range(300):
+        q.acquire(stop)
+        q.release(8.9, _t.time())
+    assert q.limit == 8 and q.unpaid == 0

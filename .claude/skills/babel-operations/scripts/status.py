@@ -71,6 +71,8 @@ try:
                 print(f"  run {when(r['finished_at'])}: {r.get('frames_per_hour')}/h, latency median "
                       f"{c['latency_median_s']}s p90 {c['latency_p90_s']}s, {c.get('in_flight')} requests "
                       f"in flight on average (of up to {r.get('max_workers')})")
+                if c.get("unpaid_steps"):
+                    print(f"    {c['unpaid_steps']} step(s) up gave no more frames a second and were undone")
                 if c.get("by_level"):
                     print("    median latency by requests at once: " + ", ".join(
                         f"{k}: {v[1]}s ({v[0]})" for k, v in c["by_level"].items()))
