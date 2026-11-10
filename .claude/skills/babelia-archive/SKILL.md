@@ -28,6 +28,10 @@ description: Facts about the Babel Image Archive (babelia.libraryofbabel.info) t
   14 s over a day. Deciding on stale samples against an all-time-best baseline cascaded
   5 → 1 in a minute, many times per chunk.
 
+- **Retry downloads that are cut off.** Babelia sometimes drops the connection part-way
+  through a frame, in bursts (`http.client.IncompleteRead`, 7 in 24 s on 2026-11-10). That
+  is an `HTTPException`, not an `OSError`, so `fetch()` must catch it explicitly or the frame
+  is lost unretried. `error_kind` labels it "cut off mid-download".
 - **Keep request slots busy, not more of them.** Scoring a frame takes about 0.8 s. When each
   of 5 threads fetched and then scored, its slot sat idle for that time (about 8% at 9–12 s
   latency). `scan()` now runs more threads than slots: `Politeness` still caps requests in

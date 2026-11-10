@@ -13,6 +13,7 @@ saved with their location.
 from __future__ import annotations
 
 import argparse
+import http.client
 import io
 import logging
 import math
@@ -79,6 +80,7 @@ def error_kind(e: Exception) -> str:
     """A short label for a failed fetch: 'timeout', 'HTTP 503', 'not a JPEG', ..."""
     text = str(e)
     for label, needle in (("timeout", "timed out"), ("not a JPEG", "not a JPEG"),
+                          ("cut off mid-download", "IncompleteRead"),
                           ("connection reset", "reset"), ("connection refused", "refused")):
         if needle in text:
             return label
@@ -111,7 +113,9 @@ def fetch(location: str, timeout: float = 120.0, retries: int = 3) -> bytes:
             if data[:2] != b"\xff\xd8":
                 raise ValueError(f"not a JPEG ({len(data)} bytes)")
             return data
-        except (urllib.error.URLError, TimeoutError, ValueError, OSError) as e:
+        # HTTPException covers IncompleteRead: Babelia sometimes drops the
+        # connection part-way through a frame; that is worth a retry too
+        except (urllib.error.URLError, TimeoutError, ValueError, OSError, http.client.HTTPException) as e:
             last = e
             time.sleep(2 ** attempt * 2)
     raise RuntimeError(f"location {location}: {last}")

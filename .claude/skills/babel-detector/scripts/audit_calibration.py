@@ -29,12 +29,16 @@ def main() -> int:
     ap.add_argument("scores", type=Path)
     ap.add_argument("--calibration", type=Path, help="e.g. a live data/calibration.json")
     args = ap.parse_args()
-    if not args.calibration:            # the site's live layer, if it sits next to the log
-        side = args.scores.with_name("calibration.json")
-        if side.exists():
-            args.calibration = side
     if args.calibration:
         classifier.use_calibration(args.calibration)
+    else:
+        # what the scan itself uses: the site's live layer next to the log, but
+        # only while it was fitted on this package calibration (its "base")
+        live = classifier.activate_live_calibration(args.scores.parent)
+        side = args.scores.with_name("calibration.json")
+        if side.exists() and not live:
+            print(f"{side} was fitted on another package calibration: auditing the package one, "
+                  "as the scan does (pass --calibration to audit it anyway)")
     cal = classifier.load_calibration()
     sources = json.loads(classifier.CALIBRATION_FILE.read_text()).get("map_sources") or {}
     log = np.load(args.scores)
