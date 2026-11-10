@@ -96,3 +96,29 @@ foothold for recovering the rest.
 3. Model what the mixing does to an exactly additive number, using the block as ground truth.
 4. Any formula must reproduce whole frames at the 82% recovery ceiling. Then the slideshow range
    can be generated locally, at CPU speed and with no load on Babelia.
+
+## Mapping (2026-11-10): the mixing works in fixed tiles
+
+Locations L … L+31 at three bases (10⁹, 7.3×10¹², 4.5×10¹⁵), 90 requests, fetched one at a
+time. Per value, the rate of second difference 0 over 30 triples:
+
+- **Fixed tiles.** The map of that rate in 16 px blocks is the same at all three bases
+  (correlation 0.997–0.998), so it belongs to the generator, not to the location.
+- **Sharp edges.** Columns change at exactly x = 160 and x = 480, so tiles are 160 px wide.
+  Rows change at y = 156 (right quarter), 208 (left quarter), 364 and 380 (right quarter).
+  156, 208 and 364 are multiples of 52, and 156 is the offset of the cross-channel
+  fingerprint.
+- **Three levels.**
+  - Top tiles, x 160–480 and y < 208: none (0.071 against 0.0625 chance).
+  - Most of the frame: weak (0.08–0.11).
+  - Right quarter, y 364–380: 0.20.
+  - Right quarter, y ≥ 380: exact addition (0.36).
+- **Independent of spacing.** Second differences at spacing 1, 2, 3, 4 and 8 give the same
+  rates in every region (corner 0.36, middle 0.11, top 0.071). The map is affine in L, with
+  no periodic component at these spacings.
+
+**Reading:** a carry-propagating mixing step works tile by tile and leaves the most
+significant tile (bottom right) untouched. How strongly each tile is mixed is fixed by its
+position. Next: inside a weak tile, look for the operation, such as an addition of a
+neighbouring tile's value (which would carry the corner's structure inward) or a fixed
+multiplication. Test each candidate against the corner, where the values are known exactly.

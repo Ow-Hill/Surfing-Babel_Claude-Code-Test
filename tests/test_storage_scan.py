@@ -491,3 +491,25 @@ def test_stale_frames_are_rescored_alongside_the_scan(tmp_path, monkeypatch):
     assert run["rescored"] == 1 and run["scanned"] == 4
     s = Store(tmp_path)
     assert s.missing_assets() == [] and s.finds == []       # re-scored at 1σ: no longer a find
+
+
+def test_a_download_cut_off_midway_is_retried_and_labelled(monkeypatch):
+    """Babelia sometimes drops the connection part-way through a frame
+    (http.client.IncompleteRead, seen 7 times in 24 s on 2026-11-10). It
+    must be retried like a timeout, and counted under its own name."""
+    import http.client
+    calls = []
+
+    class Resp:
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def read(self):
+            if len(calls) == 1:
+                raise http.client.IncompleteRead(b"\xff\xd8partial", 400000)
+            return FRAME
+
+    monkeypatch.setattr(scan_mod.urllib.request, "urlopen", lambda req, timeout: calls.append(1) or Resp())
+    monkeypatch.setattr(scan_mod.time, "sleep", lambda s: None)
+    assert scan_mod.fetch("1") == FRAME and len(calls) == 2
+    e = RuntimeError(f"location 1: {http.client.IncompleteRead(b'x' * 65511)!r}")
+    assert scan_mod.error_kind(e) == "cut off mid-download"

@@ -62,6 +62,14 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
   arrive at about 0.45/s, so classification has several times the headroom it needs. Scans
   classify in a forkserver pool whose initializer is `use_calibration`.
 
+- **Live refits stop once a test is fitted on 50,000 or more frames.** `refit_live` waits for
+  `REFIT_GROWTH`× the frames a test was fitted on, but `scores.npy` keeps only the last
+  100,000. After the package refit from 100,000 frames, only a package calibration change
+  starts a new live fit. A live `data/calibration.json` whose `base` no longer matches is
+  ignored by the scan (`activate_live_calibration` returns None), and
+  `scripts/audit_calibration.py` now ignores it the same way. On 2026-11-10 it had audited
+  that stale file and reported flat at sd 2.0 when the scan's calibration gives 0.88.
+
 ## Find what the detector misses (the learning loop)
 - **Probe:** `python -m babel_surfer.sensitivity --explore 40 --seed N --calibration <live
   calibration.json>` takes about 10–15 minutes on 4 cores. Per signal kind, it gives the
