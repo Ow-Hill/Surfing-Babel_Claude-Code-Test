@@ -28,6 +28,12 @@ description: Facts about the Babel Image Archive (babelia.libraryofbabel.info) t
   14 s over a day. Deciding on stale samples against an all-time-best baseline cascaded
   5 → 1 in a minute, many times per chunk.
 
+- **Babelia serves about 5 requests at a time.** Measured 2026-11-10 with the cap at 8:
+  median latency 8.9 s at 5 in flight, 11.5 s at 6, 14.5 s at 8, which is 0.56, 0.52 and
+  0.55 frames/s. More requests only wait longer and load the server. `Politeness` therefore
+  keeps a step up only if it delivers `MIN_GAIN` (5%) more frames a second, else it steps
+  back and waits `RETRY` (10 min); runs record `unpaid_steps`. Throughput is about
+  5 × 3600 / latency whatever the cap, so past 5 only local generation can speed the search.
 - **Retry downloads that are cut off.** Babelia sometimes drops the connection part-way
   through a frame, in bursts (`http.client.IncompleteRead`, 7 in 24 s on 2026-11-10). That
   is an `HTTPException`, not an `OSError`, so `fetch()` must catch it explicitly or the frame
