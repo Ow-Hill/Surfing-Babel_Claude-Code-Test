@@ -26,7 +26,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 
 from PIL import Image
@@ -278,23 +278,11 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
     # Entries saved before evidence maps existed, or scored by an older
     # detector: re-fetch their full frames (Babelia regenerates them from the
     # location), re-score them and rebuild their assets.
+    # They are the scan threads' first jobs (below), under the same request
+    # slots and rate cap, so scanning doesn't wait for them.
     stale = store.missing_assets()
-
-    def rescore(entry):
-        try:
-            data = fetch(entry["location"])
-            store.enrich(entry, data, classify(data, threshold=threshold))
-            log.info("re-scored %s", entry["location"])
-        except Exception as e:
-            log.warning("could not re-score %s: %s", entry["location"], e)
     if stale:
-        log.info("re-scoring %d saved frames with the current detector", len(stale))
-        with ThreadPoolExecutor(max_workers=max(1, workers)) as ex:
-            list(ex.map(rescore, stale))
-    if stale:
-        dropped = store.reconcile(threshold)
-        if dropped:
-            log.info("%d finds no longer reach %.1fσ under the current detector", dropped, threshold)
+        log.info("re-scoring %d saved frames with the current detector, alongside the scan", len(stale))
     # After a recalibration: re-score the whole score log and fetch the
     # frames that now qualify (no-op otherwise).
     from . import remine
@@ -370,6 +358,33 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
             data = again
         return None
 
+    stale_lock = threading.Lock()
+
+    def rescore_next() -> bool:
+        """Re-fetch and re-score one stale saved frame (holding a request
+        slot). False when there are none left."""
+        with stale_lock:
+            entry = stale.pop() if stale else None
+        if entry is None:
+            return False
+        t0 = time.time()
+        try:
+            data = fetch(entry["location"])
+        except Exception as e:
+            polite.release(None, t0)
+            log.warning("could not re-score %s: %s", entry["location"], e)
+            return True
+        polite.release(time.time() - t0, t0)
+        try:
+            if frame_problem(data):
+                raise ValueError(frame_problem(data))
+            store.enrich(entry, data, score(data))
+            bump(run, "rescored")
+            log.info("re-scored %s", entry["location"])
+        except Exception as e:
+            log.warning("could not re-score %s: %s", entry["location"], e)
+        return True
+
     def worker():
         while not stop.is_set() and time.time() < deadline:
             if not polite.acquire(stop):
@@ -377,6 +392,8 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
             if time.time() >= deadline:
                 polite.release_unused()
                 break
+            if rescore_next():
+                continue
             loc = counter.next()
             if loc is None:
                 polite.release_unused()
@@ -456,6 +473,10 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
             t.join(150)
     if pool is not None:
         pool.shutdown()
+    if run.get("rescored"):
+        dropped = store.reconcile(threshold)
+        if dropped:
+            log.info("%d finds no longer reach %.1fσ under the current detector", dropped, threshold)
     run["finished_at"] = time.time()
     run["end_location"] = counter.peek()
     minutes_run = max((run["finished_at"] - run["started_at"]) / 60, 1e-9)

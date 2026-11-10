@@ -5,3 +5,6 @@ data/
 .venv/
 .pytest_cache/
 !tests/data/
+.public-bench-new/
+.public-bench-old/
+benchmark.log

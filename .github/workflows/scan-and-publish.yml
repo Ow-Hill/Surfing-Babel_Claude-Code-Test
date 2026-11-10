@@ -131,8 +131,12 @@ jobs:
           # A long run handed over to this one because main moved: put the new
           # code live straight away, then scan.
           if [ "$PUBLISH_FIRST" = "1" ]; then
-            python -m babel_surfer.build_site --out public && publish || echo "::warning::early publish failed"
+            python -m babel_surfer.build_site --out public --bench skip && publish || echo "::warning::early publish failed"
           fi
+          # After a detector change the benchmark takes ~5 CPU-minutes: run it
+          # beside the scan (low priority) rather than before it; the site keeps
+          # the previous benchmark until the next publish after it finishes.
+          nice -n 10 python -m babel_surfer.build_site --out public --bench only > benchmark.log 2>&1 &
 
           remaining=$MIN
           while :; do
@@ -149,7 +153,7 @@ jobs:
             # the scan log has enough of them; re-score the log if that happened
             python -m babel_surfer.calibrate --refit-live public/data || echo "::warning::refit failed"
             python -m babel_surfer.remine --out public/data || echo "::warning::re-mine failed"
-            python -m babel_surfer.build_site --out public \
+            python -m babel_surfer.build_site --out public --bench skip \
               || echo "::warning::site build failed; publishing the data with the previous site"
             python -m babel_surfer.alerts --data public/data --feed public/feed.xml --alert alert.md \
               || echo "::warning::alerts failed"

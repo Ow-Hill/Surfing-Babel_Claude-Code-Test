@@ -22,6 +22,12 @@ description: Ship and run Surfing Babel. Covers the branch → PR → CI → mer
   agent".
 - Before saying something is live, check it with `scripts/status.py`. If a deploy is
   queued, schedule a follow-up check (`send_later`) instead of polling.
+- Keep the scan's critical path free of one-off work. Each merge hands the scan to a new run,
+  and a detector change used to cost about 9 minutes of no scanning there: 4.5 min of
+  benchmark and 4 min re-fetching saved frames. The benchmark now runs in the background
+  (`build_site --bench only`, under `nice`), and the loop's builds use `--bench skip`. Stale
+  saved frames are re-scored by the scan threads, under the same slots and rate cap. Put any
+  new slow step in one of those two places, never before the first chunk.
 
 ## Never
 - Put tokens or secrets in the repo or on the site. The Scan now token lives only in the

@@ -471,3 +471,23 @@ def test_latency_is_recorded_per_level():
         p.active += 1
         p.release(1.0, _t.time())
     assert p.by_level == {2: [1.0, 1.0, 1.0]}
+
+
+def test_stale_frames_are_rescored_alongside_the_scan(tmp_path, monkeypatch):
+    """After a detector change, saved frames are re-fetched by the scan
+    threads themselves (same slots and rate cap) instead of before the scan;
+    finds that no longer qualify drop at the end of the run."""
+    (tmp_path / "images").mkdir()
+    (tmp_path / "images" / "1.jpg").write_bytes(FRAME)
+    (tmp_path / "finds.json").write_text(json.dumps([{
+        "location": "1", "sigma": 9, "tier": "faint", "reason": "shape", "tests": {},
+        "found_at": 0, "image": "images/1.jpg"}]))
+    fetched = []
+    monkeypatch.setattr(scan_mod, "fetch", lambda loc: fetched.append(loc) or FRAME)
+    monkeypatch.setattr(scan_mod, "classify", lambda data, threshold=None: fake(1.0))
+    run = scan_mod.scan(str(tmp_path), minutes=1, workers=2, max_workers=2, start=500,
+                        max_frames=4, processes=0)
+    assert fetched[0] == "1" and len(fetched) == 5          # the stale find first, then 4 new frames
+    assert run["rescored"] == 1 and run["scanned"] == 4
+    s = Store(tmp_path)
+    assert s.missing_assets() == [] and s.finds == []       # re-scored at 1σ: no longer a find
