@@ -22,7 +22,7 @@ GitHub Actions (continuous) ─► scan.py ─► POST babelia.cgi location=N, N
   `/babelia.cgi`. Each frame is a 640×416 JPEG, and the location number *is* its seed
   (`https://babelia.libraryofbabel.info/babelia.cgi?location=N` shows it again). Babelia takes
   5–30 s to render a frame, so concurrency is **adaptive**: it starts at 3 parallel requests,
-  opens up to 5 while response time stays near its best, and backs off (down to 1) as soon as
+  opens up to 8 while response time stays near its best (never more than 40 requests a minute), and backs off (down to 1) as soon as
   responses slow or fail.
 * **Classifier** (`babel_surfer/classifier.py`): seventeen tests. Ten are statistical tests, each run on brightness and both colour
   channels, each expressed in **σ** (standard deviations away from what static produces):

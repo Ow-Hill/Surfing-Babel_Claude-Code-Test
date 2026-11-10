@@ -15,7 +15,8 @@ description: Facts about the Babel Image Archive (babelia.libraryofbabel.info) t
     (`calibrate.babel_static` / `BABELIA_QTABLES`). Pillow's generic q90 made real static
     score 14σ.
 - **Stay polite.** It is a one-person site. Use `scan.Politeness`: start at 3 concurrent
-  requests, go up to 5 while latency stays near its best, back off on errors or when
+  requests, go up to 8 while latency stays near its best (never more than 40 started in any
+  minute: `--max-rate`), back off on errors or when
   responses slow. Identify the client as `SurfingBabel/1.0`, never with personal details.
 - **Judge each concurrency level on its own requests, failures included.** Babelia's
   errors come in bursts: every in-flight request fails together. Counted one by one, a
@@ -38,8 +39,11 @@ description: Facts about the Babel Image Archive (babelia.libraryofbabel.info) t
 - Expect a faster endpoint or caching to help. Every request is rendered server-side in
   5–30 s, the same location is re-rendered each time, and `imagedl.cgi` and GET are just as
   slow.
-- Add parallel runners or raise `max_workers` above 5 without the owner's agreement and a
-  hard rate cap. Scanning *longer* (the serial relay) at the same cap is fine.
+- Add parallel runners, or raise the cap past 8 at once or 40 requests a minute (agreed with
+  the owner on 2026-11-10), without the owner's agreement. Scanning *longer* (the serial
+  relay) at the same cap is fine. Each run records latency per level
+  (`concurrency.by_level`): if the median rises with the level, Babelia is feeling it, so
+  lower the cap.
 - Treat nearby locations as nearby pictures. Hill-climbing and biased start ranges don't
   work.
 - Try to read Babelia pixels in the browser. There is no CORS, so all scoring happens in
@@ -51,8 +55,12 @@ description: Facts about the Babel Image Archive (babelia.libraryofbabel.info) t
 - **Fingerprint:** in every real frame, red at row y correlates with green at row y+156, and
   green with blue (about +14σ). `classifier.fingerprint_z` measures it, and the repetition
   test excludes that offset. A frame without the fingerprint would itself be news.
-- **Equally spaced locations share partly affine structure.** Recovering Babelia's mapping is
-  the only route to directed search or local generation. It remains an open research lead.
+- **Babelia's map is affine in location, and one block is exactly additive.**
+  image(L+k) = image(L) + k·A, read as a big number: a row runs from least to most significant
+  left to right, blue < green < red within a pixel. In the block y ≥ 380, x ≥ 480 this predicts
+  frame L+2 from L and L+1 at the JPEG recovery ceiling (0.57 vs 0.587). Elsewhere a mixing step
+  hides it. See `docs/research-babelia-generator.md`. Recovering that mixing is the only route
+  to local generation, which would make search CPU-bound and put no load on Babelia.
 
 ## Reference
 [reference.md](reference.md) covers:

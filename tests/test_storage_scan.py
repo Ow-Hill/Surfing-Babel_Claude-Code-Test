@@ -442,3 +442,32 @@ def test_scoring_does_not_hold_a_request_slot(tmp_path, monkeypatch):
     assert run["finished_at"] - run["started_at"] < 3.1
     c = run["concurrency"]
     assert 0.25 <= c["latency_median_s"] <= c["latency_p90_s"] < 1.5 and 0 < c["in_flight"] <= 2
+
+
+def test_rate_cap_holds_whatever_the_level(monkeypatch):
+    """max_rate caps requests started in any window, even with free slots."""
+    import threading
+    import time as _t
+    monkeypatch.setattr(scan_mod.Politeness, "RATE_WINDOW", 0.6)
+    p = scan_mod.Politeness(start=8, min_workers=1, max_workers=8, max_rate=3)
+    stop = threading.Event()
+    t0 = _t.time()
+    for _ in range(3):
+        assert p.acquire(stop)
+        p.release(0.01, _t.time())
+    assert _t.time() - t0 < 0.3                  # the first three go at once
+    assert p.acquire(stop)                       # the fourth waits for the window
+    assert _t.time() - t0 >= 0.55
+    p.release(0.01, _t.time())
+    starts = sorted(p.starts)
+    assert all(b - a >= 0.55 for a, b in zip(starts, starts[3:]))
+    stop.set()
+
+
+def test_latency_is_recorded_per_level():
+    import time as _t
+    p = scan_mod.Politeness(start=2, min_workers=1, max_workers=8)
+    for _ in range(3):
+        p.active += 1
+        p.release(1.0, _t.time())
+    assert p.by_level == {2: [1.0, 1.0, 1.0]}

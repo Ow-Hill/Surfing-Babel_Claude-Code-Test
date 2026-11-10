@@ -158,7 +158,9 @@ class Politeness:
     doesn't make normal latency look slow for the rest of the run. While the
     current median stays under 1.3x baseline another request slot opens (up
     to ``max_workers``); above 2x, or on errors, one closes (down to
-    ``min_workers``). After every change the latency window starts afresh, so
+    ``min_workers``). ``max_rate`` is a hard cap on requests started in any
+    minute, whatever the level (agreed with the owner: up to 8 at once, at
+    most 40 a minute). After every change the latency window starts afresh, so
     the next decision is judged on requests made at the new level (judging
     on stale samples used to cascade 5 -> 1 in about a minute). That includes
     errors: requests already in flight when the level changed say nothing
@@ -167,10 +169,16 @@ class Politeness:
 
     WINDOW = 12
     DRIFT = 1.03
+    RATE_WINDOW = 60.0                 # seconds: max_rate counts requests started in this window
 
-    def __init__(self, start: int, min_workers: int = 1, max_workers: int = 5):
+    def __init__(self, start: int, min_workers: int = 1, max_workers: int = 5,
+                 max_rate: float | None = None):
         self.limit = max(min_workers, min(start, max_workers))
         self.min, self.max = min_workers, max_workers
+        # hard cap on requests started in any 60 s, whatever the level
+        self.max_rate = max_rate
+        self.starts: list[float] = []
+        self.by_level: dict[int, list[float]] = {}   # latencies judged at each level
         self.active = 0
         self.baseline: float | None = None
         self.lat: list[float] = []
@@ -183,11 +191,17 @@ class Politeness:
 
     def acquire(self, stop: threading.Event) -> bool:
         with self._cv:
-            while self.active >= self.limit:
+            while True:
                 if stop.is_set():
                     return False
-                self._cv.wait(1.0)
+                now = time.time()
+                self.starts = [t for t in self.starts if t > now - self.RATE_WINDOW]
+                if self.active < self.limit and (self.max_rate is None or len(self.starts) < self.max_rate):
+                    break
+                wait = 1.0 if self.active >= self.limit else max(0.05, self.starts[0] + self.RATE_WINDOW - now)
+                self._cv.wait(min(1.0, wait))
             self.active += 1
+            self.starts.append(time.time())
             return True
 
     def release(self, latency: float | None, started: float | None = None) -> None:
@@ -205,6 +219,7 @@ class Politeness:
             elif latency is None:                        # error: back off now
                 self._set(self.limit - 1, "error")
             else:
+                self.by_level.setdefault(self.limit, []).append(latency)
                 self.lat = (self.lat + [latency])[-self.WINDOW:]
                 self.done += 1
                 if len(self.lat) >= self.WINDOW // 2 and self.done % 4 == 0:
@@ -236,7 +251,7 @@ class Politeness:
 def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
          threshold: float = INTERESTING_SIGMA, max_frames: int | None = None,
          max_workers: int | None = None, processes: int | None = None,
-         resume: bool = False) -> dict:
+         resume: bool = False, max_rate: float | None = None) -> dict:
     """Scan for ``minutes``. Fetching happens in threads (the server is the
     bottleneck); classification runs in ``processes`` worker processes
     (default: all cores but one; 0 = in the fetch threads). There are more
@@ -288,9 +303,10 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
     start = random.randrange(SLIDESHOW_MAX) if start is None else start
     counter = Location(start, max_frames)
     max_workers = max(workers, max_workers or workers)
-    polite = Politeness(workers, 1, max_workers)
+    polite = Politeness(workers, 1, max_workers, max_rate)
     run = {"started_at": time.time(), "start_location": str(start + 1),
-           "scanned": 0, "finds": 0, "errors": 0, "workers": workers, "max_workers": max_workers}
+           "scanned": 0, "finds": 0, "errors": 0, "workers": workers, "max_workers": max_workers,
+           "max_rate": max_rate}
     deadline = time.time() + minutes * 60
     stop = threading.Event()
 
@@ -448,6 +464,9 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
                           "baseline_latency_s": round(polite.baseline or 0, 2),
                           "changes": len(polite.history) - 1,
                           **latency_summary(polite.seen),
+                          # does Babelia slow down when we send more at once? {level: [requests, median s]}
+                          "by_level": {str(k): [len(v), round(statistics.median(v), 2)]
+                                       for k, v in sorted(polite.by_level.items())},
                           # average requests in flight: below the slots allowed means idle slots
                           "in_flight": round(polite.busy / max(run["finished_at"] - run["started_at"], 1e-9), 2),
                           # (minutes into the run, request slots), to see throughput limits
@@ -471,6 +490,8 @@ def main(argv=None) -> int:
                     help="parallel requests to start with (be kind to the server)")
     ap.add_argument("--max-workers", type=int, default=None,
                     help="let adaptive concurrency go up to this many while Babelia stays fast")
+    ap.add_argument("--max-rate", type=float, default=None,
+                    help="hard cap: at most this many requests started in any minute")
     ap.add_argument("--start", type=int, help="start location (default: random)")
     ap.add_argument("--max-frames", type=int)
     ap.add_argument("--threshold", type=float, default=INTERESTING_SIGMA)
@@ -481,7 +502,8 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     run = scan(args.out, args.minutes, args.workers, args.start, args.threshold,
-               args.max_frames, args.max_workers, args.processes, resume=args.resume)
+               args.max_frames, args.max_workers, args.processes, resume=args.resume,
+               max_rate=args.max_rate)
     print(f"scanned {run['scanned']} frames, {run['finds']} finds, "
           f"{run['errors']} errors ({run.get('rejected', 0)} not genuine frames, "
           f"{run.get('unconfirmed', 0)} unconfirmed finds), best {run.get('max_sigma', 0):.2f}σ")
