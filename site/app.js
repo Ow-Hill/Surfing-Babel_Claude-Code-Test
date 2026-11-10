@@ -712,6 +712,7 @@ async function load() {
     getJSON("data/flags.json", [], false), getJSON("data/sensitivity.json", null, false),
   ]);
   renderProbe(probe);
+  if (window.searchDemoLive) window.searchDemoLive(stats);   // the "How the search works" card
   $("load-error").hidden = !loadFailed;
   $("halt-note").hidden = !stats.halted;     // an implausible find rate paused scanning
   if (bench) THRESHOLD = bench.threshold_sigma;      // before anything that uses it renders

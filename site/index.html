@@ -42,6 +42,55 @@
     <div class="stat"><b id="s-last">–</b><small>last scan finished<span id="s-pace"></span></small></div>
   </section>
 
+  <section class="wrap card search-demo" id="search-demo" aria-labelledby="sd-h">
+    <div class="card-head"><h2 id="sd-h">How the search works</h2>
+      <span class="muted small" id="sd-live"></span></div>
+    <ol class="sd-steps" id="sd-steps" aria-label="Steps"></ol>
+    <div class="sd-grid">
+      <div class="sd-explain">
+        <h3 id="sd-step-title"></h3>
+        <p id="sd-step-text" aria-live="polite"></p>
+        <div class="sd-nav">
+          <button class="btn ghost tiny" type="button" id="sd-prev">← Back</button>
+          <button class="btn tiny" type="button" id="sd-next">Next →</button>
+        </div>
+      </div>
+      <div class="sd-play">
+        <div class="sd-frame" data-focus="frame">
+          <canvas id="sd-canvas" width="160" height="104" role="img"
+                  aria-label="A simulated frame of Babel static"></canvas>
+        </div>
+        <div class="sd-controls">
+          <div data-focus="loc"><span class="muted small">Location</span>
+            <b class="mono" id="sd-loc">–</b>
+            <button class="btn ghost tiny" type="button" id="sd-next-loc">Next frame</button>
+            <button class="btn ghost tiny" type="button" id="sd-rand-loc">Random</button></div>
+          <label>Hide a signal
+            <select id="sd-signal">
+              <option value="none">none (pure static)</option>
+              <option value="disc">a faint red disc</option>
+              <option value="line">a thin white line</option>
+              <option value="patch">a grey patch</option>
+            </select></label>
+          <label>Strength <input type="range" id="sd-strength" min="1" max="100" value="30">
+            <output id="sd-strength-out" for="sd-strength"></output></label>
+        </div>
+      </div>
+      <div class="sd-score">
+        <div id="sd-tests" data-focus="tests"></div>
+        <p id="sd-verdict" class="sd-verdict" data-focus="verdict" aria-live="polite"></p>
+        <div class="sd-batch" data-focus="batch">
+          <button class="btn tiny" type="button" id="sd-batch">Scan 1,000 frames of static</button>
+          <div id="sd-hist" class="sd-hist" hidden aria-label="Scores of 1,000 frames, 0 to 4σ and above"></div>
+          <div class="sd-axis" id="sd-axis" hidden aria-hidden="true"><span>0σ</span><span></span><span>1σ</span><span></span><span>2σ</span><span></span><span>3σ</span><span></span><span>4σ+</span></div>
+          <p class="muted small" id="sd-batch-out" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+    <p class="muted small">A simplified model: frames are simulated in your browser and scored by three of the
+      ideas behind the real detector's 17 tests, with the same correction for looking in many places at once.</p>
+  </section>
+
   <section class="wrap card" id="hist-card" aria-labelledby="hist-h">
     <div class="card-head">
       <h2 id="hist-h">How static is static?</h2>
@@ -133,10 +182,10 @@
     <section id="how" class="card how" aria-labelledby="how-h">
       <h2 id="how-h">How detection works</h2>
       <p>Each Babel pixel is an independent random 12-bit colour, so instead of asking “what is this a picture of?”
-        the detector asks “how unlikely is this frame if it were pure static?”. Sixteen tests each give a score in
+        the detector asks “how unlikely is this frame if it were pure static?”. Seventeen tests each give a score in
         <b>σ</b>: how many standard deviations the frame is from what static produces. Ten are classic statistical
-        tests; six are modelled on what people notice first (soft spots, curves, flat strokes, few-colour areas,
-        photo-like texture, face-like layouts). 0σ is typical static; in real scans 4σ or more turns up
+        tests; seven are modelled on what people notice first (soft spots, curves, flat strokes, few-colour areas,
+        photo-like texture, face-like layouts, drawn marks). 0σ is typical static; in real scans 4σ or more turns up
         <span class="rate-text">rarely (the measured rate loads with the data)</span>; real static has never reached 8σ.</p>
 
       <p class="muted" id="fp-note"></p>
@@ -265,6 +314,7 @@
   </dialog>
 
   <script src="overlay.js"></script>
+  <script src="search-demo.js"></script>
   <script src="app.js"></script>
   <script src="scan-now.js"></script>
 </body>
