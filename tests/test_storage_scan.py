@@ -516,15 +516,16 @@ def test_a_download_cut_off_midway_is_retried_and_labelled(monkeypatch):
 
 
 def test_politeness_keeps_a_higher_level_only_if_it_pays(monkeypatch):
-    """Babelia serves about 5 requests at a time: beyond that, latency grows
-    in step (measured 8.9 s at 5, 11.5 s at 6, 14.5 s at 8) and no more frames
-    arrive. The controller must settle at 5, not climb to 8, and try again
-    only after RETRY."""
+    """On a server that is overloaded past 5 requests at a time (it gets
+    slower in total), the controller must settle at 5 and try again only
+    after RETRY. On one that gains a little per step with
+    noisy latency (Babelia: about 6% a step from 5 to 8), it must not undo
+    good steps."""
     import threading
     import time as _t
     p = scan_mod.Politeness(start=3, min_workers=1, max_workers=8)
     stop = threading.Event()
-    served = lambda: 8.9 * max(1.0, p.limit / 5)        # a server with 5 lanes
+    served = lambda: 8.9 * max(1.0, p.limit / 5) ** 2   # overloaded past 5: fewer frames in total
     for _ in range(300):
         p.acquire(stop)
         p.release(served(), _t.time())
@@ -541,3 +542,13 @@ def test_politeness_keeps_a_higher_level_only_if_it_pays(monkeypatch):
         q.acquire(stop)
         q.release(8.9, _t.time())
     assert q.limit == 8 and q.unpaid == 0
+    # Babelia as measured: 11 s at 5 rising to 14.4 s at 8, noisy
+    rng = np.random.default_rng(0)
+    high = []
+    for seed in range(6):
+        b = scan_mod.Politeness(start=3, min_workers=1, max_workers=8)
+        for _ in range(400):
+            b.acquire(stop)
+            b.release((7.4 + 0.88 * b.limit) * rng.lognormal(0, 0.3), _t.time())
+        high.append(b.limit)
+    assert sum(h >= 7 for h in high) >= 5

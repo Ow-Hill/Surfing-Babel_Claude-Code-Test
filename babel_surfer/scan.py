@@ -171,13 +171,13 @@ class Politeness:
     about the new level, so a burst of failures (Babelia hiccups and every
     in-flight request fails together) backs off one step, not five.
 
-    A step up must also pay: if the new level doesn't deliver ``MIN_GAIN``
-    times the frames a second of the one below, it steps back and waits
-    ``RETRY`` seconds before trying again."""
+    A step up must not lose throughput: if the new level delivers under
+    ``MIN_GAIN`` times the frames a second of the one below (an overloaded
+    server), it steps back and waits ``RETRY`` seconds before trying again."""
 
     WINDOW = 12
     DRIFT = 1.03
-    MIN_GAIN = 1.05                    # a higher level must deliver 5% more frames a second
+    MIN_GAIN = 0.9                     # undo a step up that delivers under 90% of the frames a second
     RETRY = 600.0                      # seconds before trying a level that didn't pay again
     RATE_WINDOW = 60.0                 # seconds: max_rate counts requests started in this window
 
@@ -243,10 +243,14 @@ class Politeness:
                     if med > 2.0 * self.baseline:
                         self._set(self.limit - 1, f"slow ({med:.1f}s vs {self.baseline:.1f}s)")
                     elif self.below and self.below[0] == self.limit - 1:
-                        # Just stepped up: did it pay? Babelia serves about 5
-                        # requests at a time; beyond that each one only waits
-                        # longer (5 at 8.9 s and 8 at 14.5 s are both 0.55
-                        # frames/s), which loads the server for nothing.
+                        # Just stepped up: did it clearly cost throughput (an
+                        # overloaded server, slower in total)? Then undo it.
+                        # This can't tell "no gain" from a small one: Babelia
+                        # gains about 6% a step from 5 to 8 (11.0 s at 5, 14.0 s
+                        # at 8, hundreds of requests each), a window of 12
+                        # can't measure that, and demanding a gain undid good
+                        # steps and cost about 20% of the frames (2026-11-10).
+                        # by_level, over many runs, is the record to judge by.
                         if len(self.lat) >= self.WINDOW:
                             n, was = self.below
                             self.below = None
