@@ -68,8 +68,9 @@ description: Facts about the Babel Image Archive (babelia.libraryofbabel.info) t
 - **Babelia's map is affine in location, and one block is exactly additive.**
   image(L+k) = image(L) + k·A, read as a big number: a row runs from least to most significant
   left to right, blue < green < red within a pixel. In the block y ≥ 380, x ≥ 480 this predicts
-  frame L+2 from L and L+1 at the JPEG recovery ceiling (0.57 vs 0.587). Elsewhere a mixing step
-  hides it. See `docs/research-babelia-generator.md`. Recovering that mixing is the only route
+  frame L+2 from L and L+1 at the JPEG recovery ceiling (0.57 vs 0.587). The frame is four 160 px strips read like text,
+  end to end 32 blocks of 52 rows; a bitwise mixing with a fixed pattern (unidentified) hides
+  the rest. See `docs/research-babelia-generator.md`. Recovering that mixing is the only route
   to local generation, which would make search CPU-bound and put no load on Babelia.
 
 ## Reference

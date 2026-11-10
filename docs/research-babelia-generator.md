@@ -122,3 +122,42 @@ significant tile (bottom right) untouched. How strongly each tile is mixed is fi
 position. Next: inside a weak tile, look for the operation, such as an addition of a
 neighbouring tile's value (which would carry the corner's structure inward) or a fixed
 multiplication. Test each candidate against the corner, where the values are known exactly.
+
+## Layout and bit-level structure (2026-11-10, same 96 frames)
+
+**The digit stream.** Carries cross from the right edge of one row (x = 639) into the left edge
+of the row below (x = 480), correlation 0.49, and never into the neighbouring strip (0.005).
+So the frame is four vertical strips, each 160 px wide and read like text: top to bottom, left to
+right, blue < green < red. End to end that is 1,664 rows of 160 px, with the bottom-right pixel
+most significant.
+
+**Mixing follows 52-row blocks.** 1,664 = 32 × 52. Along the stream, the additive rate changes
+only at multiples of 52 rows, or 16 or 36 rows past one:
+
+| stream rows (blocks of 52) | rate |
+|---|---|
+| 8–12, 14–15.3, 16–20, 24–25.3, 27–28 | none (0.07) |
+| the other blocks below 31 | weak (0.11–0.12) |
+| 31–31.3 (16 rows) | 0.20 |
+| 31.3–32 (36 rows) | exact (0.36) |
+
+**The 0.20 band is exact in its low bits.** Second differences there are 0 mod 4 as often as in
+the exact block (0.366 vs 0.369, and the same per channel). Bits 2 and 3 are each clean at about
+three quarters of positions and disturbed at the rest, and which positions is fixed. So the
+mixing is bitwise with a fixed pattern, like the masked shift-XOR steps of a Mersenne
+Twister-style tempering. In the weak blocks all four bits are partly disturbed.
+
+**Ruled out:**
+- **Polynomial in L:** third to sixth differences are not zero anywhere outside the exact block.
+- **Periodic in L:** rates are the same at spacings 1 to 15.
+- **XOR with the plain values above:** XORing the band with the exact rows at any shift within
+  the block, nibble- or bit-aligned, never raises the rate (best 0.13 against 0.20 untouched).
+- **XOR with the lowest bits of the number:** the second differences show no systematic short
+  period in L.
+- **A repeating mask word:** the disturbed-bit pattern has no period up to 8,000 bits. About
+  25–28% of bits 2 and 3 are disturbed, the density of an AND of two random bit streams.
+
+**Open.** What the disturbed bits are XORed with. The candidates left are bits from lower blocks
+(a left shift, whose sources are already mixed) and a product term (an AND, suggested by the 25%
+density). Useful next data: frames far apart in L at one fixed low-digit pattern, and the two
+demo pictures at known ~961,760-digit locations, where the whole location is known.
