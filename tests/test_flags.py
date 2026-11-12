@@ -88,3 +88,87 @@ def test_failing_frame_does_not_block_others_and_is_closed_after_retries(tmp_pat
         flags.process(store, gh, fetch)
     assert 2 in gh.closed and 1 in gh.closed
     assert "1" not in store.stats["flag_failures"]
+
+
+class Recorder:
+    """Stands in for urllib.request.urlopen: records each request, replies
+    from a queue of JSON bodies."""
+    def __init__(self, replies):
+        self.replies, self.requests = list(replies), []
+
+    def __call__(self, req, timeout):
+        self.requests.append(req)
+        body = self.replies.pop(0) if self.replies else None
+
+        class Resp:
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+            def read(self): return json.dumps(body).encode() if body is not None else b""
+        return Resp()
+
+
+def test_github_client_sends_the_token_only_to_the_api_and_skips_pull_requests(monkeypatch):
+    page1 = ([{"number": n, "title": f"Flag: {n}"} for n in range(99)]
+             + [{"number": 500, "title": "Flag: 500", "pull_request": {}}])       # a full page
+    page2 = [{"number": 600, "title": "Flag: 600"}, {"number": 601, "title": "Bug report"}]
+    rec = Recorder([page1, page2])
+    monkeypatch.setattr(flags.urllib.request, "urlopen", rec)
+    gh = flags.GitHub("tok123", "owner/repo")
+    got = gh.open_flags()
+    assert [i["number"] for i in got][-1] == 600 and 500 not in [i["number"] for i in got]
+    assert len(got) == 100 and len(rec.requests) == 2                       # stopped after a short page
+    for req in rec.requests:
+        assert req.full_url.startswith("https://api.github.com/repos/owner/repo/issues?")
+        assert req.get_header("Authorization") == "Bearer tok123" and req.get_method() == "GET"
+
+    rec = Recorder([{"id": 1}, {"id": 2}])
+    monkeypatch.setattr(flags.urllib.request, "urlopen", rec)
+    gh.reply_and_close(7, "thanks", completed=False)
+    post, patch = rec.requests
+    assert post.get_method() == "POST" and post.full_url.endswith("/issues/7/comments")
+    assert json.loads(post.data) == {"body": "thanks"}
+    assert patch.get_method() == "PATCH" and json.loads(patch.data) == {
+        "state": "closed", "state_reason": "not_planned"}
+
+
+def test_a_flag_on_something_that_is_not_a_babelia_frame_is_not_kept(tmp_path):
+    """A flag can name any location; if Babelia answers with an error page,
+    that must count as a failed try, never become a find."""
+    import io
+    from PIL import Image
+    buf = io.BytesIO()
+    Image.new("RGB", (640, 416), (200, 200, 200)).save(buf, "JPEG")
+    gh = FakeGitHub([{"number": 1, "title": "Flag: 31", "body": ""}])
+    store = Store(tmp_path)
+    assert flags.process(store, gh, fetch=lambda loc: buf.getvalue()) == 0
+    assert gh.closed == [] and store.finds == [] and store.stats["flag_failures"] == {"31": 1}
+
+
+def test_one_flag_failing_to_save_or_reply_does_not_stop_the_others(tmp_path, monkeypatch):
+    gh = FakeGitHub([{"number": n, "title": f"Flag: {n}", "body": ""} for n in (1, 2, 3)])
+    good = babel_static(np.random.default_rng(4))
+    store = Store(tmp_path)
+    real_add = store.add_flag
+
+    def add_flag(loc, *a, **k):
+        if loc == "1":
+            raise OSError("disk full")
+        return real_add(loc, *a, **k)
+    monkeypatch.setattr(store, "add_flag", add_flag)
+    real_reply = gh.reply_and_close
+
+    def reply_and_close(number, text, completed=True):
+        if number == 2:
+            raise RuntimeError("GitHub API rate limited")
+        return real_reply(number, text, completed)
+    monkeypatch.setattr(gh, "reply_and_close", reply_and_close)
+    n = flags.process(store, gh, fetch=lambda loc: good)
+    assert n == 2 and gh.closed == [3]                       # 2 was saved but its reply failed
+    assert sorted(f["location"] for f in json.loads((tmp_path / "flags.json").read_text())) == ["2", "3"]
+
+
+def test_flags_do_nothing_without_a_token(tmp_path, monkeypatch, capsys):
+    monkeypatch.delenv("GH_TOKEN", raising=False)
+    monkeypatch.delenv("GITHUB_REPOSITORY", raising=False)
+    assert flags.main(["--data", str(tmp_path)]) == 0
+    assert "skipping flags" in capsys.readouterr().out and not list(tmp_path.iterdir())
