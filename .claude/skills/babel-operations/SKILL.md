@@ -17,6 +17,15 @@ description: Ship and run Surfing Babel. Covers the branch → PR → CI → mer
 - Before pushing, run `python -m pytest -q` and `node --check site/*.js`. Then open a PR
   with the GitHub MCP tools, wait for the **Tests** check, and merge (the owner has
   authorised merging to main).
+- Writing tests:
+  - No test may reach the internet; `tests/conftest.py` fails any that tries. Monkeypatch
+    `scan.fetch`.
+  - Use the shared `static_classified` fixture rather than classifying static again (about
+    0.9 s a frame).
+  - Assert what overlaps or what is counted, not wall-clock time: timings shift on shared
+    runners and under coverage.
+  - For a guard, check that the test fails with the guard removed. `tests/test_resilience.py`
+    holds the error paths that only run in production.
 - Write plain commit and PR messages: **no Co-Authored-By, session or "Generated with"
   lines in commits** (the owner's request). Use tool-neutral wording such as "an AI coding
   agent".

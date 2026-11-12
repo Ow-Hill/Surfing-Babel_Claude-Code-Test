@@ -412,36 +412,47 @@ def test_fetch_errors_are_counted_by_kind(tmp_path, monkeypatch):
 
 def test_scoring_does_not_hold_a_request_slot(tmp_path, monkeypatch):
     """Requests in flight never exceed the slots allowed, but a thread that is
-    scoring doesn't block the next request: with 2 slots and scoring as slow
-    as fetching, fetches overlap scoring instead of waiting for it."""
+    scoring doesn't block the next request: with 2 slots, both can be
+    fetching while a third thread scores. (With one thread per slot, a
+    scoring thread leaves its slot idle, so at most 1 fetch runs during a
+    score.) Asserted on what overlaps, not on wall-clock time, so a slow
+    or busy machine can't fail it."""
     import threading
     import time as _t
-    lock, now, peak = threading.Lock(), [0], [0]
+    lock = threading.Lock()
+    state = {"fetching": 0, "scoring": 0, "peak": 0, "peak_while_scoring": 0}
 
     def fetch(loc):
         with lock:
-            now[0] += 1
-            peak[0] = max(peak[0], now[0])
-        _t.sleep(0.3)
+            state["fetching"] += 1
+            state["peak"] = max(state["peak"], state["fetching"])
+            if state["scoring"]:
+                state["peak_while_scoring"] = max(state["peak_while_scoring"], state["fetching"])
+        _t.sleep(0.1)
         with lock:
-            now[0] -= 1
+            state["fetching"] -= 1
         return FRAME
 
     def classify(data, threshold=None):
-        _t.sleep(0.3)
+        with lock:
+            state["scoring"] += 1
+            if state["fetching"]:
+                state["peak_while_scoring"] = max(state["peak_while_scoring"], state["fetching"])
+        _t.sleep(0.1)
+        with lock:
+            state["scoring"] -= 1
         return fake(1.0)
 
     monkeypatch.setattr(scan_mod, "fetch", fetch)
     monkeypatch.setattr(scan_mod, "classify", classify)
     monkeypatch.setattr(scan_mod, "frame_problem", lambda data: None)
     run = scan_mod.scan(str(tmp_path), minutes=1, workers=2, max_workers=2, start=0,
-                        max_frames=12, processes=0)
-    assert run["scanned"] == 12 and peak[0] <= 2
-    # one thread per slot would need 12 x (0.3 fetch + 0.3 score) / 2 = 3.6 s;
-    # with scoring off the slots, the fetches set the pace (about 2.4 s)
-    assert run["finished_at"] - run["started_at"] < 3.1
+                        max_frames=16, processes=0)
+    assert run["scanned"] == 16
+    assert state["peak"] <= 2                       # never more requests than slots
+    assert state["peak_while_scoring"] == 2         # both slots busy while a frame is scored
     c = run["concurrency"]
-    assert 0.25 <= c["latency_median_s"] <= c["latency_p90_s"] < 1.5 and 0 < c["in_flight"] <= 2
+    assert 0.08 <= c["latency_median_s"] <= c["latency_p90_s"] and 0 < c["in_flight"] <= 2
 
 
 def test_rate_cap_holds_whatever_the_level(monkeypatch):
