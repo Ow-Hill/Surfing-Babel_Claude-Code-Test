@@ -5,7 +5,6 @@ import pytest
 from PIL import Image
 
 from babel_surfer import benchmark
-from babel_surfer.calibrate import babel_static
 from babel_surfer.classifier import PICTURE_SIGMA, classify, tier_for
 
 
@@ -14,9 +13,8 @@ def rng():
     return np.random.default_rng(99)
 
 
-def test_simulated_babel_static_is_static(rng):
-    for _ in range(25):
-        c = classify(babel_static(rng))
+def test_simulated_babel_static_is_static(static_classified):
+    for c in static_classified:
         assert c.sigma < PICTURE_SIGMA - 2, c
 
 

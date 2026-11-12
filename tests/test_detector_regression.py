@@ -4,6 +4,7 @@ on real frames) would no longer apply."""
 
 import json
 import os
+import sys
 import time
 from pathlib import Path
 
@@ -26,6 +27,7 @@ def test_raw_statistics_unchanged(name, data):
 
 
 @pytest.mark.skipif(bool(os.environ.get("CI")), reason="shared CI runners are too noisy to time")
+@pytest.mark.skipif(sys.gettrace() is not None, reason="a tracer (coverage, a debugger) slows every line")
 def test_classify_is_fast():
     data = FRAMES[0][1]
     C.classify(data)                                 # warm caches

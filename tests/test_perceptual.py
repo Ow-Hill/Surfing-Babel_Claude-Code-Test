@@ -15,14 +15,8 @@ def rgb(data: bytes) -> np.ndarray:
     return np.asarray(Image.open(io.BytesIO(data)).convert("RGB"), dtype=np.float64)
 
 
-@pytest.fixture(scope="module")
-def static_sigmas():
-    rng = np.random.default_rng(2024)
-    return [C.classify(babel_static(rng)) for _ in range(12)]
-
-
-def test_static_stays_quiet(static_sigmas):
-    for c in static_sigmas:
+def test_static_stays_quiet(static_classified):
+    for c in static_classified:
         for t in C.PERCEPTUAL_TESTS:
             assert c.tests[t] < 4.0, (t, c.tests[t])
         assert c.sigma_global <= c.sigma
