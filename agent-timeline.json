@@ -1,0 +1,214 @@
+{
+  "intro": "Every line of Surfing Babel (scanner, detector, calibration, website, automation) was written by an AI coding agent, working from short requests in a conversation. The agent read code and websites, ran experiments, wrote and ran tests, opened and merged pull requests and watched the deployments. The person directed it; the agent did the engineering. Below is how it went, including the mistakes the agent caught in its own work.",
+  "stats": [
+    {
+      "value": "20",
+      "label": "pull requests merged in ~3 days"
+    },
+    {
+      "value": "~6,700",
+      "label": "lines of Python, JavaScript, HTML and CSS"
+    },
+    {
+      "value": "90+",
+      "label": "automated tests, run on every pull request"
+    },
+    {
+      "value": "16",
+      "label": "tests in the detector (10 statistical, 6 modelled on human vision)"
+    }
+  ],
+  "events": [
+    {
+      "date": "2026-11-04",
+      "pr": 1,
+      "title": "Built the scanner, detector and site",
+      "request": "Build a website that scans Babel's slideshow and keeps images that resemble something.",
+      "did": "Read Babelia's slideshow JavaScript and found it simply POSTs location=N, N+1, … to babelia.cgi; the location is the seed. Wrote a direct scanner, a statistical detector and a GitHub Pages site with a scheduled GitHub Actions scan.",
+      "moments": [
+        {
+          "kind": "bug caught",
+          "text": "Its first calibration said real Babel static scored up to 14σ. The cause: the simulation used a generic JPEG quality setting. It read Babelia's exact quantisation tables out of real frames, re-encoded the simulation with them, and real static dropped back under 3σ."
+        },
+        {
+          "kind": "improvement",
+          "text": "The benchmark showed a small 24 px square was found only 2 times in 5. It switched to sliding windows: 5 out of 5."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-04",
+      "pr": 3,
+      "title": "Lowered the threshold so scans actually find things",
+      "request": "Lower the threshold so it actually finds something.",
+      "did": "Measured how often pure static reaches each score, chose 4σ, and labelled 4–8σ finds 'anomalies' so the site stays honest that they are unusual static, not pictures.",
+      "moments": []
+    },
+    {
+      "date": "2026-11-04",
+      "pr": 4,
+      "title": "Scan now button",
+      "request": "Add a scan now button.",
+      "did": "Checked Babelia's CORS headers first: none, so a browser can't score frames. Built the button on GitHub's API instead, with the token kept only in the visitor's browser.",
+      "moments": [
+        {
+          "kind": "decision",
+          "text": "Never put a token in the public site; status works for everyone without one."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-04",
+      "pr": 5,
+      "title": "Made it able to run forever",
+      "request": "Keep only the top finds and store smaller images.",
+      "did": "Projected storage would hit GitHub Pages' 1 GB limit in about 8 months. Stored 28 KB previews instead of 460 KB frames (the seed regenerates the original), kept the top 100 finds and published without git history.",
+      "moments": []
+    },
+    {
+      "date": "2026-11-04",
+      "pr": 7,
+      "title": "Proof it works, heatmaps, share links, live strip, alerts",
+      "request": "Add share links, a live strip, heatmaps, a proof it works and alerts.",
+      "did": "Used Babelia's own image search to find where a drawn picture lives in the archive, then fetched it back with the scanner: 339,434σ. Real pictures live at locations about 961,760 digits long, which is why the slideshow never meets one.",
+      "moments": [
+        {
+          "kind": "bug caught",
+          "text": "The first heatmap made plain static look structured: it was computed from downscaled JPEG previews, which no longer behave like static. It moved the computation to full-resolution frames."
+        },
+        {
+          "kind": "bug caught",
+          "text": "Edge padding counted the same evidence twice and pushed static to 7σ; fixed so static stays under 4.5σ."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-05",
+      "pr": 8,
+      "title": "Four new tests, evidence overlays and descriptions",
+      "request": "Make the overlay perceptible, describe each find, and add more ways to screen for anomalies.",
+      "did": "Added contrast, angled-line, repetition and symmetry tests, per-find evidence maps with adjustable thresholds, and a generated description for every find.",
+      "moments": [
+        {
+          "kind": "discovery",
+          "text": "The new repetition test flagged real frames at one offset, again and again. Digging in, the agent found a fingerprint of Babelia's generator: in every frame, red at row y correlates with green 156 rows lower (and green with blue), about +10σ per frame. It documented it and excluded that offset."
+        },
+        {
+          "kind": "bug caught",
+          "text": "Its own benchmark blended two layers of static, which secretly changed the colour histogram. It switched to per-pixel mixing so only the intended signal was tested."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-05",
+      "pr": 9,
+      "title": "Usability review",
+      "request": "Use Nielsen's usability heuristics to critique, evaluate and update the UI.",
+      "did": "Reviewed every screen against the 10 heuristics, rated 25 findings by severity, fixed 23 and published the review in the repository.",
+      "moments": [
+        {
+          "kind": "bug caught",
+          "text": "A failed data load looked exactly like 'no finds yet'. Now it shows an error with a Retry button."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-05",
+      "pr": 10,
+      "title": "Showcase page, live-coding slot and a search plan",
+      "request": "Plan ways to optimise the search, and prepare a live demo of agentic coding through the website.",
+      "did": "Measured the bottleneck first (Babelia takes 5–32 s to render a frame; scoring takes 0.6 s), wrote a prioritised plan, and built this page with a deliberately small, test-specified function for live demos.",
+      "moments": []
+    },
+    {
+      "date": "2026-11-05",
+      "pr": 11,
+      "title": "Built the plan, and a round of bug fixing",
+      "request": "Build the plan, do a round of error fixing, and close an image by clicking outside it.",
+      "did": "Added adaptive politeness (up to 5 parallel requests while Babelia stays fast, backing off when it slows), hourly scans that publish every 30 minutes, per-test leaderboards, a combined score, a log of every frame's scores and a fingerprint monitor. Fixed ten bugs found in review.",
+      "moments": [
+        {
+          "kind": "bug caught",
+          "text": "The colour-balance test turned a chi-square statistic into σ with a formula that ignores its skew, so it overstated how unusual frames were. Fixed with the Wilson–Hilferty transform. Re-scoring showed all 12 earlier finds had been this artefact: none still reaches 4σ."
+        },
+        {
+          "kind": "discovery",
+          "text": "A time-boxed look at Babelia's generator found that equally spaced locations share a partly affine structure (pixel changes between them cluster at 0 and ±1, 1.65× chance), so the archive's mapping isn't a perfect scramble."
+        },
+        {
+          "kind": "improvement",
+          "text": "Live test of adaptive politeness: it ramped from 2 to 5 parallel requests while Babelia answered in 3.7 s, then backed off to 1 as responses slowed to 15 s."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-05",
+      "pr": 12,
+      "title": "A better live demo",
+      "request": "Improve the demo feature.",
+      "did": "Added CI on every pull request, a live checklist of the spec's requirements, a six-step progress tracker with a stopwatch, a 'buggy' variant for a debugging demo, one-click reset, publishing without a scan when only the demo changes, and a presenter mode.",
+      "moments": [
+        {
+          "kind": "bug caught",
+          "text": "Its first test for the demo kit asserted that the repository always ships the unimplemented stub, which would have failed in the middle of every live demo. Rewritten so it checks consistency, whatever is in the slot."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-05",
+      "pr": 15,
+      "title": "Redrew the score chart for the current detector",
+      "request": "Redo the 'How static is static?' graph to reflect the new test.",
+      "did": "Split the histogram so it only counts frames scored by the current detector, backfilled from the score log, and added a per-test view.",
+      "moments": [
+        {
+          "kind": "bug caught",
+          "text": "The user reported the graph hadn't changed. The cause was browsers caching the old app.js; the agent added content fingerprints to every script and stylesheet link (PR #16)."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "pr": 17,
+      "title": "Found the detector was miscalibrated",
+      "request": "Find ways to optimise the search and find more artifacts.",
+      "did": "Checked every test against 23,456 logged real frames: nine of ten had a spread of 0.3 to 0.7 instead of 1, because the calibration floored each standard deviation at 1.0. Replaced it with empirical null distributions learned from real frames, then re-scored the whole log without re-downloading anything.",
+      "moments": [
+        {
+          "kind": "result",
+          "text": "From 0 finds in 23,456 frames to 7, from six different tests, each the statistical tail of static, as expected for honest 4σ."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "pr": 18,
+      "title": "Tests modelled on human vision",
+      "request": "Plan better ways to search and more things to detect, closer to what a person would notice; make detection more efficient.",
+      "did": "Made scoring 30% faster while adding six tests (soft spots, curves, flat strokes, few-colour areas, photo-like texture, face-like layouts), a frame-wide score that allows for running 16 tests, a visibility model, and an 'I see something' button that turns a GitHub issue into a scored frame.",
+      "moments": [
+        {
+          "kind": "bug caught",
+          "text": "Its first curve test (orientation coherence) barely beat static on thin arcs; it measured alternatives and switched to oriented line filters on a half-size copy: 5x stronger and 3x cheaper."
+        },
+        {
+          "kind": "honest result",
+          "text": "The visibility model rates almost every benchmark signal the detector catches as invisible to the eye: the tests integrate evidence people can't."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "pr": 19,
+      "title": "Improvement sweep",
+      "request": "Find more things to improve anywhere.",
+      "did": "Halved per-frame evidence files, made alerts check every run, stopped side jobs overwriting 'last scan', and let long scans hand over to new code within 30 minutes.",
+      "moments": [
+        {
+          "kind": "bug caught",
+          "text": "A second, audit-driven sweep then found that re-mining ran on every scan (a rounding mismatch), re-fetching up to 60 frames and inflating the find count; fixed in PR #20."
+        }
+      ]
+    }
+  ]
+}

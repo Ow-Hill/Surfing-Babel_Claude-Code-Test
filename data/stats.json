@@ -1,0 +1,7634 @@
+{
+ "scanned": 364715,
+ "errors": 406,
+ "hist_edges": [
+  -2,
+  -1,
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  8,
+  12,
+  16,
+  40
+ ],
+ "hist": [
+  0,
+  0,
+  525,
+  49342,
+  215167,
+  92584,
+  6923,
+  169,
+  5,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "runs": [
+  {
+   "started_at": 1794554349.4759002,
+   "start_location": "3986714190767752",
+   "scanned": 1052,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.617,
+   "finished_at": 1794556159.5419946,
+   "end_location": "3986714190768804",
+   "frames_per_hour": 2092,
+   "concurrency": {
+    "final": 7,
+    "max_used": 8,
+    "baseline_latency_s": 4.4,
+    "changes": 16,
+    "latency_median_s": 11.47,
+    "latency_p90_s": 14.25,
+    "by_level": {
+     "3": [
+      8,
+      5.58
+     ],
+     "4": [
+      20,
+      10.36
+     ],
+     "5": [
+      56,
+      10.48
+     ],
+     "6": [
+      100,
+      10.33
+     ],
+     "7": [
+      52,
+      12.31
+     ],
+     "8": [
+      744,
+      11.53
+     ]
+    },
+    "in_flight": 6.3,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.6,
+      5
+     ],
+     [
+      2.0,
+      6
+     ],
+     [
+      2.5,
+      7
+     ],
+     [
+      3.4,
+      8
+     ],
+     [
+      9.0,
+      7
+     ],
+     [
+      9.6,
+      6
+     ],
+     [
+      10.5,
+      7
+     ],
+     [
+      11.0,
+      6
+     ],
+     [
+      12.9,
+      5
+     ],
+     [
+      13.8,
+      4
+     ],
+     [
+      14.5,
+      5
+     ],
+     [
+      15.0,
+      6
+     ],
+     [
+      15.7,
+      7
+     ],
+     [
+      16.1,
+      8
+     ],
+     [
+      30.1,
+      7
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794556192.6276176,
+   "start_location": "2126550758334808",
+   "scanned": 1195,
+   "finds": 2,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.505,
+   "new_finds": [
+    {
+     "location": "2126550758335496",
+     "sigma": 4.143,
+     "tier": "anomaly",
+     "reason": "colours",
+     "description": "Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the right side, roughly 24 px across (4.1\u03c3)."
+    },
+    {
+     "location": "2126550758335915",
+     "sigma": 4.505,
+     "tier": "anomaly",
+     "reason": "marks",
+     "description": "Statistically unusual static, not a picture: a thin stroke whose colour hardly changes along it, at least 16 px long, around the right side (4.5\u03c3)."
+    }
+   ],
+   "finished_at": 1794558001.1477056,
+   "end_location": "2126550758336003",
+   "frames_per_hour": 2379,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.84,
+    "changes": 9,
+    "latency_median_s": 8.14,
+    "latency_p90_s": 11.34,
+    "by_level": {
+     "3": [
+      8,
+      5.34
+     ],
+     "4": [
+      8,
+      5.1
+     ],
+     "5": [
+      8,
+      5.6
+     ],
+     "6": [
+      28,
+      7.26
+     ],
+     "7": [
+      24,
+      6.45
+     ],
+     "8": [
+      1085,
+      8.36
+     ]
+    },
+    "in_flight": 5.38,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.5,
+      5
+     ],
+     [
+      0.7,
+      6
+     ],
+     [
+      1.1,
+      7
+     ],
+     [
+      1.3,
+      8
+     ],
+     [
+      20.5,
+      7
+     ],
+     [
+      20.9,
+      6
+     ],
+     [
+      21.5,
+      7
+     ],
+     [
+      21.8,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794558013.461823,
+   "start_location": "2963306595569479",
+   "scanned": 1173,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.026,
+   "finished_at": 1794559824.9429219,
+   "end_location": "2963306595570652",
+   "frames_per_hour": 2331,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.01,
+    "changes": 11,
+    "latency_median_s": 7.62,
+    "latency_p90_s": 10.14,
+    "by_level": {
+     "3": [
+      8,
+      5.34
+     ],
+     "4": [
+      12,
+      6.83
+     ],
+     "5": [
+      24,
+      8.54
+     ],
+     "6": [
+      16,
+      8.89
+     ],
+     "7": [
+      72,
+      8.12
+     ],
+     "8": [
+      988,
+      7.44
+     ]
+    },
+    "in_flight": 5.1,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      1.5,
+      6
+     ],
+     [
+      2.0,
+      7
+     ],
+     [
+      2.3,
+      8
+     ],
+     [
+      10.4,
+      7
+     ],
+     [
+      11.6,
+      8
+     ],
+     [
+      12.9,
+      7
+     ],
+     [
+      13.3,
+      8
+     ],
+     [
+      24.8,
+      7
+     ],
+     [
+      25.3,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794559836.6506815,
+   "start_location": "435400816296346",
+   "scanned": 1191,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.907,
+   "finished_at": 1794561644.788485,
+   "end_location": "435400816297537",
+   "frames_per_hour": 2371,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 6.38,
+    "changes": 7,
+    "latency_median_s": 6.84,
+    "latency_p90_s": 10.41,
+    "by_level": {
+     "3": [
+      8,
+      6.63
+     ],
+     "4": [
+      8,
+      7.17
+     ],
+     "5": [
+      20,
+      10.06
+     ],
+     "6": [
+      8,
+      6.57
+     ],
+     "7": [
+      28,
+      7.76
+     ],
+     "8": [
+      1094,
+      6.8
+     ]
+    },
+    "in_flight": 4.72,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      1.3,
+      6
+     ],
+     [
+      1.6,
+      7
+     ],
+     [
+      1.8,
+      8
+     ],
+     [
+      7.7,
+      7
+     ],
+     [
+      8.2,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794561656.2648106,
+   "start_location": "6248014070362310",
+   "scanned": 1105,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.885,
+   "finished_at": 1794563464.1761453,
+   "end_location": "6248014070363415",
+   "frames_per_hour": 2200,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 12.23,
+    "changes": 5,
+    "latency_median_s": 11.83,
+    "latency_p90_s": 15.23,
+    "by_level": {
+     "3": [
+      8,
+      6.05
+     ],
+     "4": [
+      8,
+      7.53
+     ],
+     "5": [
+      8,
+      7.1
+     ],
+     "6": [
+      12,
+      8.13
+     ],
+     "7": [
+      8,
+      5.44
+     ],
+     "8": [
+      1044,
+      12.04
+     ]
+    },
+    "in_flight": 7.02,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      0.9,
+      6
+     ],
+     [
+      1.3,
+      7
+     ],
+     [
+      1.6,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794563476.1250305,
+   "start_location": "4007409473227995",
+   "scanned": 1159,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.753,
+   "finished_at": 1794565282.8097472,
+   "end_location": "4007409473229154",
+   "frames_per_hour": 2309,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.52,
+    "changes": 9,
+    "latency_median_s": 9.22,
+    "latency_p90_s": 12.91,
+    "by_level": {
+     "3": [
+      8,
+      5.52
+     ],
+     "4": [
+      28,
+      8.4
+     ],
+     "5": [
+      16,
+      8.91
+     ],
+     "6": [
+      16,
+      10.01
+     ],
+     "7": [
+      80,
+      9.48
+     ],
+     "8": [
+      968,
+      9.28
+     ]
+    },
+    "in_flight": 5.9,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      1.4,
+      5
+     ],
+     [
+      1.9,
+      6
+     ],
+     [
+      2.5,
+      7
+     ],
+     [
+      3.0,
+      8
+     ],
+     [
+      13.7,
+      7
+     ],
+     [
+      14.6,
+      8
+     ],
+     [
+      15.8,
+      7
+     ],
+     [
+      16.6,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794565294.7634468,
+   "start_location": "8598189986955571",
+   "scanned": 1194,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.638,
+   "finished_at": 1794567106.8263574,
+   "end_location": "8598189986956765",
+   "frames_per_hour": 2372,
+   "concurrency": {
+    "final": 7,
+    "max_used": 8,
+    "baseline_latency_s": 4.8,
+    "changes": 10,
+    "latency_median_s": 6.87,
+    "latency_p90_s": 9.98,
+    "by_level": {
+     "3": [
+      8,
+      5.74
+     ],
+     "4": [
+      8,
+      7.05
+     ],
+     "5": [
+      8,
+      6.46
+     ],
+     "6": [
+      8,
+      6.97
+     ],
+     "7": [
+      37,
+      8.18
+     ],
+     "8": [
+      1072,
+      6.76
+     ]
+    },
+    "in_flight": 4.76,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.6,
+      5
+     ],
+     [
+      0.8,
+      6
+     ],
+     [
+      1.1,
+      7
+     ],
+     [
+      1.5,
+      8
+     ],
+     [
+      9.1,
+      7
+     ],
+     [
+      9.4,
+      8
+     ],
+     [
+      23.7,
+      7
+     ],
+     [
+      24.3,
+      8
+     ],
+     [
+      29.9,
+      7
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794567119.0122626,
+   "start_location": "4982558751416377",
+   "scanned": 1158,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 5.521,
+   "new_finds": [
+    {
+     "location": "4982558751417038",
+     "sigma": 5.521,
+     "tier": "anomaly",
+     "reason": "marks",
+     "description": "Statistically unusual static, not a picture: a thin stroke whose colour hardly changes along it, at least 16 px long, around the bottom-right (5.5\u03c3)."
+    }
+   ],
+   "finished_at": 1794568929.2365012,
+   "end_location": "4982558751417535",
+   "frames_per_hour": 2303,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 5.46,
+    "changes": 19,
+    "latency_median_s": 7.23,
+    "latency_p90_s": 10.74,
+    "by_level": {
+     "3": [
+      8,
+      6.89
+     ],
+     "4": [
+      8,
+      7.08
+     ],
+     "5": [
+      44,
+      7.18
+     ],
+     "6": [
+      72,
+      8.47
+     ],
+     "7": [
+      52,
+      8.72
+     ],
+     "8": [
+      884,
+      6.69
+     ]
+    },
+    "in_flight": 4.93,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      0.9,
+      6
+     ],
+     [
+      1.2,
+      7
+     ],
+     [
+      1.5,
+      8
+     ],
+     [
+      4.5,
+      7
+     ],
+     [
+      4.8,
+      8
+     ],
+     [
+      13.4,
+      7
+     ],
+     [
+      14.0,
+      6
+     ],
+     [
+      14.5,
+      5
+     ],
+     [
+      14.8,
+      6
+     ],
+     [
+      15.0,
+      7
+     ],
+     [
+      15.3,
+      8
+     ],
+     [
+      16.1,
+      7
+     ],
+     [
+      16.4,
+      6
+     ],
+     [
+      17.3,
+      5
+     ],
+     [
+      18.1,
+      6
+     ],
+     [
+      18.9,
+      7
+     ],
+     [
+      19.3,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794568940.8393924,
+   "start_location": "2118695274850973",
+   "scanned": 1091,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.861,
+   "finished_at": 1794570750.0645485,
+   "end_location": "2118695274852064",
+   "frames_per_hour": 2171,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.11,
+    "changes": 5,
+    "latency_median_s": 10.26,
+    "latency_p90_s": 15.97,
+    "by_level": {
+     "3": [
+      8,
+      4.78
+     ],
+     "4": [
+      16,
+      6.53
+     ],
+     "5": [
+      24,
+      7.65
+     ],
+     "6": [
+      8,
+      6.54
+     ],
+     "7": [
+      8,
+      6.16
+     ],
+     "8": [
+      1012,
+      10.82
+     ]
+    },
+    "in_flight": 6.5,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.8,
+      5
+     ],
+     [
+      1.5,
+      6
+     ],
+     [
+      1.7,
+      7
+     ],
+     [
+      2.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794570761.4960523,
+   "start_location": "91617024495599",
+   "scanned": 901,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.699,
+   "finished_at": 1794572576.0740206,
+   "end_location": "91617024496500",
+   "frames_per_hour": 1788,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 15.91,
+    "changes": 7,
+    "latency_median_s": 14.99,
+    "latency_p90_s": 18.79,
+    "by_level": {
+     "3": [
+      20,
+      8.89
+     ],
+     "4": [
+      16,
+      12.47
+     ],
+     "5": [
+      12,
+      10.86
+     ],
+     "6": [
+      24,
+      12.52
+     ],
+     "7": [
+      8,
+      12.49
+     ],
+     "8": [
+      796,
+      15.28
+     ]
+    },
+    "in_flight": 7.47,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      1.3,
+      3
+     ],
+     [
+      2.0,
+      4
+     ],
+     [
+      2.4,
+      5
+     ],
+     [
+      3.0,
+      6
+     ],
+     [
+      4.1,
+      7
+     ],
+     [
+      4.5,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794572588.404421,
+   "start_location": "4051724759898111",
+   "scanned": 922,
+   "finds": 0,
+   "errors": 5,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.483,
+   "error_kinds": {
+    "HTTP 500": 5
+   },
+   "finished_at": 1794574398.9315073,
+   "end_location": "4051724759899038",
+   "frames_per_hour": 1833,
+   "concurrency": {
+    "final": 7,
+    "max_used": 8,
+    "baseline_latency_s": 5.65,
+    "changes": 16,
+    "latency_median_s": 13.29,
+    "latency_p90_s": 20.63,
+    "by_level": {
+     "3": [
+      8,
+      9.52
+     ],
+     "4": [
+      8,
+      9.49
+     ],
+     "5": [
+      8,
+      10.39
+     ],
+     "6": [
+      20,
+      11.64
+     ],
+     "7": [
+      70,
+      14.04
+     ],
+     "8": [
+      719,
+      13.37
+     ]
+    },
+    "in_flight": 7.23,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.9,
+      5
+     ],
+     [
+      1.3,
+      6
+     ],
+     [
+      1.8,
+      7
+     ],
+     [
+      2.9,
+      8
+     ],
+     [
+      7.9,
+      7
+     ],
+     [
+      8.3,
+      8
+     ],
+     [
+      22.5,
+      7
+     ],
+     [
+      23.0,
+      6
+     ],
+     [
+      23.3,
+      7
+     ],
+     [
+      23.7,
+      8
+     ],
+     [
+      24.9,
+      7
+     ],
+     [
+      25.4,
+      8
+     ],
+     [
+      27.5,
+      7
+     ],
+     [
+      28.0,
+      8
+     ],
+     [
+      29.9,
+      7
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794574429.7296934,
+   "start_location": "7001491683953182",
+   "scanned": 1106,
+   "finds": 1,
+   "errors": 17,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.153,
+   "error_kinds": {
+    "HTTP 500": 17
+   },
+   "new_finds": [
+    {
+     "location": "7001491683954191",
+     "sigma": 4.153,
+     "tier": "anomaly",
+     "reason": "palette",
+     "description": "Statistically unusual static, not a picture: the red-green channels move in opposition (r = -0.009; static gives \u2248 0) (4.2\u03c3). Nothing local: no shapes, lines or patterns stand out."
+    }
+   ],
+   "finished_at": 1794576239.5860584,
+   "end_location": "7001491683954305",
+   "frames_per_hour": 2200,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 9.65,
+    "changes": 33,
+    "latency_median_s": 6.57,
+    "latency_p90_s": 12.95,
+    "by_level": {
+     "3": [
+      8,
+      3.99
+     ],
+     "4": [
+      40,
+      5.97
+     ],
+     "5": [
+      16,
+      9.51
+     ],
+     "6": [
+      108,
+      6.96
+     ],
+     "7": [
+      172,
+      8.07
+     ],
+     "8": [
+      625,
+      6.03
+     ]
+    },
+    "in_flight": 4.95,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.2,
+      4
+     ],
+     [
+      1.2,
+      5
+     ],
+     [
+      1.8,
+      4
+     ],
+     [
+      2.1,
+      5
+     ],
+     [
+      2.3,
+      6
+     ],
+     [
+      2.6,
+      7
+     ],
+     [
+      2.9,
+      8
+     ],
+     [
+      4.1,
+      7
+     ],
+     [
+      4.6,
+      6
+     ],
+     [
+      4.8,
+      7
+     ],
+     [
+      5.0,
+      8
+     ],
+     [
+      7.0,
+      7
+     ],
+     [
+      7.5,
+      6
+     ],
+     [
+      7.9,
+      7
+     ],
+     [
+      8.3,
+      8
+     ],
+     [
+      10.2,
+      7
+     ],
+     [
+      11.4,
+      8
+     ],
+     [
+      13.1,
+      7
+     ],
+     [
+      13.4,
+      6
+     ],
+     [
+      13.7,
+      7
+     ],
+     [
+      14.2,
+      8
+     ],
+     [
+      16.8,
+      7
+     ],
+     [
+      17.1,
+      6
+     ],
+     [
+      17.4,
+      7
+     ],
+     [
+      17.7,
+      8
+     ],
+     [
+      21.0,
+      7
+     ],
+     [
+      21.5,
+      6
+     ],
+     [
+      22.2,
+      7
+     ],
+     [
+      22.8,
+      8
+     ],
+     [
+      25.7,
+      7
+     ],
+     [
+      26.1,
+      6
+     ],
+     [
+      26.8,
+      7
+     ],
+     [
+      27.1,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794576250.733946,
+   "start_location": "64193350126519",
+   "scanned": 1120,
+   "finds": 0,
+   "errors": 5,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.792,
+   "error_kinds": {
+    "HTTP 500": 5
+   },
+   "finished_at": 1794578064.821191,
+   "end_location": "64193350127644",
+   "frames_per_hour": 2223,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 3.92,
+    "changes": 29,
+    "latency_median_s": 6.83,
+    "latency_p90_s": 11.09,
+    "by_level": {
+     "3": [
+      8,
+      14.98
+     ],
+     "4": [
+      8,
+      7.59
+     ],
+     "5": [
+      80,
+      7.91
+     ],
+     "6": [
+      94,
+      7.16
+     ],
+     "7": [
+      132,
+      8.89
+     ],
+     "8": [
+      672,
+      5.62
+     ]
+    },
+    "in_flight": 4.57,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.8,
+      4
+     ],
+     [
+      1.1,
+      5
+     ],
+     [
+      1.4,
+      6
+     ],
+     [
+      1.7,
+      7
+     ],
+     [
+      2.0,
+      8
+     ],
+     [
+      6.0,
+      7
+     ],
+     [
+      6.6,
+      6
+     ],
+     [
+      7.0,
+      5
+     ],
+     [
+      7.4,
+      6
+     ],
+     [
+      7.9,
+      7
+     ],
+     [
+      8.2,
+      8
+     ],
+     [
+      12.6,
+      7
+     ],
+     [
+      13.0,
+      8
+     ],
+     [
+      13.7,
+      7
+     ],
+     [
+      14.1,
+      8
+     ],
+     [
+      14.6,
+      7
+     ],
+     [
+      14.9,
+      6
+     ],
+     [
+      15.3,
+      5
+     ],
+     [
+      17.1,
+      6
+     ],
+     [
+      17.3,
+      7
+     ],
+     [
+      17.6,
+      8
+     ],
+     [
+      18.6,
+      7
+     ],
+     [
+      19.7,
+      8
+     ],
+     [
+      26.0,
+      7
+     ],
+     [
+      26.4,
+      6
+     ],
+     [
+      27.1,
+      7
+     ],
+     [
+      28.1,
+      6
+     ],
+     [
+      28.7,
+      7
+     ],
+     [
+      28.9,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794578075.4396274,
+   "start_location": "1387968009025885",
+   "scanned": 1148,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.739,
+   "finished_at": 1794579889.407212,
+   "end_location": "1387968009027033",
+   "frames_per_hour": 2278,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 14.25,
+    "changes": 13,
+    "latency_median_s": 7.62,
+    "latency_p90_s": 14.2,
+    "by_level": {
+     "3": [
+      8,
+      3.53
+     ],
+     "4": [
+      8,
+      4.63
+     ],
+     "5": [
+      44,
+      6.26
+     ],
+     "6": [
+      40,
+      6.87
+     ],
+     "7": [
+      32,
+      5.48
+     ],
+     "8": [
+      961,
+      8.97
+     ]
+    },
+    "in_flight": 5.36,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.2,
+      4
+     ],
+     [
+      0.4,
+      5
+     ],
+     [
+      1.2,
+      6
+     ],
+     [
+      1.5,
+      5
+     ],
+     [
+      2.1,
+      6
+     ],
+     [
+      2.3,
+      7
+     ],
+     [
+      2.6,
+      8
+     ],
+     [
+      4.9,
+      7
+     ],
+     [
+      5.2,
+      8
+     ],
+     [
+      12.0,
+      7
+     ],
+     [
+      12.6,
+      6
+     ],
+     [
+      13.1,
+      7
+     ],
+     [
+      13.6,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794579900.328048,
+   "start_location": "6516770839293101",
+   "scanned": 959,
+   "finds": 1,
+   "errors": 3,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.031,
+   "error_kinds": {
+    "HTTP 500": 3
+   },
+   "finished_at": 1794581708.3592465,
+   "end_location": "6516770839294063",
+   "frames_per_hour": 1909,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 11.11,
+    "changes": 9,
+    "latency_median_s": 13.76,
+    "latency_p90_s": 17.9,
+    "by_level": {
+     "3": [
+      8,
+      6.8
+     ],
+     "4": [
+      12,
+      9.27
+     ],
+     "5": [
+      16,
+      10.3
+     ],
+     "6": [
+      8,
+      9.81
+     ],
+     "7": [
+      62,
+      13.83
+     ],
+     "8": [
+      810,
+      13.9
+     ]
+    },
+    "in_flight": 7.65,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      1.0,
+      5
+     ],
+     [
+      1.7,
+      6
+     ],
+     [
+      2.0,
+      7
+     ],
+     [
+      2.8,
+      8
+     ],
+     [
+      5.9,
+      7
+     ],
+     [
+      7.0,
+      8
+     ],
+     [
+      10.9,
+      7
+     ],
+     [
+      11.8,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794581719.3253102,
+   "start_location": "1058577489653844",
+   "scanned": 757,
+   "finds": 1,
+   "errors": 2,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.14,
+   "new_finds": [
+    {
+     "location": "1058577489653919",
+     "sigma": 4.14,
+     "tier": "anomaly",
+     "reason": "lines",
+     "description": "Statistically unusual static, not a picture: a darker vertical band near x \u2248 286 px (4.1\u03c3)."
+    }
+   ],
+   "error_kinds": {
+    "HTTP 500": 2
+   },
+   "finished_at": 1794583540.2315984,
+   "end_location": "1058577489654603",
+   "frames_per_hour": 1497,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 26.24,
+    "changes": 9,
+    "latency_median_s": 17.72,
+    "latency_p90_s": 23.84,
+    "by_level": {
+     "3": [
+      8,
+      5.77
+     ],
+     "4": [
+      60,
+      10.48
+     ],
+     "5": [
+      8,
+      11.15
+     ],
+     "6": [
+      17,
+      20.33
+     ],
+     "7": [
+      20,
+      12.74
+     ],
+     "8": [
+      601,
+      18.23
+     ]
+    },
+    "in_flight": 7.39,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      3.1,
+      5
+     ],
+     [
+      3.4,
+      6
+     ],
+     [
+      3.8,
+      7
+     ],
+     [
+      4.4,
+      8
+     ],
+     [
+      23.5,
+      7
+     ],
+     [
+      24.0,
+      6
+     ],
+     [
+      24.9,
+      7
+     ],
+     [
+      25.5,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794583551.507645,
+   "start_location": "629041800985615",
+   "scanned": 1174,
+   "finds": 2,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.573,
+   "new_finds": [
+    {
+     "location": "629041800985643",
+     "sigma": 4.573,
+     "tier": "anomaly",
+     "reason": "colours",
+     "description": "Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the bottom-right, roughly 32 px across (4.6\u03c3)."
+    }
+   ],
+   "finished_at": 1794585358.627446,
+   "end_location": "629041800986789",
+   "frames_per_hour": 2339,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.7,
+    "changes": 5,
+    "latency_median_s": 7.7,
+    "latency_p90_s": 10.46,
+    "by_level": {
+     "3": [
+      8,
+      5.77
+     ],
+     "4": [
+      8,
+      7.68
+     ],
+     "5": [
+      40,
+      9.28
+     ],
+     "6": [
+      8,
+      9.14
+     ],
+     "7": [
+      8,
+      8.98
+     ],
+     "8": [
+      1085,
+      7.6
+     ]
+    },
+    "in_flight": 5.1,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      1.9,
+      6
+     ],
+     [
+      2.3,
+      7
+     ],
+     [
+      2.6,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794585369.4803267,
+   "start_location": "3654668517169792",
+   "scanned": 1167,
+   "finds": 1,
+   "errors": 3,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.275,
+   "error_kinds": {
+    "HTTP 500": 3
+   },
+   "new_finds": [
+    {
+     "location": "3654668517170485",
+     "sigma": 4.275,
+     "tier": "anomaly",
+     "reason": "texture",
+     "description": "Statistically unusual static, not a picture: smoother: neighbouring pixels agree more than static, mostly vertically (r = +0.003) (4.3\u03c3). Nothing local: no shapes, lines or patterns stand out."
+    }
+   ],
+   "finished_at": 1794587178.3462126,
+   "end_location": "3654668517170962",
+   "frames_per_hour": 2323,
+   "concurrency": {
+    "final": 5,
+    "max_used": 8,
+    "baseline_latency_s": 4.28,
+    "changes": 12,
+    "latency_median_s": 6.95,
+    "latency_p90_s": 10.18,
+    "by_level": {
+     "3": [
+      8,
+      6.09
+     ],
+     "4": [
+      16,
+      8.3
+     ],
+     "5": [
+      13,
+      8.55
+     ],
+     "6": [
+      24,
+      9.1
+     ],
+     "7": [
+      36,
+      10.1
+     ],
+     "8": [
+      1012,
+      6.39
+     ]
+    },
+    "in_flight": 4.62,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.9,
+      5
+     ],
+     [
+      1.3,
+      6
+     ],
+     [
+      1.6,
+      7
+     ],
+     [
+      2.3,
+      8
+     ],
+     [
+      8.3,
+      7
+     ],
+     [
+      8.6,
+      6
+     ],
+     [
+      9.0,
+      7
+     ],
+     [
+      9.3,
+      8
+     ],
+     [
+      29.1,
+      7
+     ],
+     [
+      29.5,
+      6
+     ],
+     [
+      29.8,
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794587189.3119326,
+   "start_location": "4096955589034966",
+   "scanned": 985,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.843,
+   "finished_at": 1794589001.7268558,
+   "end_location": "4096955589035951",
+   "frames_per_hour": 1957,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 16.08,
+    "changes": 5,
+    "latency_median_s": 13.82,
+    "latency_p90_s": 17.12,
+    "by_level": {
+     "3": [
+      8,
+      4.63
+     ],
+     "4": [
+      40,
+      7.98
+     ],
+     "5": [
+      44,
+      9.69
+     ],
+     "6": [
+      8,
+      9.89
+     ],
+     "7": [
+      8,
+      10.35
+     ],
+     "8": [
+      857,
+      14.14
+     ]
+    },
+    "in_flight": 7.55,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.2,
+      4
+     ],
+     [
+      1.7,
+      5
+     ],
+     [
+      3.2,
+      6
+     ],
+     [
+      3.6,
+      7
+     ],
+     [
+      4.3,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794589013.326736,
+   "start_location": "3688434270726329",
+   "scanned": 836,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.774,
+   "finished_at": 1794590826.4753218,
+   "end_location": "3688434270727165",
+   "frames_per_hour": 1660,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 14.01,
+    "changes": 5,
+    "latency_median_s": 15.32,
+    "latency_p90_s": 21.75,
+    "by_level": {
+     "3": [
+      8,
+      10.21
+     ],
+     "4": [
+      12,
+      13.62
+     ],
+     "5": [
+      8,
+      13.82
+     ],
+     "6": [
+      20,
+      16.08
+     ],
+     "7": [
+      8,
+      15.33
+     ],
+     "8": [
+      760,
+      15.38
+     ]
+    },
+    "in_flight": 7.63,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.5,
+      4
+     ],
+     [
+      1.4,
+      5
+     ],
+     [
+      1.9,
+      6
+     ],
+     [
+      3.0,
+      7
+     ],
+     [
+      3.5,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794590837.4592814,
+   "start_location": "82304314259044",
+   "scanned": 1042,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.406,
+   "new_finds": [
+    {
+     "location": "82304314259438",
+     "sigma": 4.406,
+     "tier": "anomaly",
+     "reason": "flat",
+     "description": "Statistically unusual static, not a picture: a run of near-identical neighbouring pixels (a flat patch or a single-colour stroke) around the top, roughly 80 px across (4.4\u03c3)."
+    }
+   ],
+   "finished_at": 1794592647.7671008,
+   "end_location": "82304314260086",
+   "frames_per_hour": 2072,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 9.31,
+    "changes": 7,
+    "latency_median_s": 9.35,
+    "latency_p90_s": 14.7,
+    "by_level": {
+     "3": [
+      8,
+      13.44
+     ],
+     "4": [
+      8,
+      12.25
+     ],
+     "5": [
+      8,
+      11.69
+     ],
+     "6": [
+      60,
+      20.64
+     ],
+     "7": [
+      16,
+      20.25
+     ],
+     "8": [
+      912,
+      8.96
+     ]
+    },
+    "in_flight": 5.87,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.6,
+      4
+     ],
+     [
+      1.2,
+      5
+     ],
+     [
+      1.7,
+      6
+     ],
+     [
+      3.1,
+      7
+     ],
+     [
+      3.9,
+      6
+     ],
+     [
+      6.7,
+      7
+     ],
+     [
+      7.3,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794592675.5757246,
+   "start_location": "206935127203182",
+   "scanned": 1172,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.824,
+   "finished_at": 1794594484.0897574,
+   "end_location": "206935127204354",
+   "frames_per_hour": 2333,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.07,
+    "changes": 7,
+    "latency_median_s": 8.45,
+    "latency_p90_s": 11.73,
+    "by_level": {
+     "3": [
+      8,
+      6.09
+     ],
+     "4": [
+      8,
+      7.66
+     ],
+     "5": [
+      8,
+      7.58
+     ],
+     "6": [
+      8,
+      8.63
+     ],
+     "7": [
+      40,
+      9.55
+     ],
+     "8": [
+      1068,
+      8.37
+     ]
+    },
+    "in_flight": 5.98,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      1.0,
+      6
+     ],
+     [
+      1.3,
+      7
+     ],
+     [
+      1.8,
+      8
+     ],
+     [
+      21.2,
+      7
+     ],
+     [
+      22.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794594493.1940677,
+   "start_location": "8876104382896689",
+   "scanned": 878,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.706,
+   "finished_at": 1794596307.1772027,
+   "end_location": "8876104382897567",
+   "frames_per_hour": 1742,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 14.35,
+    "changes": 9,
+    "latency_median_s": 13.79,
+    "latency_p90_s": 19.48,
+    "by_level": {
+     "3": [
+      8,
+      7.65
+     ],
+     "4": [
+      8,
+      6.76
+     ],
+     "5": [
+      8,
+      6.92
+     ],
+     "6": [
+      28,
+      10.56
+     ],
+     "7": [
+      24,
+      12.51
+     ],
+     "8": [
+      760,
+      14.31
+     ]
+    },
+    "in_flight": 7.58,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      0.9,
+      6
+     ],
+     [
+      1.6,
+      7
+     ],
+     [
+      1.9,
+      8
+     ],
+     [
+      16.9,
+      7
+     ],
+     [
+      18.3,
+      6
+     ],
+     [
+      18.7,
+      7
+     ],
+     [
+      19.2,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794596316.3559673,
+   "start_location": "3848136797412471",
+   "scanned": 871,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.256,
+   "new_finds": [
+    {
+     "location": "3848136797412656",
+     "sigma": 4.256,
+     "tier": "anomaly",
+     "reason": "shape",
+     "description": "Statistically unusual static, not a picture: a bluer region around the top-right, roughly 96 px across (4.3\u03c3)."
+    }
+   ],
+   "finished_at": 1794598123.8725004,
+   "end_location": "3848136797413342",
+   "frames_per_hour": 1735,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.96,
+    "changes": 7,
+    "latency_median_s": 13.85,
+    "latency_p90_s": 20.12,
+    "by_level": {
+     "3": [
+      8,
+      8.61
+     ],
+     "4": [
+      8,
+      9.47
+     ],
+     "5": [
+      8,
+      10.28
+     ],
+     "6": [
+      20,
+      14.91
+     ],
+     "7": [
+      32,
+      16.56
+     ],
+     "8": [
+      764,
+      13.82
+     ]
+    },
+    "in_flight": 7.6,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.8,
+      5
+     ],
+     [
+      1.3,
+      6
+     ],
+     [
+      2.4,
+      7
+     ],
+     [
+      3.4,
+      8
+     ],
+     [
+      5.0,
+      7
+     ],
+     [
+      6.2,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794598133.715404,
+   "start_location": "401433552514927",
+   "scanned": 974,
+   "finds": 1,
+   "errors": 26,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.042,
+   "error_kinds": {
+    "HTTP 522": 26
+   },
+   "finished_at": 1794599972.6779904,
+   "end_location": "401433552515927",
+   "frames_per_hour": 1907,
+   "concurrency": {
+    "final": 4,
+    "max_used": 8,
+    "baseline_latency_s": 5.57,
+    "changes": 9,
+    "latency_median_s": 8.93,
+    "latency_p90_s": 12.11,
+    "by_level": {
+     "3": [
+      8,
+      6.44
+     ],
+     "4": [
+      8,
+      8.54
+     ],
+     "5": [
+      8,
+      8.47
+     ],
+     "6": [
+      8,
+      8.91
+     ],
+     "7": [
+      24,
+      10.9
+     ],
+     "8": [
+      899,
+      8.93
+     ]
+    },
+    "in_flight": 6.38,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      1.0,
+      6
+     ],
+     [
+      1.3,
+      7
+     ],
+     [
+      2.2,
+      8
+     ],
+     [
+      26.5,
+      7
+     ],
+     [
+      27.9,
+      6
+     ],
+     [
+      29.1,
+      5
+     ],
+     [
+      30.4,
+      4
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794599981.5428708,
+   "start_location": "4055516833320956",
+   "scanned": 1171,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.76,
+   "finished_at": 1794601790.7390277,
+   "end_location": "4055516833322127",
+   "frames_per_hour": 2330,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.1,
+    "changes": 19,
+    "latency_median_s": 7.04,
+    "latency_p90_s": 11.39,
+    "by_level": {
+     "3": [
+      8,
+      4.45
+     ],
+     "4": [
+      8,
+      4.49
+     ],
+     "5": [
+      32,
+      8.12
+     ],
+     "6": [
+      44,
+      8.49
+     ],
+     "7": [
+      68,
+      8.35
+     ],
+     "8": [
+      926,
+      6.81
+     ]
+    },
+    "in_flight": 4.95,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.6,
+      5
+     ],
+     [
+      0.9,
+      6
+     ],
+     [
+      1.1,
+      7
+     ],
+     [
+      1.5,
+      8
+     ],
+     [
+      4.9,
+      7
+     ],
+     [
+      5.5,
+      8
+     ],
+     [
+      8.0,
+      7
+     ],
+     [
+      8.4,
+      8
+     ],
+     [
+      17.7,
+      7
+     ],
+     [
+      18.1,
+      6
+     ],
+     [
+      18.6,
+      5
+     ],
+     [
+      19.4,
+      6
+     ],
+     [
+      19.6,
+      7
+     ],
+     [
+      19.9,
+      8
+     ],
+     [
+      26.1,
+      7
+     ],
+     [
+      26.5,
+      6
+     ],
+     [
+      27.1,
+      7
+     ],
+     [
+      27.4,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794601799.5413032,
+   "start_location": "1100116691591768",
+   "scanned": 1157,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.341,
+   "new_finds": [
+    {
+     "location": "1100116691592688",
+     "sigma": 4.341,
+     "tier": "anomaly",
+     "reason": "face",
+     "description": "Statistically unusual static, not a picture: a face-like arrangement, two spots above a third, about 60 px across, around the bottom (4.3\u03c3)."
+    }
+   ],
+   "finished_at": 1794603610.4188619,
+   "end_location": "1100116691592925",
+   "frames_per_hour": 2300,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.73,
+    "changes": 5,
+    "latency_median_s": 9.22,
+    "latency_p90_s": 13.26,
+    "by_level": {
+     "3": [
+      8,
+      4.83
+     ],
+     "4": [
+      8,
+      5.63
+     ],
+     "5": [
+      16,
+      6.88
+     ],
+     "6": [
+      12,
+      7.01
+     ],
+     "7": [
+      8,
+      5.31
+     ],
+     "8": [
+      1092,
+      9.46
+     ]
+    },
+    "in_flight": 6.04,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.5,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      1.2,
+      6
+     ],
+     [
+      1.6,
+      7
+     ],
+     [
+      1.9,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794603619.111444,
+   "start_location": "3986417405553388",
+   "scanned": 1013,
+   "finds": 2,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.305,
+   "new_finds": [
+    {
+     "location": "3986417405553533",
+     "sigma": 4.117,
+     "tier": "anomaly",
+     "reason": "face",
+     "description": "Statistically unusual static, not a picture: a face-like arrangement, two spots above a third, about 60 px across, around the right side (4.1\u03c3)."
+    },
+    {
+     "location": "3986417405554185",
+     "sigma": 4.305,
+     "tier": "anomaly",
+     "reason": "marks",
+     "description": "Statistically unusual static, not a picture: a small mark about 8 px across whose colour hardly changes, around the centre (4.3\u03c3)."
+    }
+   ],
+   "finished_at": 1794605435.3893237,
+   "end_location": "3986417405554401",
+   "frames_per_hour": 2008,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 11.09,
+    "changes": 7,
+    "latency_median_s": 12.33,
+    "latency_p90_s": 17.06,
+    "by_level": {
+     "3": [
+      8,
+      7.51
+     ],
+     "4": [
+      8,
+      7.91
+     ],
+     "5": [
+      8,
+      10.04
+     ],
+     "6": [
+      44,
+      13.96
+     ],
+     "7": [
+      60,
+      15.75
+     ],
+     "8": [
+      854,
+      12.07
+     ]
+    },
+    "in_flight": 7.1,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      1.1,
+      6
+     ],
+     [
+      3.0,
+      7
+     ],
+     [
+      4.6,
+      8
+     ],
+     [
+      28.1,
+      7
+     ],
+     [
+      29.1,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794605444.1541386,
+   "start_location": "441223047735256",
+   "scanned": 1168,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 5.206,
+   "new_finds": [
+    {
+     "location": "441223047735820",
+     "sigma": 5.206,
+     "tier": "anomaly",
+     "reason": "repetition",
+     "description": "Statistically unusual static, not a picture: part of the frame repeats at an offset of (24, 237) px (5.2\u03c3)."
+    }
+   ],
+   "finished_at": 1794607251.60013,
+   "end_location": "441223047736424",
+   "frames_per_hour": 2326,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 6.57,
+    "changes": 7,
+    "latency_median_s": 8.85,
+    "latency_p90_s": 12.75,
+    "by_level": {
+     "3": [
+      8,
+      8.66
+     ],
+     "4": [
+      8,
+      7.26
+     ],
+     "5": [
+      8,
+      9.51
+     ],
+     "6": [
+      8,
+      8.68
+     ],
+     "7": [
+      20,
+      10.68
+     ],
+     "8": [
+      1084,
+      8.8
+     ]
+    },
+    "in_flight": 5.98,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.8,
+      5
+     ],
+     [
+      1.1,
+      6
+     ],
+     [
+      1.4,
+      7
+     ],
+     [
+      1.7,
+      8
+     ],
+     [
+      12.8,
+      7
+     ],
+     [
+      13.4,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794607260.6274197,
+   "start_location": "4311278347051616",
+   "scanned": 1113,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.283,
+   "new_finds": [
+    {
+     "location": "4311278347052252",
+     "sigma": 4.283,
+     "tier": "anomaly",
+     "reason": "angled",
+     "description": "Statistically unusual static, not a picture: a faint yellower line at 75\u00b0 through the left side (4.3\u03c3)."
+    }
+   ],
+   "finished_at": 1794609079.0631034,
+   "end_location": "4311278347052729",
+   "frames_per_hour": 2203,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 10.25,
+    "changes": 11,
+    "latency_median_s": 9.81,
+    "latency_p90_s": 14.55,
+    "by_level": {
+     "3": [
+      8,
+      4.88
+     ],
+     "4": [
+      28,
+      7.67
+     ],
+     "5": [
+      8,
+      7.17
+     ],
+     "6": [
+      52,
+      10.74
+     ],
+     "7": [
+      56,
+      11.99
+     ],
+     "8": [
+      908,
+      9.69
+     ]
+    },
+    "in_flight": 6.32,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      1.3,
+      5
+     ],
+     [
+      1.6,
+      6
+     ],
+     [
+      2.0,
+      7
+     ],
+     [
+      2.3,
+      8
+     ],
+     [
+      6.6,
+      7
+     ],
+     [
+      7.2,
+      6
+     ],
+     [
+      8.7,
+      7
+     ],
+     [
+      9.8,
+      8
+     ],
+     [
+      29.7,
+      7
+     ],
+     [
+      30.1,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794609088.1148946,
+   "start_location": "729399262343844",
+   "scanned": 1153,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.148,
+   "new_finds": [
+    {
+     "location": "729399262343953",
+     "sigma": 4.148,
+     "tier": "anomaly",
+     "reason": "blob",
+     "description": "Statistically unusual static, not a picture: a yellower spot around the top-left, roughly 96 px across (4.1\u03c3)."
+    }
+   ],
+   "finished_at": 1794610897.9054844,
+   "end_location": "729399262344997",
+   "frames_per_hour": 2294,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.1,
+    "changes": 5,
+    "latency_median_s": 10.63,
+    "latency_p90_s": 13.63,
+    "by_level": {
+     "3": [
+      8,
+      6.58
+     ],
+     "4": [
+      8,
+      7.42
+     ],
+     "5": [
+      12,
+      9.28
+     ],
+     "6": [
+      16,
+      10.03
+     ],
+     "7": [
+      28,
+      12.91
+     ],
+     "8": [
+      1062,
+      10.72
+     ]
+    },
+    "in_flight": 6.73,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      1.1,
+      6
+     ],
+     [
+      1.7,
+      7
+     ],
+     [
+      2.6,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794610923.2867281,
+   "start_location": "6731695683747784",
+   "scanned": 1121,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.799,
+   "finished_at": 1794612733.4790454,
+   "end_location": "6731695683748905",
+   "frames_per_hour": 2229,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 11.39,
+    "changes": 7,
+    "latency_median_s": 10.01,
+    "latency_p90_s": 14.2,
+    "by_level": {
+     "3": [
+      8,
+      4.52
+     ],
+     "4": [
+      8,
+      5.16
+     ],
+     "5": [
+      8,
+      5.97
+     ],
+     "6": [
+      8,
+      6.1
+     ],
+     "7": [
+      40,
+      9.5
+     ],
+     "8": [
+      1021,
+      10.17
+     ]
+    },
+    "in_flight": 6.73,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.5,
+      5
+     ],
+     [
+      0.7,
+      6
+     ],
+     [
+      1.1,
+      7
+     ],
+     [
+      1.4,
+      8
+     ],
+     [
+      2.8,
+      7
+     ],
+     [
+      3.8,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794612741.899239,
+   "start_location": "5790939949086346",
+   "scanned": 971,
+   "finds": 0,
+   "errors": 1,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.984,
+   "error_kinds": {
+    "cut off mid-download": 1
+   },
+   "finished_at": 1794614551.4694943,
+   "end_location": "5790939949087318",
+   "frames_per_hour": 1932,
+   "concurrency": {
+    "final": 7,
+    "max_used": 8,
+    "baseline_latency_s": 16.31,
+    "changes": 6,
+    "latency_median_s": 13.69,
+    "latency_p90_s": 17.41,
+    "by_level": {
+     "3": [
+      8,
+      4.39
+     ],
+     "4": [
+      12,
+      6.05
+     ],
+     "5": [
+      64,
+      9.26
+     ],
+     "6": [
+      28,
+      11.47
+     ],
+     "7": [
+      48,
+      17.64
+     ],
+     "8": [
+      784,
+      13.87
+     ]
+    },
+    "in_flight": 7.53,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.2,
+      4
+     ],
+     [
+      0.6,
+      5
+     ],
+     [
+      2.7,
+      6
+     ],
+     [
+      3.7,
+      7
+     ],
+     [
+      5.9,
+      8
+     ],
+     [
+      30.0,
+      7
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794614559.6901927,
+   "start_location": "281591910826213",
+   "scanned": 957,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.587,
+   "finished_at": 1794616366.0626252,
+   "end_location": "281591910827170",
+   "frames_per_hour": 1907,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.82,
+    "changes": 7,
+    "latency_median_s": 14.46,
+    "latency_p90_s": 16.95,
+    "by_level": {
+     "3": [
+      8,
+      7.23
+     ],
+     "4": [
+      12,
+      9.4
+     ],
+     "5": [
+      12,
+      10.43
+     ],
+     "6": [
+      8,
+      8.33
+     ],
+     "7": [
+      16,
+      10.4
+     ],
+     "8": [
+      868,
+      14.68
+     ]
+    },
+    "in_flight": 7.67,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      1.0,
+      5
+     ],
+     [
+      1.5,
+      6
+     ],
+     [
+      1.8,
+      7
+     ],
+     [
+      2.1,
+      8
+     ],
+     [
+      28.1,
+      7
+     ],
+     [
+      28.6,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794616374.3055081,
+   "start_location": "8343062468965577",
+   "scanned": 1002,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.79,
+   "finished_at": 1794618188.6040049,
+   "end_location": "8343062468966579",
+   "frames_per_hour": 1988,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 12.76,
+    "changes": 7,
+    "latency_median_s": 13.45,
+    "latency_p90_s": 17.05,
+    "by_level": {
+     "3": [
+      8,
+      9.51
+     ],
+     "4": [
+      8,
+      10.48
+     ],
+     "5": [
+      8,
+      11.08
+     ],
+     "6": [
+      8,
+      10.96
+     ],
+     "7": [
+      16,
+      13.45
+     ],
+     "8": [
+      921,
+      13.6
+     ]
+    },
+    "in_flight": 7.55,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.5,
+      4
+     ],
+     [
+      1.0,
+      5
+     ],
+     [
+      1.4,
+      6
+     ],
+     [
+      1.8,
+      7
+     ],
+     [
+      2.2,
+      8
+     ],
+     [
+      16.0,
+      7
+     ],
+     [
+      16.5,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794618197.1039484,
+   "start_location": "5988573029476515",
+   "scanned": 1091,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.143,
+   "new_finds": [
+    {
+     "location": "5988573029477302",
+     "sigma": 4.143,
+     "tier": "anomaly",
+     "reason": "colours",
+     "description": "Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the bottom-right, roughly 48 px across (4.1\u03c3)."
+    }
+   ],
+   "finished_at": 1794620007.216988,
+   "end_location": "5988573029477606",
+   "frames_per_hour": 2170,
+   "concurrency": {
+    "final": 7,
+    "max_used": 8,
+    "baseline_latency_s": 7.54,
+    "changes": 10,
+    "latency_median_s": 11.82,
+    "latency_p90_s": 14.95,
+    "by_level": {
+     "3": [
+      8,
+      7.94
+     ],
+     "4": [
+      8,
+      9.64
+     ],
+     "5": [
+      40,
+      8.66
+     ],
+     "6": [
+      32,
+      11.28
+     ],
+     "7": [
+      25,
+      11.11
+     ],
+     "8": [
+      932,
+      12.07
+     ]
+    },
+    "in_flight": 7.14,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.9,
+      5
+     ],
+     [
+      1.2,
+      6
+     ],
+     [
+      1.6,
+      7
+     ],
+     [
+      1.9,
+      8
+     ],
+     [
+      27.3,
+      7
+     ],
+     [
+      27.6,
+      6
+     ],
+     [
+      28.2,
+      5
+     ],
+     [
+      29.2,
+      6
+     ],
+     [
+      29.8,
+      7
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794620015.5434506,
+   "start_location": "947738392517965",
+   "scanned": 1013,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.033,
+   "finished_at": 1794621821.714078,
+   "end_location": "947738392518978",
+   "frames_per_hour": 2019,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 12.25,
+    "changes": 5,
+    "latency_median_s": 12.38,
+    "latency_p90_s": 17.21,
+    "by_level": {
+     "3": [
+      8,
+      9.0
+     ],
+     "4": [
+      8,
+      8.66
+     ],
+     "5": [
+      24,
+      13.15
+     ],
+     "6": [
+      8,
+      9.64
+     ],
+     "7": [
+      8,
+      9.96
+     ],
+     "8": [
+      938,
+      12.52
+     ]
+    },
+    "in_flight": 7.1,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.5,
+      4
+     ],
+     [
+      0.9,
+      5
+     ],
+     [
+      2.0,
+      6
+     ],
+     [
+      2.4,
+      7
+     ],
+     [
+      2.7,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794621829.7548761,
+   "start_location": "6156618423614563",
+   "scanned": 1093,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.904,
+   "finished_at": 1794623638.2843387,
+   "end_location": "6156618423615656",
+   "frames_per_hour": 2176,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 5.5,
+    "changes": 5,
+    "latency_median_s": 12.17,
+    "latency_p90_s": 15.52,
+    "by_level": {
+     "3": [
+      8,
+      6.2
+     ],
+     "4": [
+      8,
+      6.36
+     ],
+     "5": [
+      8,
+      7.84
+     ],
+     "6": [
+      8,
+      7.51
+     ],
+     "7": [
+      8,
+      6.56
+     ],
+     "8": [
+      1033,
+      12.37
+     ]
+    },
+    "in_flight": 7.36,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.6,
+      5
+     ],
+     [
+      0.9,
+      6
+     ],
+     [
+      1.1,
+      7
+     ],
+     [
+      1.5,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794623646.7712514,
+   "start_location": "3288021946973804",
+   "scanned": 1021,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.962,
+   "finished_at": 1794625460.995951,
+   "end_location": "3288021946974825",
+   "frames_per_hour": 2026,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 15.75,
+    "changes": 7,
+    "latency_median_s": 13.56,
+    "latency_p90_s": 16.49,
+    "by_level": {
+     "3": [
+      8,
+      3.99
+     ],
+     "4": [
+      32,
+      6.03
+     ],
+     "5": [
+      40,
+      8.24
+     ],
+     "6": [
+      36,
+      11.44
+     ],
+     "7": [
+      56,
+      10.89
+     ],
+     "8": [
+      816,
+      14.15
+     ]
+    },
+    "in_flight": 7.4,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.2,
+      4
+     ],
+     [
+      1.1,
+      5
+     ],
+     [
+      2.3,
+      6
+     ],
+     [
+      3.5,
+      7
+     ],
+     [
+      3.8,
+      8
+     ],
+     [
+      4.9,
+      7
+     ],
+     [
+      6.5,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794625469.1759691,
+   "start_location": "3817321518934092",
+   "scanned": 849,
+   "finds": 2,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.772,
+   "new_finds": [
+    {
+     "location": "3817321518934320",
+     "sigma": 4.143,
+     "tier": "anomaly",
+     "reason": "colours",
+     "description": "Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the centre, roughly 40 px across (4.1\u03c3)."
+    },
+    {
+     "location": "3817321518934474",
+     "sigma": 4.772,
+     "tier": "anomaly",
+     "reason": "marks",
+     "description": "Statistically unusual static, not a picture: a thin stroke whose colour hardly changes along it, at least 16 px long, around the right side (4.8\u03c3). Also a faint redder line at 60\u00b0 through the top-left (3.6\u03c3)."
+    }
+   ],
+   "finished_at": 1794627276.2533786,
+   "end_location": "3817321518934941",
+   "frames_per_hour": 1691,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.61,
+    "changes": 5,
+    "latency_median_s": 15.26,
+    "latency_p90_s": 20.08,
+    "by_level": {
+     "3": [
+      8,
+      13.17
+     ],
+     "4": [
+      20,
+      15.09
+     ],
+     "5": [
+      8,
+      13.12
+     ],
+     "6": [
+      8,
+      16.41
+     ],
+     "7": [
+      8,
+      14.26
+     ],
+     "8": [
+      779,
+      15.32
+     ]
+    },
+    "in_flight": 7.56,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.6,
+      4
+     ],
+     [
+      2.3,
+      5
+     ],
+     [
+      2.7,
+      6
+     ],
+     [
+      3.3,
+      7
+     ],
+     [
+      3.8,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794627284.3946679,
+   "start_location": "604723313113958",
+   "scanned": 949,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.996,
+   "finished_at": 1794629092.0563843,
+   "end_location": "604723313114907",
+   "frames_per_hour": 1890,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 12.27,
+    "changes": 5,
+    "latency_median_s": 14.14,
+    "latency_p90_s": 18.29,
+    "by_level": {
+     "3": [
+      8,
+      7.42
+     ],
+     "4": [
+      28,
+      11.4
+     ],
+     "5": [
+      8,
+      10.42
+     ],
+     "6": [
+      12,
+      12.51
+     ],
+     "7": [
+      8,
+      12.47
+     ],
+     "8": [
+      865,
+      14.3
+     ]
+    },
+    "in_flight": 7.63,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      1.8,
+      5
+     ],
+     [
+      2.3,
+      6
+     ],
+     [
+      2.9,
+      7
+     ],
+     [
+      3.3,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794629116.1312225,
+   "start_location": "4395435920537899",
+   "scanned": 911,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.39,
+   "finished_at": 1794630926.8679829,
+   "end_location": "4395435920538810",
+   "frames_per_hour": 1811,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 16.2,
+    "changes": 5,
+    "latency_median_s": 14.83,
+    "latency_p90_s": 18.59,
+    "by_level": {
+     "3": [
+      8,
+      7.49
+     ],
+     "4": [
+      8,
+      8.52
+     ],
+     "5": [
+      8,
+      10.18
+     ],
+     "6": [
+      52,
+      13.39
+     ],
+     "7": [
+      8,
+      13.6
+     ],
+     "8": [
+      807,
+      15.03
+     ]
+    },
+    "in_flight": 7.66,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.8,
+      5
+     ],
+     [
+      1.2,
+      6
+     ],
+     [
+      3.3,
+      7
+     ],
+     [
+      3.7,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794630937.8220937,
+   "start_location": "6355447080018716",
+   "scanned": 918,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.45,
+   "new_finds": [
+    {
+     "location": "6355447080019519",
+     "sigma": 4.45,
+     "tier": "anomaly",
+     "reason": "marks",
+     "description": "Statistically unusual static, not a picture: a small mark about 6 px across whose colour hardly changes, around the bottom-left (4.5\u03c3)."
+    }
+   ],
+   "finished_at": 1794632748.325551,
+   "end_location": "6355447080019634",
+   "frames_per_hour": 1825,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.58,
+    "changes": 5,
+    "latency_median_s": 14.44,
+    "latency_p90_s": 20.41,
+    "by_level": {
+     "3": [
+      8,
+      7.16
+     ],
+     "4": [
+      8,
+      9.52
+     ],
+     "5": [
+      8,
+      9.33
+     ],
+     "6": [
+      8,
+      9.49
+     ],
+     "7": [
+      44,
+      13.5
+     ],
+     "8": [
+      823,
+      14.61
+     ]
+    },
+    "in_flight": 7.76,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.8,
+      5
+     ],
+     [
+      1.1,
+      6
+     ],
+     [
+      1.4,
+      7
+     ],
+     [
+      3.0,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794632759.0271952,
+   "start_location": "2995025133475729",
+   "scanned": 1007,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.867,
+   "finished_at": 1794634570.4935062,
+   "end_location": "2995025133476736",
+   "frames_per_hour": 2001,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.14,
+    "changes": 7,
+    "latency_median_s": 13.56,
+    "latency_p90_s": 16.02,
+    "by_level": {
+     "3": [
+      8,
+      8.56
+     ],
+     "4": [
+      20,
+      11.2
+     ],
+     "5": [
+      12,
+      11.89
+     ],
+     "6": [
+      8,
+      11.47
+     ],
+     "7": [
+      24,
+      13.4
+     ],
+     "8": [
+      902,
+      13.67
+     ]
+    },
+    "in_flight": 7.62,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      1.5,
+      5
+     ],
+     [
+      2.1,
+      6
+     ],
+     [
+      2.5,
+      7
+     ],
+     [
+      3.2,
+      8
+     ],
+     [
+      24.6,
+      7
+     ],
+     [
+      25.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794634581.5508738,
+   "start_location": "3383141636381572",
+   "scanned": 1002,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.969,
+   "finished_at": 1794636394.2901378,
+   "end_location": "3383141636382574",
+   "frames_per_hour": 1990,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 16.32,
+    "changes": 5,
+    "latency_median_s": 13.65,
+    "latency_p90_s": 16.88,
+    "by_level": {
+     "3": [
+      8,
+      7.92
+     ],
+     "4": [
+      8,
+      8.71
+     ],
+     "5": [
+      8,
+      8.97
+     ],
+     "6": [
+      8,
+      10.56
+     ],
+     "7": [
+      40,
+      15.97
+     ],
+     "8": [
+      910,
+      13.72
+     ]
+    },
+    "in_flight": 7.74,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.8,
+      5
+     ],
+     [
+      1.1,
+      6
+     ],
+     [
+      1.5,
+      7
+     ],
+     [
+      3.2,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794636405.568332,
+   "start_location": "656912685378111",
+   "scanned": 908,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.218,
+   "new_finds": [
+    {
+     "location": "656912685378552",
+     "sigma": 4.218,
+     "tier": "anomaly",
+     "reason": "lines",
+     "description": "Statistically unusual static, not a picture: a darker vertical band near x \u2248 182 px (4.2\u03c3)."
+    }
+   ],
+   "finished_at": 1794638216.3851373,
+   "end_location": "656912685379019",
+   "frames_per_hour": 1805,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 14.79,
+    "changes": 5,
+    "latency_median_s": 14.86,
+    "latency_p90_s": 18.58,
+    "by_level": {
+     "3": [
+      8,
+      9.92
+     ],
+     "4": [
+      16,
+      10.65
+     ],
+     "5": [
+      8,
+      9.66
+     ],
+     "6": [
+      12,
+      13.3
+     ],
+     "7": [
+      12,
+      14.11
+     ],
+     "8": [
+      833,
+      15.04
+     ]
+    },
+    "in_flight": 7.65,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.6,
+      4
+     ],
+     [
+      1.6,
+      5
+     ],
+     [
+      2.0,
+      6
+     ],
+     [
+      2.6,
+      7
+     ],
+     [
+      3.1,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794638227.7338972,
+   "start_location": "931869789954812",
+   "scanned": 1025,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.837,
+   "finished_at": 1794640037.2550812,
+   "end_location": "931869789955837",
+   "frames_per_hour": 2039,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.07,
+    "changes": 5,
+    "latency_median_s": 13.45,
+    "latency_p90_s": 15.64,
+    "by_level": {
+     "3": [
+      8,
+      7.97
+     ],
+     "4": [
+      8,
+      9.61
+     ],
+     "5": [
+      8,
+      10.72
+     ],
+     "6": [
+      24,
+      13.0
+     ],
+     "7": [
+      20,
+      13.92
+     ],
+     "8": [
+      937,
+      13.52
+     ]
+    },
+    "in_flight": 7.72,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.9,
+      5
+     ],
+     [
+      1.3,
+      6
+     ],
+     [
+      2.3,
+      7
+     ],
+     [
+      3.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794640047.8478992,
+   "start_location": "8237016615953583",
+   "scanned": 1023,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.057,
+   "finished_at": 1794641860.116442,
+   "end_location": "8237016615954606",
+   "frames_per_hour": 2032,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.81,
+    "changes": 5,
+    "latency_median_s": 13.61,
+    "latency_p90_s": 15.73,
+    "by_level": {
+     "3": [
+      8,
+      10.72
+     ],
+     "4": [
+      8,
+      9.84
+     ],
+     "5": [
+      8,
+      10.73
+     ],
+     "6": [
+      8,
+      11.76
+     ],
+     "7": [
+      8,
+      12.35
+     ],
+     "8": [
+      964,
+      13.67
+     ]
+    },
+    "in_flight": 7.69,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.5,
+      4
+     ],
+     [
+      1.0,
+      5
+     ],
+     [
+      1.4,
+      6
+     ],
+     [
+      1.8,
+      7
+     ],
+     [
+      2.2,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794641871.2434547,
+   "start_location": "926524002516891",
+   "scanned": 1041,
+   "finds": 3,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.573,
+   "new_finds": [
+    {
+     "location": "926524002516980",
+     "sigma": 4.515,
+     "tier": "anomaly",
+     "reason": "lines",
+     "description": "Statistically unusual static, not a picture: a brighter vertical band near x \u2248 162 px (4.5\u03c3)."
+    },
+    {
+     "location": "926524002517814",
+     "sigma": 4.573,
+     "tier": "anomaly",
+     "reason": "colours",
+     "description": "Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the right side, roughly 32 px across (4.6\u03c3)."
+    }
+   ],
+   "finished_at": 1794643683.7295425,
+   "end_location": "926524002517932",
+   "frames_per_hour": 2068,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.35,
+    "changes": 5,
+    "latency_median_s": 13.2,
+    "latency_p90_s": 15.61,
+    "by_level": {
+     "3": [
+      8,
+      8.21
+     ],
+     "4": [
+      8,
+      8.52
+     ],
+     "5": [
+      8,
+      10.23
+     ],
+     "6": [
+      8,
+      11.65
+     ],
+     "7": [
+      24,
+      14.51
+     ],
+     "8": [
+      968,
+      13.25
+     ]
+    },
+    "in_flight": 7.75,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.8,
+      5
+     ],
+     [
+      1.2,
+      6
+     ],
+     [
+      1.6,
+      7
+     ],
+     [
+      2.6,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794643694.8453379,
+   "start_location": "6535570388510046",
+   "scanned": 1008,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.615,
+   "new_finds": [
+    {
+     "location": "6535570388510608",
+     "sigma": 4.615,
+     "tier": "anomaly",
+     "reason": "blob",
+     "description": "Statistically unusual static, not a picture: a yellower spot around the left side, roughly 56 px across (4.6\u03c3). Also a soft, round patch around the left side, roughly 40 px across (3.1\u03c3)."
+    }
+   ],
+   "finished_at": 1794645504.4829903,
+   "end_location": "6535570388511054",
+   "frames_per_hour": 2005,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 12.37,
+    "changes": 7,
+    "latency_median_s": 13.41,
+    "latency_p90_s": 17.09,
+    "by_level": {
+     "3": [
+      8,
+      8.59
+     ],
+     "4": [
+      8,
+      9.57
+     ],
+     "5": [
+      8,
+      11.37
+     ],
+     "6": [
+      8,
+      10.87
+     ],
+     "7": [
+      16,
+      11.98
+     ],
+     "8": [
+      928,
+      13.74
+     ]
+    },
+    "in_flight": 7.73,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.9,
+      5
+     ],
+     [
+      1.3,
+      6
+     ],
+     [
+      1.7,
+      7
+     ],
+     [
+      2.1,
+      8
+     ],
+     [
+      22.5,
+      7
+     ],
+     [
+      22.9,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794645515.1762745,
+   "start_location": "3162920715114443",
+   "scanned": 901,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.08,
+   "finished_at": 1794647340.0885053,
+   "end_location": "3162920715115344",
+   "frames_per_hour": 1777,
+   "concurrency": {
+    "final": 7,
+    "max_used": 8,
+    "baseline_latency_s": 13.69,
+    "changes": 8,
+    "latency_median_s": 15.04,
+    "latency_p90_s": 19.2,
+    "by_level": {
+     "3": [
+      8,
+      6.79
+     ],
+     "4": [
+      8,
+      8.29
+     ],
+     "5": [
+      8,
+      8.6
+     ],
+     "6": [
+      28,
+      10.36
+     ],
+     "7": [
+      40,
+      13.12
+     ],
+     "8": [
+      776,
+      15.51
+     ]
+    },
+    "in_flight": 7.71,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      1.0,
+      6
+     ],
+     [
+      1.7,
+      7
+     ],
+     [
+      2.3,
+      6
+     ],
+     [
+      2.6,
+      7
+     ],
+     [
+      3.8,
+      8
+     ],
+     [
+      30.4,
+      7
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794647380.7337658,
+   "start_location": "7350293770871060",
+   "scanned": 1017,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.549,
+   "finished_at": 1794649197.9494457,
+   "end_location": "7350293770872077",
+   "frames_per_hour": 2015,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 18.62,
+    "changes": 5,
+    "latency_median_s": 13.77,
+    "latency_p90_s": 16.83,
+    "by_level": {
+     "3": [
+      8,
+      4.8
+     ],
+     "4": [
+      12,
+      6.58
+     ],
+     "5": [
+      32,
+      8.59
+     ],
+     "6": [
+      36,
+      10.4
+     ],
+     "7": [
+      20,
+      11.47
+     ],
+     "8": [
+      889,
+      14.03
+     ]
+    },
+    "in_flight": 7.59,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      1.7,
+      6
+     ],
+     [
+      2.8,
+      7
+     ],
+     [
+      3.5,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794649208.288096,
+   "start_location": "1231103306740911",
+   "scanned": 868,
+   "finds": 1,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.143,
+   "new_finds": [
+    {
+     "location": "1231103306741168",
+     "sigma": 4.143,
+     "tier": "anomaly",
+     "reason": "colours",
+     "description": "Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the bottom-right, roughly 24 px across (4.1\u03c3)."
+    }
+   ],
+   "finished_at": 1794651022.7963083,
+   "end_location": "1231103306741779",
+   "frames_per_hour": 1722,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 16.87,
+    "changes": 5,
+    "latency_median_s": 15.36,
+    "latency_p90_s": 20.46,
+    "by_level": {
+     "3": [
+      8,
+      7.08
+     ],
+     "4": [
+      8,
+      8.59
+     ],
+     "5": [
+      8,
+      9.35
+     ],
+     "6": [
+      24,
+      11.38
+     ],
+     "7": [
+      24,
+      13.09
+     ],
+     "8": [
+      777,
+      15.73
+     ]
+    },
+    "in_flight": 7.74,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      0.8,
+      5
+     ],
+     [
+      1.1,
+      6
+     ],
+     [
+      2.1,
+      7
+     ],
+     [
+      2.9,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794651032.7164485,
+   "start_location": "5751112340158244",
+   "scanned": 981,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.718,
+   "finished_at": 1794652845.506796,
+   "end_location": "5751112340159225",
+   "frames_per_hour": 1948,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.63,
+    "changes": 5,
+    "latency_median_s": 13.66,
+    "latency_p90_s": 16.89,
+    "by_level": {
+     "3": [
+      8,
+      5.63
+     ],
+     "4": [
+      20,
+      8.11
+     ],
+     "5": [
+      36,
+      9.99
+     ],
+     "6": [
+      12,
+      10.74
+     ],
+     "7": [
+      60,
+      15.83
+     ],
+     "8": [
+      825,
+      13.88
+     ]
+    },
+    "in_flight": 7.57,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      1.1,
+      5
+     ],
+     [
+      2.4,
+      6
+     ],
+     [
+      2.9,
+      7
+     ],
+     [
+      5.3,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794652855.131953,
+   "start_location": "5329722518393753",
+   "scanned": 968,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.641,
+   "finished_at": 1794654671.2217138,
+   "end_location": "5329722518394721",
+   "frames_per_hour": 1919,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 16.78,
+    "changes": 5,
+    "latency_median_s": 14.39,
+    "latency_p90_s": 17.46,
+    "by_level": {
+     "3": [
+      8,
+      6.78
+     ],
+     "4": [
+      8,
+      6.96
+     ],
+     "5": [
+      8,
+      7.54
+     ],
+     "6": [
+      12,
+      9.82
+     ],
+     "7": [
+      28,
+      12.36
+     ],
+     "8": [
+      884,
+      14.56
+     ]
+    },
+    "in_flight": 7.78,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      0.7,
+      5
+     ],
+     [
+      0.9,
+      6
+     ],
+     [
+      1.4,
+      7
+     ],
+     [
+      2.4,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794654680.9242525,
+   "start_location": "1019788131156617",
+   "scanned": 863,
+   "finds": 2,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 4.203,
+   "new_finds": [
+    {
+     "location": "1019788131156977",
+     "sigma": 4.203,
+     "tier": "anomaly",
+     "reason": "angled",
+     "description": "Statistically unusual static, not a picture: a faint bluer line at 120\u00b0 through the centre (4.2\u03c3)."
+    }
+   ],
+   "finished_at": 1794656495.2484174,
+   "end_location": "1019788131157480",
+   "frames_per_hour": 1712,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 18.39,
+    "changes": 5,
+    "latency_median_s": 15.69,
+    "latency_p90_s": 19.03,
+    "by_level": {
+     "3": [
+      8,
+      9.1
+     ],
+     "4": [
+      8,
+      11.51
+     ],
+     "5": [
+      20,
+      13.55
+     ],
+     "6": [
+      12,
+      14.4
+     ],
+     "7": [
+      20,
+      16.36
+     ],
+     "8": [
+      777,
+      15.77
+     ]
+    },
+    "in_flight": 7.63,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.5,
+      4
+     ],
+     [
+      1.1,
+      5
+     ],
+     [
+      2.0,
+      6
+     ],
+     [
+      2.7,
+      7
+     ],
+     [
+      3.8,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "started_at": 1794656505.2658608,
+   "start_location": "7534032592959929",
+   "scanned": 712,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.964,
+   "finished_at": 1794658320.4733877,
+   "end_location": "7534032592960641",
+   "frames_per_hour": 1412,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 17.62,
+    "changes": 7,
+    "latency_median_s": 18.88,
+    "latency_p90_s": 23.22,
+    "by_level": {
+     "3": [
+      8,
+      8.51
+     ],
+     "4": [
+      16,
+      11.82
+     ],
+     "5": [
+      44,
+      16.96
+     ],
+     "6": [
+      32,
+      17.23
+     ],
+     "7": [
+      8,
+      13.89
+     ],
+     "8": [
+      575,
+      19.28
+     ]
+    },
+    "in_flight": 7.36,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      1.4,
+      5
+     ],
+     [
+      1.8,
+      6
+     ],
+     [
+      3.4,
+      5
+     ],
+     [
+      5.7,
+      6
+     ],
+     [
+      6.2,
+      7
+     ],
+     [
+      6.7,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794658330.3193276,
+   "start_location": "6218407908187383",
+   "scanned": 668,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.823,
+   "finished_at": 1794660140.8072984,
+   "end_location": "6218407908188051",
+   "frames_per_hour": 1328,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 21.93,
+    "changes": 7,
+    "latency_median_s": 18.11,
+    "latency_p90_s": 28.52,
+    "by_level": {
+     "3": [
+      8,
+      6.24
+     ],
+     "4": [
+      64,
+      12.65
+     ],
+     "5": [
+      44,
+      15.9
+     ],
+     "6": [
+      8,
+      14.54
+     ],
+     "7": [
+      16,
+      17.29
+     ],
+     "8": [
+      501,
+      19.92
+     ]
+    },
+    "in_flight": 7.12,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.3,
+      4
+     ],
+     [
+      2.2,
+      5
+     ],
+     [
+      2.8,
+      4
+     ],
+     [
+      4.5,
+      5
+     ],
+     [
+      6.5,
+      6
+     ],
+     [
+      7.0,
+      7
+     ],
+     [
+      7.9,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794660150.5528963,
+   "start_location": "1411602353457175",
+   "scanned": 620,
+   "finds": 0,
+   "errors": 0,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.637,
+   "finished_at": 1794661967.2825868,
+   "end_location": "1411602353457795",
+   "frames_per_hour": 1229,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 18.92,
+    "changes": 5,
+    "latency_median_s": 22.01,
+    "latency_p90_s": 27.38,
+    "by_level": {
+     "3": [
+      8,
+      15.09
+     ],
+     "4": [
+      8,
+      16.72
+     ],
+     "5": [
+      8,
+      16.58
+     ],
+     "6": [
+      8,
+      15.62
+     ],
+     "7": [
+      8,
+      19.51
+     ],
+     "8": [
+      560,
+      22.24
+     ]
+    },
+    "in_flight": 7.63,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.8,
+      4
+     ],
+     [
+      1.6,
+      5
+     ],
+     [
+      2.2,
+      6
+     ],
+     [
+      2.7,
+      7
+     ],
+     [
+      3.3,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  },
+  {
+   "started_at": 1794661976.9132664,
+   "start_location": "3172061864921930",
+   "scanned": 593,
+   "finds": 0,
+   "errors": 1,
+   "workers": 3,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "max_sigma": 3.747,
+   "error_kinds": {
+    "HTTP 500": 1
+   },
+   "finished_at": 1794663790.3007739,
+   "end_location": "3172061864922524",
+   "frames_per_hour": 1177,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 19.26,
+    "changes": 7,
+    "latency_median_s": 22.29,
+    "latency_p90_s": 28.76,
+    "by_level": {
+     "3": [
+      8,
+      7.87
+     ],
+     "4": [
+      20,
+      11.11
+     ],
+     "5": [
+      36,
+      14.37
+     ],
+     "6": [
+      8,
+      14.9
+     ],
+     "7": [
+      79,
+      22.21
+     ],
+     "8": [
+      409,
+      23.61
+     ]
+    },
+    "in_flight": 7.36,
+    "history": [
+     [
+      -0.0,
+      3
+     ],
+     [
+      0.4,
+      4
+     ],
+     [
+      1.5,
+      5
+     ],
+     [
+      3.4,
+      6
+     ],
+     [
+      4.0,
+      7
+     ],
+     [
+      8.2,
+      8
+     ],
+     [
+      13.0,
+      7
+     ],
+     [
+      13.7,
+      8
+     ]
+    ]
+   },
+   "new_finds": []
+  }
+ ],
+ "best": {
+  "location": "4982558751417038",
+  "sigma": 5.521
+ },
+ "updated_at": 1794663790.3009307,
+ "last_run": {
+  "started_at": 1794661976.9132664,
+  "start_location": "3172061864921930",
+  "scanned": 593,
+  "finds": 0,
+  "errors": 1,
+  "workers": 3,
+  "max_workers": 8,
+  "max_rate": 40.0,
+  "max_sigma": 3.747,
+  "error_kinds": {
+   "HTTP 500": 1
+  },
+  "finished_at": 1794663790.3007739,
+  "end_location": "3172061864922524",
+  "frames_per_hour": 1177,
+  "concurrency": {
+   "final": 8,
+   "max_used": 8,
+   "baseline_latency_s": 19.26,
+   "changes": 7,
+   "latency_median_s": 22.29,
+   "latency_p90_s": 28.76,
+   "by_level": {
+    "3": [
+     8,
+     7.87
+    ],
+    "4": [
+     20,
+     11.11
+    ],
+    "5": [
+     36,
+     14.37
+    ],
+    "6": [
+     8,
+     14.9
+    ],
+    "7": [
+     79,
+     22.21
+    ],
+    "8": [
+     409,
+     23.61
+    ]
+   },
+   "in_flight": 7.36,
+   "history": [
+    [
+     -0.0,
+     3
+    ],
+    [
+     0.4,
+     4
+    ],
+    [
+     1.5,
+     5
+    ],
+    [
+     3.4,
+     6
+    ],
+    [
+     4.0,
+     7
+    ],
+    [
+     8.2,
+     8
+    ],
+    [
+     13.0,
+     7
+    ],
+    [
+     13.7,
+     8
+    ]
+   ]
+  },
+  "new_finds": []
+ },
+ "finds_total": 154,
+ "test_hist": {
+  "lo": -5.0,
+  "step": 0.25,
+  "counts": {
+   "shape": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    2240,
+    1494,
+    3231,
+    5549,
+    8440,
+    11907,
+    16576,
+    21176,
+    25841,
+    28556,
+    30146,
+    30564,
+    29045,
+    25643,
+    21095,
+    16494,
+    11843,
+    8539,
+    5456,
+    3420,
+    1838,
+    987,
+    510,
+    239,
+    83,
+    60,
+    16,
+    4,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "blob": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    2073,
+    1803,
+    3250,
+    5580,
+    8192,
+    11856,
+    16500,
+    21037,
+    25288,
+    28825,
+    30936,
+    30788,
+    28630,
+    25288,
+    21280,
+    16451,
+    12166,
+    8340,
+    5584,
+    3345,
+    1864,
+    1013,
+    491,
+    263,
+    85,
+    42,
+    15,
+    6,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "lines": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    171,
+    236,
+    529,
+    1029,
+    1872,
+    3340,
+    5440,
+    8299,
+    11924,
+    16403,
+    21083,
+    25552,
+    28561,
+    30727,
+    30628,
+    29167,
+    25892,
+    21144,
+    16249,
+    12284,
+    8165,
+    5360,
+    3128,
+    1851,
+    1001,
+    520,
+    259,
+    109,
+    44,
+    17,
+    8,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "texture": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    9,
+    190,
+    226,
+    574,
+    1010,
+    1777,
+    3355,
+    5463,
+    8237,
+    12325,
+    16402,
+    20996,
+    25509,
+    28969,
+    30792,
+    30789,
+    28886,
+    25525,
+    20907,
+    16214,
+    12142,
+    8258,
+    5298,
+    3415,
+    1878,
+    964,
+    507,
+    224,
+    96,
+    41,
+    13,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "palette": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    197,
+    216,
+    541,
+    994,
+    1851,
+    3257,
+    5330,
+    8401,
+    11773,
+    16634,
+    21162,
+    25624,
+    28734,
+    30922,
+    30802,
+    28766,
+    25524,
+    21335,
+    16165,
+    11866,
+    8444,
+    5491,
+    3263,
+    1779,
+    960,
+    521,
+    235,
+    114,
+    55,
+    24,
+    12,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "tone": [
+    0,
+    0,
+    1,
+    8,
+    6,
+    17,
+    43,
+    96,
+    225,
+    486,
+    1010,
+    1778,
+    3271,
+    5483,
+    8515,
+    12310,
+    16225,
+    20824,
+    107168,
+    162,
+    169,
+    9065,
+    28593,
+    25078,
+    21137,
+    16365,
+    12208,
+    8317,
+    5391,
+    3151,
+    1935,
+    954,
+    535,
+    264,
+    137,
+    31,
+    29,
+    4,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "contrast": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    263414,
+    0,
+    0,
+    0,
+    0,
+    14733,
+    12150,
+    8409,
+    5327,
+    3225,
+    1902,
+    923,
+    491,
+    275,
+    92,
+    29,
+    20,
+    1,
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "angled": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8,
+    178,
+    257,
+    548,
+    984,
+    1851,
+    3227,
+    5300,
+    8203,
+    12142,
+    16454,
+    20927,
+    25439,
+    29250,
+    30512,
+    30649,
+    28872,
+    24705,
+    21535,
+    16683,
+    12398,
+    8321,
+    5479,
+    3298,
+    1858,
+    1025,
+    496,
+    244,
+    77,
+    50,
+    15,
+    5,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "repetition": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    69270,
+    1735,
+    25479,
+    28533,
+    30875,
+    30435,
+    28990,
+    25187,
+    21042,
+    16630,
+    11954,
+    8074,
+    5599,
+    3331,
+    1899,
+    1033,
+    536,
+    241,
+    78,
+    43,
+    23,
+    5,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "symmetry": [
+    0,
+    0,
+    0,
+    0,
+    1,
+    5,
+    31,
+    151,
+    242,
+    459,
+    994,
+    1861,
+    3052,
+    5448,
+    8383,
+    12025,
+    16665,
+    20672,
+    25347,
+    28904,
+    30655,
+    30760,
+    28954,
+    25562,
+    20994,
+    16667,
+    12301,
+    8180,
+    5477,
+    3385,
+    1843,
+    993,
+    503,
+    268,
+    142,
+    51,
+    13,
+    2,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "spot": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    15,
+    158,
+    227,
+    489,
+    922,
+    1854,
+    3166,
+    5238,
+    8070,
+    11766,
+    16227,
+    20864,
+    24840,
+    28425,
+    30145,
+    29502,
+    28153,
+    24830,
+    20719,
+    16169,
+    11804,
+    8210,
+    5102,
+    3184,
+    1833,
+    986,
+    481,
+    227,
+    96,
+    43,
+    8,
+    5,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "curves": [
+    5,
+    0,
+    1,
+    5,
+    8,
+    27,
+    39,
+    98,
+    206,
+    463,
+    942,
+    1889,
+    3234,
+    5109,
+    8045,
+    11698,
+    15898,
+    20800,
+    24730,
+    28418,
+    29822,
+    29439,
+    28483,
+    24578,
+    21020,
+    16545,
+    11940,
+    8260,
+    5268,
+    3074,
+    1790,
+    1018,
+    471,
+    254,
+    88,
+    66,
+    23,
+    3,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "flat": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    126944,
+    0,
+    0,
+    24518,
+    30372,
+    28701,
+    24372,
+    20564,
+    15971,
+    11798,
+    8265,
+    5217,
+    3298,
+    1783,
+    1116,
+    389,
+    261,
+    119,
+    40,
+    23,
+    6,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "colours": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    39578,
+    0,
+    32309,
+    116,
+    22086,
+    27805,
+    29161,
+    34028,
+    26125,
+    28550,
+    19967,
+    11183,
+    12660,
+    6611,
+    6813,
+    3629,
+    813,
+    1540,
+    452,
+    174,
+    73,
+    58,
+    3,
+    18,
+    2,
+    5,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "spectrum": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    222612,
+    0,
+    0,
+    0,
+    11920,
+    20786,
+    16349,
+    11887,
+    8084,
+    5255,
+    3123,
+    1920,
+    999,
+    449,
+    222,
+    88,
+    45,
+    14,
+    4,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "face": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    23,
+    146,
+    185,
+    482,
+    972,
+    1777,
+    3205,
+    5217,
+    8008,
+    11721,
+    16307,
+    20412,
+    24771,
+    28360,
+    29747,
+    29952,
+    28126,
+    25148,
+    20685,
+    16315,
+    11739,
+    8225,
+    5248,
+    3131,
+    1806,
+    1069,
+    540,
+    258,
+    103,
+    50,
+    18,
+    7,
+    4,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "marks": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    18,
+    170,
+    195,
+    482,
+    963,
+    1595,
+    2777,
+    4759,
+    7057,
+    10039,
+    14311,
+    18196,
+    22007,
+    24697,
+    26802,
+    26756,
+    25217,
+    22154,
+    17861,
+    14264,
+    10920,
+    7354,
+    4580,
+    2737,
+    1625,
+    864,
+    397,
+    139,
+    105,
+    38,
+    23,
+    6,
+    7,
+    4,
+    2,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "combined": [
+    0,
+    0,
+    0,
+    1,
+    5,
+    13,
+    32,
+    92,
+    240,
+    532,
+    1077,
+    1914,
+    3393,
+    5263,
+    8344,
+    12286,
+    16570,
+    21046,
+    25259,
+    28296,
+    30553,
+    30664,
+    28922,
+    25436,
+    21272,
+    16559,
+    12219,
+    8485,
+    5393,
+    3285,
+    1835,
+    1035,
+    559,
+    231,
+    101,
+    49,
+    22,
+    5,
+    2,
+    1,
+    0,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "detector": "e05ce15fe031",
+  "since_log": true
+ },
+ "fingerprint": {
+  "n": 343145,
+  "sum": 4835356.880000108,
+  "sumsq": 68478121.1170011,
+  "min": {
+   "value": 9.59,
+   "location": "4704129513063274"
+  }
+ },
+ "hist_current": {
+  "detector": "e05ce15fe031",
+  "since": null,
+  "edges": [
+   -2,
+   -1,
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   8,
+   12,
+   16,
+   40
+  ],
+  "counts": [
+   0,
+   0,
+   32,
+   21015,
+   192946,
+   90190,
+   6663,
+   144,
+   3,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "log_calibration": "3adf78f11e93"
+}

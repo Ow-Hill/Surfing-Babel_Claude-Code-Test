@@ -1,0 +1,772 @@
+{
+  "threshold_sigma": 4.0,
+  "null": {
+    "frames": 500,
+    "max_sigma": 4.09,
+    "hist_edges": [
+      -2,
+      -1,
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      12,
+      16,
+      40
+    ],
+    "hist": [
+      0,
+      0,
+      0,
+      22,
+      327,
+      140,
+      10,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "mean_sigma": 1.79,
+    "false_positives": 1,
+    "worst_test": "spot"
+  },
+  "signals": [
+    {
+      "visibility": 1.22,
+      "visible": "invisible",
+      "signal": "large disc",
+      "strength": 0.02,
+      "min_sigma": 1.26,
+      "median_sigma": 1.53,
+      "detected": 0,
+      "trials": 8,
+      "reason": "repetition"
+    },
+    {
+      "visibility": 1.37,
+      "visible": "invisible",
+      "signal": "large disc",
+      "strength": 0.05,
+      "min_sigma": 18.37,
+      "median_sigma": 19.24,
+      "detected": 8,
+      "trials": 8,
+      "reason": "tone"
+    },
+    {
+      "visibility": 2.7,
+      "visible": "likely",
+      "signal": "large disc",
+      "strength": 0.1,
+      "min_sigma": 96.05,
+      "median_sigma": 97.47,
+      "detected": 8,
+      "trials": 8,
+      "reason": "tone"
+    },
+    {
+      "visibility": 99.0,
+      "visible": "likely",
+      "signal": "large disc",
+      "strength": 1.0,
+      "min_sigma": 60000.0,
+      "median_sigma": 60000.0,
+      "detected": 8,
+      "trials": 8,
+      "reason": "face"
+    },
+    {
+      "visibility": 1.19,
+      "visible": "invisible",
+      "signal": "landscape",
+      "strength": 0.02,
+      "min_sigma": 0.66,
+      "median_sigma": 1.51,
+      "detected": 0,
+      "trials": 8,
+      "reason": "spot"
+    },
+    {
+      "visibility": 1.3,
+      "visible": "invisible",
+      "signal": "landscape",
+      "strength": 0.05,
+      "min_sigma": 69.45,
+      "median_sigma": 70.15,
+      "detected": 8,
+      "trials": 8,
+      "reason": "tone"
+    },
+    {
+      "visibility": 1.9,
+      "visible": "faint",
+      "signal": "landscape",
+      "strength": 0.1,
+      "min_sigma": 83.32,
+      "median_sigma": 83.72,
+      "detected": 8,
+      "trials": 8,
+      "reason": "tone"
+    },
+    {
+      "visibility": 99.0,
+      "visible": "likely",
+      "signal": "landscape",
+      "strength": 1.0,
+      "min_sigma": 654.09,
+      "median_sigma": 654.09,
+      "detected": 8,
+      "trials": 8,
+      "reason": "spectrum"
+    },
+    {
+      "visibility": 1.23,
+      "visible": "invisible",
+      "signal": "word 'BABEL'",
+      "strength": 0.02,
+      "min_sigma": 0.82,
+      "median_sigma": 1.61,
+      "detected": 0,
+      "trials": 8,
+      "reason": "tone"
+    },
+    {
+      "visibility": 1.61,
+      "visible": "faint",
+      "signal": "word 'BABEL'",
+      "strength": 0.05,
+      "min_sigma": 83.52,
+      "median_sigma": 83.86,
+      "detected": 8,
+      "trials": 8,
+      "reason": "tone"
+    },
+    {
+      "visibility": 1.52,
+      "visible": "faint",
+      "signal": "word 'BABEL'",
+      "strength": 0.1,
+      "min_sigma": 81.46,
+      "median_sigma": 82.49,
+      "detected": 8,
+      "trials": 8,
+      "reason": "tone"
+    },
+    {
+      "visibility": 99.0,
+      "visible": "likely",
+      "signal": "word 'BABEL'",
+      "strength": 1.0,
+      "min_sigma": 60000.0,
+      "median_sigma": 60000.0,
+      "detected": 8,
+      "trials": 8,
+      "reason": "shape"
+    },
+    {
+      "visibility": 1.24,
+      "visible": "invisible",
+      "signal": "horizon line (2px)",
+      "strength": 0.1,
+      "min_sigma": 4.27,
+      "median_sigma": 6.34,
+      "detected": 8,
+      "trials": 8,
+      "reason": "lines"
+    },
+    {
+      "visibility": 1.42,
+      "visible": "faint",
+      "signal": "horizon line (2px)",
+      "strength": 0.25,
+      "min_sigma": 18.05,
+      "median_sigma": 19.73,
+      "detected": 8,
+      "trials": 8,
+      "reason": "lines"
+    },
+    {
+      "visibility": 3.82,
+      "visible": "likely",
+      "signal": "horizon line (2px)",
+      "strength": 0.5,
+      "min_sigma": 41.17,
+      "median_sigma": 42.36,
+      "detected": 8,
+      "trials": 8,
+      "reason": "lines"
+    },
+    {
+      "visibility": 15.97,
+      "visible": "likely",
+      "signal": "horizon line (2px)",
+      "strength": 1.0,
+      "min_sigma": 82.99,
+      "median_sigma": 83.17,
+      "detected": 8,
+      "trials": 8,
+      "reason": "lines"
+    },
+    {
+      "visibility": 1.11,
+      "visible": "invisible",
+      "signal": "small square (24px)",
+      "strength": 0.1,
+      "min_sigma": 2.44,
+      "median_sigma": 3.1,
+      "detected": 0,
+      "trials": 8,
+      "reason": "spot"
+    },
+    {
+      "visibility": 2.32,
+      "visible": "likely",
+      "signal": "small square (24px)",
+      "strength": 0.25,
+      "min_sigma": 14.37,
+      "median_sigma": 15.82,
+      "detected": 8,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 5.36,
+      "visible": "likely",
+      "signal": "small square (24px)",
+      "strength": 0.5,
+      "min_sigma": 37.31,
+      "median_sigma": 38.47,
+      "detected": 8,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 55.65,
+      "visible": "likely",
+      "signal": "small square (24px)",
+      "strength": 1.0,
+      "min_sigma": 311.78,
+      "median_sigma": 311.78,
+      "detected": 8,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 1.23,
+      "visible": "invisible",
+      "signal": "thin arc (3px)",
+      "strength": 0.2,
+      "min_sigma": 2.69,
+      "median_sigma": 4.06,
+      "detected": 5,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 1.42,
+      "visible": "faint",
+      "signal": "thin arc (3px)",
+      "strength": 0.3,
+      "min_sigma": 8.14,
+      "median_sigma": 8.66,
+      "detected": 8,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 2.16,
+      "visible": "likely",
+      "signal": "thin arc (3px)",
+      "strength": 0.5,
+      "min_sigma": 17.74,
+      "median_sigma": 19.0,
+      "detected": 8,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 1.43,
+      "visible": "faint",
+      "signal": "pen stroke (2px)",
+      "strength": 0.3,
+      "min_sigma": 3.57,
+      "median_sigma": 5.01,
+      "detected": 6,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 2.31,
+      "visible": "likely",
+      "signal": "pen stroke (2px)",
+      "strength": 0.5,
+      "min_sigma": 10.61,
+      "median_sigma": 11.46,
+      "detected": 8,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 4.34,
+      "visible": "likely",
+      "signal": "pen stroke (2px)",
+      "strength": 0.8,
+      "min_sigma": 28.16,
+      "median_sigma": 29.5,
+      "detected": 8,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 1.15,
+      "visible": "invisible",
+      "signal": "face-like spots",
+      "strength": 0.08,
+      "min_sigma": 3.14,
+      "median_sigma": 3.97,
+      "detected": 4,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 1.62,
+      "visible": "faint",
+      "signal": "face-like spots",
+      "strength": 0.15,
+      "min_sigma": 7.41,
+      "median_sigma": 8.31,
+      "detected": 8,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 3.18,
+      "visible": "likely",
+      "signal": "face-like spots",
+      "strength": 0.3,
+      "min_sigma": 19.48,
+      "median_sigma": 20.08,
+      "detected": 8,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 1.4,
+      "visible": "faint",
+      "signal": "few-colour patch (64px)",
+      "strength": 0.15,
+      "min_sigma": 7.83,
+      "median_sigma": 9.14,
+      "detected": 8,
+      "trials": 8,
+      "reason": "colours"
+    },
+    {
+      "visibility": 3.86,
+      "visible": "likely",
+      "signal": "few-colour patch (64px)",
+      "strength": 0.3,
+      "min_sigma": 15.9,
+      "median_sigma": 19.13,
+      "detected": 8,
+      "trials": 8,
+      "reason": "colours"
+    },
+    {
+      "visibility": 9.1,
+      "visible": "likely",
+      "signal": "few-colour patch (64px)",
+      "strength": 0.6,
+      "min_sigma": 36.46,
+      "median_sigma": 37.67,
+      "detected": 8,
+      "trials": 8,
+      "reason": "colours"
+    },
+    {
+      "visibility": 2.6,
+      "visible": "likely",
+      "signal": "photo-like (1/f)",
+      "strength": 0.05,
+      "min_sigma": 14.9,
+      "median_sigma": 16.72,
+      "detected": 8,
+      "trials": 8,
+      "reason": "spectrum"
+    },
+    {
+      "visibility": 3.87,
+      "visible": "likely",
+      "signal": "photo-like (1/f)",
+      "strength": 0.1,
+      "min_sigma": 38.72,
+      "median_sigma": 40.68,
+      "detected": 8,
+      "trials": 8,
+      "reason": "spectrum"
+    },
+    {
+      "visibility": 5.54,
+      "visible": "likely",
+      "signal": "photo-like (1/f)",
+      "strength": 0.2,
+      "min_sigma": 90.2,
+      "median_sigma": 94.97,
+      "detected": 8,
+      "trials": 8,
+      "reason": "spectrum"
+    },
+    {
+      "visibility": 2.96,
+      "visible": "likely",
+      "signal": "grey patch (64px)",
+      "strength": 0.25,
+      "min_sigma": 18.89,
+      "median_sigma": 20.25,
+      "detected": 8,
+      "trials": 8,
+      "reason": "colours"
+    },
+    {
+      "visibility": 6.04,
+      "visible": "likely",
+      "signal": "grey patch (64px)",
+      "strength": 0.5,
+      "min_sigma": 41.79,
+      "median_sigma": 43.7,
+      "detected": 8,
+      "trials": 8,
+      "reason": "colours"
+    },
+    {
+      "visibility": 99.0,
+      "visible": "likely",
+      "signal": "grey patch (64px)",
+      "strength": 1.0,
+      "min_sigma": 311.78,
+      "median_sigma": 311.78,
+      "detected": 8,
+      "trials": 8,
+      "reason": "marks"
+    },
+    {
+      "visibility": 1.22,
+      "visible": "invisible",
+      "signal": "diagonal line (2px, 30\u00b0)",
+      "strength": 0.25,
+      "min_sigma": 10.24,
+      "median_sigma": 11.1,
+      "detected": 8,
+      "trials": 8,
+      "reason": "angled"
+    },
+    {
+      "visibility": 2.11,
+      "visible": "likely",
+      "signal": "diagonal line (2px, 30\u00b0)",
+      "strength": 0.5,
+      "min_sigma": 23.61,
+      "median_sigma": 24.33,
+      "detected": 8,
+      "trials": 8,
+      "reason": "angled"
+    },
+    {
+      "visibility": 3.62,
+      "visible": "likely",
+      "signal": "diagonal line (2px, 30\u00b0)",
+      "strength": 1.0,
+      "min_sigma": 50.15,
+      "median_sigma": 51.88,
+      "detected": 8,
+      "trials": 8,
+      "reason": "angled"
+    },
+    {
+      "visibility": 1.42,
+      "visible": "faint",
+      "signal": "tiled static",
+      "strength": 0.1,
+      "min_sigma": 1.45,
+      "median_sigma": 3.01,
+      "detected": 0,
+      "trials": 8,
+      "reason": "repetition"
+    },
+    {
+      "visibility": 1.18,
+      "visible": "invisible",
+      "signal": "tiled static",
+      "strength": 0.2,
+      "min_sigma": 16.13,
+      "median_sigma": 18.0,
+      "detected": 8,
+      "trials": 8,
+      "reason": "repetition"
+    },
+    {
+      "visibility": 1.12,
+      "visible": "invisible",
+      "signal": "tiled static",
+      "strength": 0.4,
+      "min_sigma": 70.31,
+      "median_sigma": 71.75,
+      "detected": 8,
+      "trials": 8,
+      "reason": "repetition"
+    },
+    {
+      "visibility": 1.07,
+      "visible": "invisible",
+      "signal": "mirror-symmetric static",
+      "strength": 0.1,
+      "min_sigma": 1.5,
+      "median_sigma": 2.37,
+      "detected": 0,
+      "trials": 8,
+      "reason": "symmetry"
+    },
+    {
+      "visibility": 1.04,
+      "visible": "invisible",
+      "signal": "mirror-symmetric static",
+      "strength": 0.2,
+      "min_sigma": 13.0,
+      "median_sigma": 13.72,
+      "detected": 8,
+      "trials": 8,
+      "reason": "symmetry"
+    },
+    {
+      "visibility": 1.06,
+      "visible": "invisible",
+      "signal": "mirror-symmetric static",
+      "strength": 0.4,
+      "min_sigma": 55.96,
+      "median_sigma": 57.37,
+      "detected": 8,
+      "trials": 8,
+      "reason": "symmetry"
+    },
+    {
+      "visibility": 9.54,
+      "visible": "likely",
+      "signal": "greyscale static",
+      "strength": "-",
+      "min_sigma": 60000.0,
+      "median_sigma": 60000.0,
+      "detected": 8,
+      "trials": 8,
+      "reason": "shape"
+    },
+    {
+      "visibility": 6.02,
+      "visible": "likely",
+      "signal": "dark static (half palette)",
+      "strength": "-",
+      "min_sigma": 195.92,
+      "median_sigma": 195.97,
+      "detected": 8,
+      "trials": 8,
+      "reason": "tone"
+    },
+    {
+      "visibility": 2.52,
+      "visible": "likely",
+      "signal": "1px checkerboard + static",
+      "strength": "-",
+      "min_sigma": 140.1,
+      "median_sigma": 141.04,
+      "detected": 8,
+      "trials": 8,
+      "reason": "repetition"
+    }
+  ],
+  "examples": [
+    {
+      "label": "large disc @ 0.05",
+      "file": "example_00.jpg",
+      "thumb": "example_00.thumb.jpg",
+      "sigma": 19.169,
+      "tier": "clear",
+      "reason": "tone"
+    },
+    {
+      "label": "large disc @ 1",
+      "file": "example_01.jpg",
+      "thumb": "example_01.thumb.jpg",
+      "sigma": 60000.0,
+      "tier": "striking",
+      "reason": "face"
+    },
+    {
+      "label": "landscape @ 0.05",
+      "file": "example_02.jpg",
+      "thumb": "example_02.thumb.jpg",
+      "sigma": 69.836,
+      "tier": "striking",
+      "reason": "tone"
+    },
+    {
+      "label": "landscape @ 1",
+      "file": "example_03.jpg",
+      "thumb": "example_03.thumb.jpg",
+      "sigma": 654.085,
+      "tier": "striking",
+      "reason": "spectrum"
+    },
+    {
+      "label": "word 'BABEL' @ 0.05",
+      "file": "example_04.jpg",
+      "thumb": "example_04.thumb.jpg",
+      "sigma": 83.993,
+      "tier": "striking",
+      "reason": "tone"
+    },
+    {
+      "label": "word 'BABEL' @ 1",
+      "file": "example_05.jpg",
+      "thumb": "example_05.thumb.jpg",
+      "sigma": 60000.0,
+      "tier": "striking",
+      "reason": "shape"
+    },
+    {
+      "label": "horizon line (2px) @ 0.25",
+      "file": "example_06.jpg",
+      "thumb": "example_06.thumb.jpg",
+      "sigma": 21.006,
+      "tier": "clear",
+      "reason": "lines"
+    },
+    {
+      "label": "horizon line (2px) @ 1",
+      "file": "example_07.jpg",
+      "thumb": "example_07.thumb.jpg",
+      "sigma": 83.137,
+      "tier": "striking",
+      "reason": "lines"
+    },
+    {
+      "label": "small square (24px) @ 0.25",
+      "file": "example_08.jpg",
+      "thumb": "example_08.thumb.jpg",
+      "sigma": 15.963,
+      "tier": "faint",
+      "reason": "marks"
+    },
+    {
+      "label": "small square (24px) @ 1",
+      "file": "example_09.jpg",
+      "thumb": "example_09.thumb.jpg",
+      "sigma": 311.781,
+      "tier": "striking",
+      "reason": "marks"
+    },
+    {
+      "label": "thin arc (3px) @ 0.5",
+      "file": "example_10.jpg",
+      "thumb": "example_10.thumb.jpg",
+      "sigma": 20.039,
+      "tier": "clear",
+      "reason": "marks"
+    },
+    {
+      "label": "pen stroke (2px) @ 0.8",
+      "file": "example_11.jpg",
+      "thumb": "example_11.thumb.jpg",
+      "sigma": 30.588,
+      "tier": "clear",
+      "reason": "marks"
+    },
+    {
+      "label": "face-like spots @ 0.3",
+      "file": "example_12.jpg",
+      "thumb": "example_12.thumb.jpg",
+      "sigma": 20.635,
+      "tier": "clear",
+      "reason": "marks"
+    },
+    {
+      "label": "few-colour patch (64px) @ 0.6",
+      "file": "example_13.jpg",
+      "thumb": "example_13.thumb.jpg",
+      "sigma": 36.695,
+      "tier": "clear",
+      "reason": "colours"
+    },
+    {
+      "label": "photo-like (1/f) @ 0.2",
+      "file": "example_14.jpg",
+      "thumb": "example_14.thumb.jpg",
+      "sigma": 92.814,
+      "tier": "striking",
+      "reason": "spectrum"
+    },
+    {
+      "label": "grey patch (64px) @ 1",
+      "file": "example_15.jpg",
+      "thumb": "example_15.thumb.jpg",
+      "sigma": 311.781,
+      "tier": "striking",
+      "reason": "marks"
+    },
+    {
+      "label": "diagonal line (2px, 30\u00b0) @ 1",
+      "file": "example_16.jpg",
+      "thumb": "example_16.thumb.jpg",
+      "sigma": 50.153,
+      "tier": "striking",
+      "reason": "angled"
+    },
+    {
+      "label": "tiled static @ 0.4",
+      "file": "example_17.jpg",
+      "thumb": "example_17.thumb.jpg",
+      "sigma": 70.744,
+      "tier": "striking",
+      "reason": "repetition"
+    },
+    {
+      "label": "mirror-symmetric static @ 0.4",
+      "file": "example_18.jpg",
+      "thumb": "example_18.thumb.jpg",
+      "sigma": 57.598,
+      "tier": "striking",
+      "reason": "symmetry"
+    },
+    {
+      "label": "greyscale static",
+      "file": "example_19.jpg",
+      "thumb": "example_19.thumb.jpg",
+      "sigma": 60000.0,
+      "tier": "striking",
+      "reason": "shape"
+    },
+    {
+      "label": "dark static (half palette)",
+      "file": "example_20.jpg",
+      "thumb": "example_20.thumb.jpg",
+      "sigma": 195.973,
+      "tier": "striking",
+      "reason": "tone"
+    },
+    {
+      "label": "1px checkerboard + static",
+      "file": "example_21.jpg",
+      "thumb": "example_21.thumb.jpg",
+      "sigma": 141.356,
+      "tier": "striking",
+      "reason": "texture"
+    }
+  ],
+  "fingerprint": "8efe1e1b5721b8c5"
+}
