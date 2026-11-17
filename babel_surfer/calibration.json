@@ -320,7 +320,7 @@
  },
  "maps_source": {
   "frames": 200000,
-  "log": "combined.npy",
+  "log": "scores of 2026-11-10 and 2026-11-17 (100,000 frames each)",
   "method": "empirical CDF + generalised Pareto tail (xi >= 0)",
   "validation": {
    "shape": {
@@ -532,7 +532,8 @@
     "expected_3": 2270.2,
     "expected_4": 53.8
    }
-  }
+  },
+  "scanned_through": 527924
  },
  "map_sources": {
   "spot": {

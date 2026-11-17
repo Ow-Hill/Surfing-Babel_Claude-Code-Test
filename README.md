@@ -137,6 +137,17 @@ Nothing needs fetching for that step. It then re-fetches only the frames that no
 first re-mine turned up 5 finds from four different tests (shape, symmetry, repetition and
 texture). They are still the extreme tail of static, the "anomaly" tier.
 
+**Weekly out-of-sample audit.** The site keeps only the latest 100,000 frames' scores (about two
+days), so an independent sample to check the calibration on disappears fast. A weekly workflow
+(`.github/workflows/audit.yml`, `babel_surfer/audit.py`) archives a snapshot of that log on the
+`log-archive` branch, never overlapping the previous one, and checks the calibration on every
+snapshot scanned after it was fitted (the calibration records where its fit ended,
+`maps_source.scanned_through`). Evidence pools week by week. A test reaching 3σ or 4σ at least
+1.5 times as often as static, at one-sided Poisson p < 0.001, opens an issue. The first such
+check, done by hand on 2026-11-17, found the colours test giving 2.4 times too many 4σ frames
+(a stepped statistic scored by the frames strictly above a value, not at or above it); it was
+fixed and the calibration refitted on 200,000 frames.
+
 ## Benchmark (`python -m babel_surfer.benchmark`)
 
 Known pictures blended into simulated Babel static (8 trials each; Nov 2026, all 16 tests):

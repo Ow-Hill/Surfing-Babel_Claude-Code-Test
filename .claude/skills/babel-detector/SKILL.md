@@ -67,6 +67,13 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
   a common step read 4.1 sigma for something 9 in 100,000 frames reach (3.7 sigma). Colours
   then gave 15 frames over 4 sigma where 6 were expected, measured by fitting on one log and
   scoring another (2026-11-17). Continuous tests are unaffected.
+- **The weekly audit does the out-of-sample check** (`audit.py`, `audit.yml`). It archives
+  non-overlapping log snapshots on the `log-archive` branch (the last 8) and judges the
+  calibration only on snapshots scanned after `maps_source.scanned_through`. So pass
+  `--scanned-through <stats.scanned>` to `calibrate --from-log` (`refit_live` records it
+  itself). An issue opens only for a surplus at least 1.5x expected with p < 0.001. One
+  snapshot can't catch a colours-sized fault (2.4x, p 0.005 on 100,000 frames); about three
+  pooled snapshots do. To refit, use the archived snapshots as the independent logs.
 - **Judge a calibration out of sample, and keep an old log to do it.** gh-pages keeps only
   the latest 100,000 frames, so a copy of an earlier `scores.npy` is the only independent
   sample. Two non-overlapping logs gave the decisive check (fit on one, score the other,

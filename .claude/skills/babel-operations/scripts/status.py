@@ -86,6 +86,20 @@ try:
 except (ValueError, json.JSONDecodeError):
     print("  could not read data/stats.json")
 
+print("== calibration audit (log-archive branch)")
+if subprocess.run(["git", "fetch", "-q", "--depth=1", "origin", "log-archive"],
+                  capture_output=True).returncode == 0:
+    try:
+        a = json.loads(git("show", "FETCH_HEAD:audit.json"))
+        snaps = git("ls-tree", "--name-only", "FETCH_HEAD").split()
+        print(f"  {a.get('status')}: {a.get('frames', 0):,} out-of-sample frames from "
+              f"{len(a.get('snapshots') or [])} snapshot(s); {sum(n.startswith('scores-') for n in snaps)} archived"
+              + (f"; surplus in {', '.join(a['flagged'])}" if a.get("flagged") else ""))
+    except (ValueError, json.JSONDecodeError):
+        print("  no audit.json yet")
+else:
+    print("  no archive yet (the weekly audit workflow has not run)")
+
 print("== code")
 # A running relay scan publishes after every 30-minute chunk, so it counts once a
 # Pages deploy has finished more than 25 minutes after it started.
