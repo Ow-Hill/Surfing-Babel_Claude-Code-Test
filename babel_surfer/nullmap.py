@@ -89,12 +89,19 @@ def fit(values: np.ndarray) -> dict:
     xs, ps = xs[keep], probs[keep]
     u, tail_p = float(xs[-1]), float(1.0 - ps[-1])         # the Pareto tail starts here
     # empirical knots past the 99th percentile, as far as TAIL_K exceedances
-    # support (ties: a knot at x takes the share of values above x)
+    # support. Ties: a frame scoring exactly x is as rare as the share of
+    # frames at or above x, not strictly above it. That matters for a
+    # stepped statistic (colours: about 700 distinct values in 100,000
+    # frames), where counting only those above made a common step read
+    # 4.1 sigma instead of 3.7 and gave colours 15 frames over 4 sigma where
+    # 6 were expected (2026-11-17, fit on one log and tested on another).
+    # The body's quantile knots already work this way (a run of tied
+    # quantiles keeps its first, lowest probability).
     srt = np.sort(v)
     upper = [float(np.quantile(srt, p)) for p in UPPER_P if (1 - p) * len(v) >= TAIL_K]
     for x in upper:
         if x > xs[-1] + 1e-9:
-            above = len(v) - np.searchsorted(srt, x, side="right")
+            above = len(v) - np.searchsorted(srt, x, side="left")
             if above >= TAIL_K:
                 xs = np.append(xs, x)
                 ps = np.append(ps, 1.0 - above / len(v))

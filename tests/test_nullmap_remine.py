@@ -208,3 +208,24 @@ def test_point_mass_found_despite_stray_values_below_it():
     assert abs(nullmap.sigma(m, 0.0) - NormalDist().inv_cdf(0.21)) < 0.05      # about -0.8
     z = nullmap.sigma_array(m, v)
     assert 0.8 < z[z > -2].std() < 1.1 and np.mean(z > 3) < 0.003
+
+
+def test_a_tied_value_is_as_rare_as_the_frames_at_or_above_it():
+    """A stepped statistic (colours has about 700 distinct values in 100,000
+    frames) puts many frames on the same value. A frame scoring exactly x is
+    as rare as the share of frames at *or above* x. Counting only those
+    strictly above overstated such values (colours read 4.1 sigma for a
+    value 9 in 100,000 frames reach, 3.7 sigma) and, on these coarse steps,
+    gave 41% too many frames over 3 sigma."""
+    rng = np.random.default_rng(0)
+    v = np.round(rng.gumbel(size=200_000) / 0.5) * 0.5        # coarse steps, many ties
+    m = nullmap.fit(v)
+    srt = np.sort(v)
+    worst = 0.0
+    for x in np.unique(srt[-200:]):
+        if m["u"] < x <= m["x"][-1]:                           # the knotted upper tail
+            at_or_above = (len(v) - np.searchsorted(srt, x, side="left")) / len(v)
+            worst = max(worst, nullmap.sigma(m, float(x)) + NormalDist().inv_cdf(at_or_above))
+    assert worst < 0.05                                        # (counting strictly above: +0.16)
+    fresh = np.round(np.random.default_rng(1).gumbel(size=200_000) / 0.5) * 0.5
+    assert (nullmap.sigma_array(m, fresh) > 3).sum() <= 270 * 1.15   # (strictly above: 381)
