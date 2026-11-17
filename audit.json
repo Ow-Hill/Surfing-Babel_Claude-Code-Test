@@ -1,0 +1,10 @@
+{
+ "calibration": "90d505dc489f",
+ "scanned_through": 527924,
+ "snapshots": [],
+ "in_sample": [
+  528912
+ ],
+ "status": "no snapshot scanned since the calibration was fitted",
+ "frames": 0
+}
