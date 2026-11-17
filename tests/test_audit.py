@@ -119,3 +119,42 @@ def test_command_line_archives_audits_and_writes_the_alert(tmp_path, fitted, sma
     assert (d / "scores-150000.npz").exists()
     rep = json.loads((d / "audit.json").read_text())
     assert rep["status"] == "flagged" and "palette" in rep["flagged"] and alert.exists()
+
+
+def test_the_combined_score_is_audited_too(tmp_path, fitted, small):
+    d = tmp_path / "arch"
+    d.mkdir()
+    for k, s in enumerate((130_000, 150_000)):
+        np.savez_compressed(d / f"scores-{s}.npz", log=make_log(20 + k, 20_000, (k + 2) * 10**9))
+    r = audit.audit(d, fitted)
+    assert "combined" in r["tests"] and r["tests"]["combined"]["n"] == 40_000
+
+
+def test_a_refit_is_proposed_from_snapshots_and_judged_on_one_it_never_saw(tmp_path, fitted, small, monkeypatch):
+    monkeypatch.setattr(audit, "MIN_FRAMES", 10_000)       # judge the one 20,000-frame check snapshot
+    d = tmp_path / "arch"
+    d.mkdir()
+    for k, s in enumerate((130_000, 150_000, 170_000)):
+        np.savez_compressed(d / f"scores-{s}.npz", log=make_log(30 + k, 20_000, (k + 2) * 10**9))
+    out = tmp_path / "candidate.json"
+    prop = audit.propose_refit(d, out, fitted)
+    assert prop["fit_snapshots"] == [130_000, 150_000] and prop["check_snapshot"] == 170_000
+    assert prop["ok"] and prop["check"]["frames"] == 20_000
+    cand = json.loads(out.read_text())
+    assert cand["maps_source"]["scanned_through"] == 150_000 and cand["maps_source"]["frames"] == 40_000
+    assert "refit-proposal" in audit.proposal_text(prop, "o/r")
+    (d / "scores-170000.npz").unlink()
+    assert audit.propose_refit(d, out, fitted) is None          # two snapshots: not enough
+
+
+def test_command_line_proposes_on_request(tmp_path, fitted, small, monkeypatch):
+    monkeypatch.setattr(audit, "MIN_FRAMES", 10_000)       # judge the one 20,000-frame check snapshot
+    from babel_surfer import classifier
+    monkeypatch.setattr(classifier, "CALIBRATION_FILE", fitted)
+    d = tmp_path / "arch"
+    d.mkdir()
+    for k, s in enumerate((130_000, 150_000, 170_000)):
+        np.savez_compressed(d / f"scores-{s}.npz", log=make_log(40 + k, 20_000, (k + 2) * 10**9))
+    alert, cand = tmp_path / "alert.md", tmp_path / "candidate.json"
+    audit.main(["--audit", str(d), "--alert", str(alert), "--propose", str(cand), "--always", "--repo", "o/r"])
+    assert cand.exists() and (d / "proposal.json").exists() and "refit-proposal" in alert.read_text()

@@ -156,7 +156,10 @@ def test_steep_tail_is_not_inflated_within_the_data():
     assert (held_out >= 4).sum() < 4 * 200000 * (1 - NormalDist().cdf(4)) + 10
 
 
-def test_refit_live_refits_when_the_log_doubles(tmp_path, monkeypatch):
+def test_refit_live_fits_a_new_test_once_and_leaves_real_fits_to_the_audit(tmp_path, monkeypatch):
+    """refit_live moves a test from simulated to real frames once. It no
+    longer refits when the log doubles (that stopped at 50,000 frames
+    anyway); refits of real fits come from the weekly audit."""
     legacy = {t: {"mean": 1.5, "std": 1.0} for t in TESTS}
     log, _ = legacy_log(np.random.default_rng(10), 6000, legacy)
     (tmp_path / "pkg.json").write_text(json.dumps({"tests": legacy}))
@@ -169,9 +172,9 @@ def test_refit_live_refits_when_the_log_doubles(tmp_path, monkeypatch):
     assert not calibrate.refit_live(tmp_path)              # nothing new
     bigger, _ = legacy_log(np.random.default_rng(11), 12000, legacy)
     np.save(tmp_path / "scores.npy", bigger)
-    assert calibrate.refit_live(tmp_path)                  # the log doubled
+    assert not calibrate.refit_live(tmp_path)              # the log doubled: still not refitted here
     src = json.loads((tmp_path / "calibration.json").read_text())["map_sources"]["shape"]
-    assert src["frames"] == 12000
+    assert src["frames"] == 6000
 
 
 def test_refit_that_fails_its_own_held_out_check_is_rejected(tmp_path):

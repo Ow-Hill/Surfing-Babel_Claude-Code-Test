@@ -110,6 +110,28 @@ def build_halt_alert(stats: dict, since_halt: float | None) -> str | None:
     return "\n".join(lines)
 
 
+FINGERPRINT_ALERT = 8.0     # every real frame reads about 14 (the lowest of 500,000: 9.4)
+
+
+def build_fingerprint_alert(stats: dict, seen: float | None) -> str | None:
+    """Issue body when the latest scan's frames lost Babelia's 156-row
+    fingerprint (once per run). Every frame Babelia has ever served carries
+    it; a scan whose frames don't means the generator or the frames changed,
+    and every calibration with them."""
+    run = stats.get("last_run") or {}
+    mean, n = run.get("fingerprint_mean"), run.get("fp_n") or 0
+    if mean is None or n < 100 or mean >= FINGERPRINT_ALERT or run.get("finished_at") == seen:
+        return None
+    return "\n".join([
+        f"The scan that finished {_iso(run.get('finished_at') or time.time())} read Babelia's 156-row "
+        f"cross-channel fingerprint at **{mean:.1f}** on average over {n:,} frames. Every frame "
+        f"before read about 14, the lowest ever 9.4.", "",
+        "Either Babelia changed how it generates frames or something between us and it alters them. "
+        "Both make every calibration wrong: finds from this point can't be trusted until it is "
+        "understood. Check a few frames by hand (`classifier.fingerprint_z`), then decide whether "
+        "to halt and recalibrate."])
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -135,10 +157,20 @@ def main(argv=None) -> int:
     if halt:
         args.alert.with_name("alert-halt.md").write_text(halt)
         print("halt alert written")
+    try:
+        fp_seen = json.loads(mark.read_text()).get("fingerprint")
+    except (OSError, ValueError, AttributeError):
+        fp_seen = None
+    fp = build_fingerprint_alert(stats, fp_seen)
+    if fp:
+        args.alert.with_name("alert-fingerprint.md").write_text(fp)
+        fp_seen = (stats.get("last_run") or {}).get("finished_at")
+        print("fingerprint alert written")
     body = build_alert(stats, since=since)
     newest = max([since] + [r.get("finished_at") or 0 for r in stats.get("runs") or []])
     mark.write_text(json.dumps({"until": newest,
-                                "halt": (stats.get("halted") or {}).get("at", halt_seen)}))
+                                "halt": (stats.get("halted") or {}).get("at", halt_seen),
+                                "fingerprint": fp_seen}))
     if body:
         args.alert.write_text(body)
         print(f"alert written to {args.alert}")

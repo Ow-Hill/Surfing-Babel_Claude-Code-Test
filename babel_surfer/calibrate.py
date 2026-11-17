@@ -198,7 +198,6 @@ def main(argv=None) -> int:
 
 
 MIN_LOG_FRAMES = 5000
-REFIT_GROWTH = 2.0          # refit a test once the log has this many times the frames it was fitted on
 
 
 def raw_from_log(log, legacy: dict) -> dict:
@@ -362,11 +361,16 @@ def calibrate_simulated(out: Path = CALIBRATION_FILE, frames: int = 6000, seed: 
 
 def refit_live(data_dir: Path) -> bool:
     """For the scan workflow: once the score log has enough real frames for a
-    test still calibrated on simulated static, or ``REFIT_GROWTH`` times the
-    frames a test was last fitted on (a first fit from 5,000 frames has a
-    rough tail), refit from the log into ``<data_dir>/calibration.json`` (a
-    live layer over the package's calibration, picked up by the next scan,
-    which then re-mines). Returns True if it wrote a new live calibration."""
+    test still calibrated on simulated static (a new test), fit it on them
+    into ``<data_dir>/calibration.json`` (a live layer over the package's
+    calibration, picked up by the next scan, which then re-mines). Returns
+    True if it wrote a new live calibration.
+
+    Tests already fitted on real frames are not refitted here. That used to
+    happen when the log doubled, which stopped once a fit reached 50,000
+    frames (the log keeps 100,000). Refits of those now come from the weekly
+    audit (audit.py), judged on a snapshot the fit never saw, as a branch a
+    person merges."""
     log_path = data_dir / "scores.npy"
     if not log_path.exists():
         return False
@@ -374,12 +378,7 @@ def refit_live(data_dir: Path) -> bool:
     data = json.loads(effective.read_text())
     sources = data.get("map_sources") or {}
     raw = raw_from_log(np.load(log_path), data.get("tests") or {})
-    def due(t):
-        src = sources.get(t, {})
-        if src.get("source") != "real":
-            return True
-        return int(np.isfinite(raw[t]).sum()) >= REFIT_GROWTH * max(src.get("frames", 0), 1)
-    pending = [t for t in ready_tests(raw) if due(t)]
+    pending = [t for t in ready_tests(raw) if (sources.get(t) or {}).get("source") != "real"]
     if not pending:
         return False
     live = data_dir / "calibration.json"

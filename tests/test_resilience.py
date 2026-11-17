@@ -250,3 +250,33 @@ def test_alerts_fire_once_per_find_and_once_per_halt(tmp_path):
     halt_file.unlink()                                     # the workflow files it as an issue
     alerts.main(args)
     assert not halt_file.exists()                          # same halt: no second issue
+
+
+def test_a_live_calibration_built_on_an_older_package_one_is_removed(tmp_path, monkeypatch):
+    (tmp_path / "calibration.json").write_text(json.dumps({"base": "an older package calibration"}))
+    monkeypatch.setattr(scan_mod, "fetch", lambda loc: FRAME)
+    monkeypatch.setattr(scan_mod, "classify", lambda data, threshold=4.0: fake(1.0))
+    scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=0, max_frames=1, processes=0)
+    assert not (tmp_path / "calibration.json").exists()
+
+
+def test_each_scan_records_its_frames_fingerprint_and_a_lost_one_alerts_once(tmp_path, monkeypatch):
+    """Every Babelia frame carries the 156-row fingerprint (about 14). A scan
+    whose frames read far lower means the generator or the frames changed:
+    one issue per such scan."""
+    weak = Classification(sigma=1.0, label="x", is_interesting=False, reason="shape",
+                          tests={"shape": 1.0}, fingerprint=2.0)
+    monkeypatch.setattr(scan_mod, "fetch", lambda loc: FRAME)
+    monkeypatch.setattr(scan_mod, "classify", lambda data, threshold=4.0: weak)
+    run = scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=0, max_frames=120, processes=0)
+    assert run["fingerprint_mean"] == 2.0 and run["fp_n"] == 120 and "fp_sum" not in run
+    feed, alert = tmp_path / "feed.xml", tmp_path / "alert.md"
+    args = ["--data", str(tmp_path), "--feed", str(feed), "--alert", str(alert)]
+    alerts.main(args)
+    fp = tmp_path / "alert-fingerprint.md"
+    assert fp.exists() and "2.0" in fp.read_text()
+    fp.unlink()
+    alerts.main(args)                                      # the same scan: no second issue
+    assert not fp.exists()
+    assert alerts.build_fingerprint_alert({"last_run": {"fingerprint_mean": 14.1, "fp_n": 900,
+                                                        "finished_at": 1}}, None) is None

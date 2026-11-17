@@ -46,7 +46,13 @@ def test_refit_live_once_then_idle(tmp_path, package):
     assert live["map_sources"]["spot"]["source"] == "real"
     assert classifier.live_calibration_path(data) == data / "calibration.json"
     assert calibrate.refit_live(data) is False                  # nothing left to refit
-    package.write_text(package.read_text().replace('"frames": 3000', '"frames": 3001'))
+    meta = json.loads(package.read_text())
+    meta["map_sources"]["spot"]["frames"] += 1                  # metadata only: live still applies
+    package.write_text(json.dumps(meta))
+    assert classifier.live_calibration_path(data) == data / "calibration.json"
+    changed = json.loads(package.read_text())
+    changed["maps"]["shape"]["u"] += 0.01                       # a new package calibration
+    package.write_text(json.dumps(changed))
     assert classifier.live_calibration_path(data) is None       # new package: live is stale
 
 
@@ -144,3 +150,25 @@ def test_finds_over_the_cap_are_counted_once_and_not_written(tmp_path, monkeypat
     total = s.stats["finds_total"]
     s.record("3", b"", mk(4.5), run, count=False)              # re-mined: not counted again
     assert s.stats["finds_total"] == total
+
+
+def test_only_what_changes_scores_changes_the_hashes(tmp_path, monkeypatch):
+    """Recording metadata in the calibration (where a fit ended, its report)
+    once made every saved find be downloaded and re-scored. The hashes that
+    trigger re-scoring, re-mining and the benchmark must ignore it."""
+    import json
+    from babel_surfer import build_site, classifier
+    cal = tmp_path / "calibration.json"
+    data = json.loads(classifier.PACKAGE_CALIBRATION.read_text())
+    cal.write_text(json.dumps(data))
+    monkeypatch.setattr(classifier, "CALIBRATION_FILE", cal)
+    before = (classifier.calibration_hash(), classifier.detector_id(), build_site.detector_fingerprint())
+    data["maps_source"]["scanned_through"] = 123
+    data["maps_source"]["validation"] = {"note": "anything"}
+    cal.write_text(json.dumps(data, indent=3))                   # different bytes, same scoring
+    assert (classifier.calibration_hash(), classifier.detector_id(),
+            build_site.detector_fingerprint()) == before
+    data["maps"]["shape"]["u"] += 0.01                           # a real change to a map
+    cal.write_text(json.dumps(data))
+    after = (classifier.calibration_hash(), classifier.detector_id(), build_site.detector_fingerprint())
+    assert all(a != b for a, b in zip(after, before))

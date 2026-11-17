@@ -94,10 +94,26 @@ PACKAGE_CALIBRATION = Path(__file__).with_name("calibration.json")
 CALIBRATION_FILE = PACKAGE_CALIBRATION        # see use_calibration()
 
 
+SCORING_KEYS = ("tests", "maps", "combined_tests", "tone_expected")
+
+
+def scoring_bytes(path: Path) -> bytes:
+    """The parts of a calibration file that change scores, in a canonical
+    form. Hashes use these, not the file's bytes: recording metadata (where
+    a fit ended, its validation report) once made every saved find be
+    downloaded and re-scored for nothing."""
+    try:
+        data = json.loads(Path(path).read_text())
+    except (OSError, ValueError):
+        return b""
+    return json.dumps({k: data.get(k) for k in SCORING_KEYS}, sort_keys=True,
+                      separators=(",", ":")).encode()
+
+
 def calibration_hash() -> str:
     """What scores mean: the calibration in use and the code that applies it."""
     import hashlib
-    h = hashlib.sha256(CALIBRATION_FILE.read_bytes() if CALIBRATION_FILE.exists() else b"")
+    h = hashlib.sha256(scoring_bytes(CALIBRATION_FILE))
     h.update(Path(__file__).with_name("nullmap.py").read_bytes())
     return h.hexdigest()[:12]
 
@@ -109,8 +125,7 @@ def detector_id() -> str:
     h = hashlib.sha256(Path(__file__).read_bytes())
     for name in ("perceptual.py", "nullmap.py"):
         h.update(Path(__file__).with_name(name).read_bytes())
-    if CALIBRATION_FILE.exists():
-        h.update(CALIBRATION_FILE.read_bytes())
+    h.update(scoring_bytes(CALIBRATION_FILE))
     return h.hexdigest()[:12]
 
 
@@ -490,7 +505,7 @@ _calibration_cache: dict | None = None
 
 def package_calibration_hash() -> str:
     import hashlib
-    return hashlib.sha256(PACKAGE_CALIBRATION.read_bytes()).hexdigest()[:16]
+    return hashlib.sha256(scoring_bytes(PACKAGE_CALIBRATION)).hexdigest()[:16]
 
 
 def live_calibration_path(data_dir) -> Path | None:

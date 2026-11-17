@@ -163,6 +163,12 @@ jobs:
                 || echo "::warning::could not open the halt issue"
               rm -f alert-halt.md
             fi
+            if [ -f alert-fingerprint.md ]; then
+              gh issue create --repo "${{ github.repository }}" \
+                --title "Surfing Babel: frames lost Babelia's fingerprint" --body-file alert-fingerprint.md \
+                || echo "::warning::could not open the fingerprint issue"
+              rm -f alert-fingerprint.md
+            fi
             if [ -f alert.md ]; then
               gh issue create --repo "${{ github.repository }}" \
                 --title "Surfing Babel: something reached 8σ" --body-file alert.md \
