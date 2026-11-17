@@ -119,10 +119,12 @@ def audit(d: Path, cal_path: Path | None = None) -> dict:
         return report
     tests = list(data.get("combined_tests") or classifier.TESTS)
     raw = calibrate.raw_from_log(log, data.get("tests") or {})
-    z, _ = calibrate.apply_maps(data["maps"], raw, tests)
+    z, comb = calibrate.apply_maps(data["maps"], raw, tests)
+    if "combined" in data["maps"]:
+        z = {**z, "combined": comb}
     tail = lambda k: 1 - NormalDist().cdf(k)
     rows, flagged = {}, []
-    for t in tests:
+    for t in tests + (["combined"] if "combined" in z else []):
         zt = z[t][np.isfinite(z[t])]
         if not len(zt):
             continue
@@ -134,15 +136,65 @@ def audit(d: Path, cal_path: Path | None = None) -> dict:
         rows[t] = row
         if any(surplus(row[f"over_{k}"], row[f"expected_{k}"]) for k in (3, 4)):
             flagged.append(t)
-    peak = np.nanmax(np.stack([z[t] for t in rows]), axis=0)
+    peak = np.nanmax(np.stack([z[t] for t in rows if t != "combined"]), axis=0)
     peak = peak[np.isfinite(peak)]
-    exp4 = len(peak) * (1 - NormalDist().cdf(4) ** len(rows))
+    exp4 = len(peak) * (1 - NormalDist().cdf(4) ** len([t for t in rows if t != "combined"]))
     head = {"over_4": int((peak > 4).sum()), "expected_4": round(exp4, 1)}
     head["p_4"] = round(poisson_sf(head["over_4"], exp4), 6)
     if surplus(head["over_4"], exp4):
         flagged.append("headline")
     report.update(status="flagged" if flagged else "ok", tests=rows, headline=head, flagged=flagged)
     return report
+
+
+PROPOSE_MIN = 3          # out-of-sample snapshots before proposing a refit: fit on all
+                         # but the newest (200,000+ frames), judge on the newest
+
+
+def propose_refit(d: Path, out: Path, cal_path: Path | None = None) -> dict | None:
+    """Fit a candidate calibration on the out-of-sample snapshots except the
+    newest, and judge it on the newest, which it never saw. Writes the
+    candidate to ``out``; returns the report (None if too few snapshots).
+    A person merges it: nothing here changes the calibration in use."""
+    import shutil
+    import tempfile
+    cal_path = cal_path or classifier.CALIBRATION_FILE
+    through = (json.loads(cal_path.read_text()).get("maps_source") or {}).get("scanned_through")
+    used = [(s, p) for s, p in snapshots(d) if through is not None and s - SCORE_LOG_KEEP >= through]
+    if len(used) < PROPOSE_MIN:
+        return None
+    fit, check = used[:-1], used[-1]
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        np.save(tmp / "fit.npy", np.concatenate([np.load(p)["log"] for _, p in fit]))
+        rep = calibrate.calibrate_from_log(tmp / "fit.npy", out, base=cal_path,
+                                           scanned_through=fit[-1][0])
+        (tmp / "check").mkdir()
+        shutil.copy(check[1], tmp / "check" / check[1].name)
+        judged = audit(tmp / "check", out)
+    return {"fit_snapshots": [s for s, _ in fit], "check_snapshot": check[0],
+            "rejected": rep.get("rejected") or [], "check": judged,
+            "ok": judged.get("status") == "ok"}
+
+
+def proposal_text(prop: dict, repo: str = "") -> str:
+    c = prop["check"]
+    head = c.get("headline") or {}
+    lines = [f"A candidate calibration was fitted on snapshots {prop['fit_snapshots']} and judged on "
+             f"snapshot {prop['check_snapshot']} ({c.get('frames', 0):,} frames it never saw): "
+             f"**{c.get('status')}**, headline {head.get('over_4')} frames over 4σ against "
+             f"{head.get('expected_4')} expected."]
+    if prop["rejected"]:
+        lines.append(f"Kept their previous maps (failed their own held-out check): {', '.join(prop['rejected'])}.")
+    if prop["ok"] and repo:
+        lines += ["", f"It is on the `refit-proposal` branch: "
+                      f"https://github.com/{repo}/compare/main...refit-proposal — open a pull request "
+                      f"from it to review and merge (CI runs there)."]
+    elif not prop["ok"]:
+        lines += ["", "The candidate fails on the snapshot it never saw too, so it is not proposed: "
+                      "the fault is likely in a test's statistic, not its calibration. See the "
+                      "babel-detector skill."]
+    return "\n".join(lines)
 
 
 def alert_text(report: dict) -> str | None:
@@ -185,6 +237,11 @@ def main(argv=None) -> int:
     ap.add_argument("--data", type=Path, help="the site's data directory: audit its live calibration "
                                               "when it matches this code, as the scan does")
     ap.add_argument("--alert", type=Path, help="write an issue body here when the audit flags a surplus")
+    ap.add_argument("--propose", type=Path, metavar="CALIBRATION",
+                    help="with --audit: when it flags (or --always), fit a candidate calibration "
+                         "here and append the verdict to the alert")
+    ap.add_argument("--always", action="store_true", help="propose a refit even without a flag")
+    ap.add_argument("--repo", default="", help="owner/name, for the proposal's link")
     a = ap.parse_args(argv)
     if a.archive:
         new = archive(a.scores, a.stats, a.archive)
@@ -195,6 +252,18 @@ def main(argv=None) -> int:
         (a.audit / "audit.json").write_text(json.dumps(rep, indent=1))
         print(format_report(rep))
         body = alert_text(rep)
+        if a.propose and (body or a.always):
+            prop = propose_refit(a.audit, a.propose, cal)
+            if prop is None:
+                note = (f"Not enough out-of-sample snapshots to propose a refit yet "
+                        f"(needs {PROPOSE_MIN}).")
+            else:
+                note = proposal_text(prop, a.repo)
+                (a.audit / "proposal.json").write_text(json.dumps(prop, indent=1))
+                if not prop["ok"]:
+                    a.propose.unlink(missing_ok=True)
+            print(note)
+            body = (body + "\n\n## Proposed refit\n\n" + note) if body else note
         if a.alert and body:
             a.alert.write_text(body)
     return 0

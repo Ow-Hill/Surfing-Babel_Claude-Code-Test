@@ -80,15 +80,17 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
   both ways), and together they gave a 200,000-frame package refit (held-out headline 53
   over 4 sigma against 53.8 expected). One 100,000-frame audit can show a test at 9 against
   3.2 by chance: palette did, then read 10 against 6.3 over both logs.
-- **Live refits stop once a test is fitted on 50,000 or more frames.** `refit_live` waits for
-  `REFIT_GROWTH`× the frames a test was fitted on, but `scores.npy` keeps only the last
-  100,000. After the package refit from 100,000 frames, only a package calibration change
-  starts a new live fit. A live `data/calibration.json` whose `base` no longer matches is
-  ignored by the scan (`activate_live_calibration` returns None), and
-  `scripts/audit_calibration.py` now ignores it the same way. On 2026-11-10 it had audited
-  that stale file and reported flat at sd 2.0 when the scan's calibration gives 0.88.
-
-## Find what the detector misses (the learning loop)
+- **Who refits what.**
+  - `refit_live` (after every chunk) only moves a *new* test from simulated to real frames,
+    once 5,000 are logged.
+  - Refits of tests already on real frames come from the weekly audit. It fits a candidate on
+    out-of-sample snapshots except the newest, judges it on the newest, pushes a passing one
+    to the `refit-proposal` branch and opens an issue. A person opens the PR and merges it.
+    Run it by hand: Actions → "Audit the calibration" → propose = 1.
+  - A live `data/calibration.json` whose `base` no longer matches is deleted at scan start.
+- **Hashes cover only what changes scores** (`classifier.scoring_bytes`: `tests`, `maps`,
+  `combined_tests`, `tone_expected`). Metadata such as `maps_source` never triggers
+  re-scoring, re-mining or the benchmark; any change to a map does.
 - **Probe:** `python -m babel_surfer.sensitivity --explore 40 --seed N --calibration <live
   calibration.json>` takes about 10–15 minutes on 4 cores. Per signal kind, it gives the
   weakest strength found in half the trials and the weakest a person would see (the

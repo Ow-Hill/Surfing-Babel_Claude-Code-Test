@@ -48,7 +48,7 @@ def detector_fingerprint() -> str:
     for name in ("classifier.py", "perceptual.py", "nullmap.py", "visibility.py", "benchmark.py",
                  "calibrate.py"):
         h.update((PKG / name).read_bytes())
-    h.update(classifier.CALIBRATION_FILE.read_bytes())       # package or live calibration
+    h.update(classifier.scoring_bytes(classifier.CALIBRATION_FILE))   # package or live; scoring parts only
     return h.hexdigest()[:16]
 
 

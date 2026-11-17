@@ -355,6 +355,8 @@ class Store:
         f["sumsq"] += fp * fp
         if f["min"] is None or fp < f["min"]["value"]:
             f["min"] = {"value": fp, "location": location}
+        run["fp_sum"] = run.get("fp_sum", 0.0) + fp      # this run's fingerprint, for the alert
+        run["fp_n"] = run.get("fp_n", 0) + 1
         try:
             raw = getattr(result, "raw", None) or {}
             self._score_log.append((int(location),
@@ -495,6 +497,9 @@ class Store:
             # keep run history small: summaries of new finds, not full entries
             run["new_finds"] = [{k: f.get(k) for k in ("location", "sigma", "tier", "reason", "description")}
                                 for f in run.get("new_finds", [])]
+            if run.get("fp_n"):
+                run["fingerprint_mean"] = round(run.pop("fp_sum") / run["fp_n"], 2)
+            run.pop("fp_sum", None)
             self.stats["runs"] = (self.stats["runs"] + [run])[-RUN_HISTORY:]
             if primary:
                 self.stats["last_run"] = run

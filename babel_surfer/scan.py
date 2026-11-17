@@ -26,6 +26,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from pathlib import Path
 
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
@@ -274,6 +275,11 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
     live = classifier.activate_live_calibration(out)
     if live:
         log.info("using live calibration %s", live)
+    elif (Path(out) / "calibration.json").exists():
+        # fitted on an older package calibration: ignored by every tool that
+        # follows the rules, but it once misled the audit script; remove it
+        (Path(out) / "calibration.json").unlink()
+        log.info("removed a live calibration built on an older package calibration")
     store = Store(out)
     if store.stats.get("halted"):
         if not resume:

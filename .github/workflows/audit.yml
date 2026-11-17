@@ -11,6 +11,10 @@ on:
   schedule:
     - cron: "41 5 * * 0"          # weekly (Sunday); the log turns over every ~2 days
   workflow_dispatch:
+    inputs:
+      propose:
+        description: "Propose a refit even if the audit is clean (1 = yes)"
+        default: "0"
 
 permissions:
   contents: write
@@ -48,10 +52,15 @@ jobs:
             done
           fi
 
-      - name: Archive and audit
+      - name: Archive and audit (and, on a surplus, fit a candidate calibration)
+        env:
+          PROPOSE: ${{ github.event.inputs.propose }}
         run: |
+          ALWAYS=""
+          if [ "$PROPOSE" = "1" ]; then ALWAYS="--always"; fi
           python -m babel_surfer.audit --archive archive --scores site-data/scores.npy \
-            --stats site-data/stats.json --audit archive --data site-data --alert audit-alert.md
+            --stats site-data/stats.json --audit archive --data site-data --alert audit-alert.md \
+            --propose candidate.json --repo "${{ github.repository }}" $ALWAYS
 
       - name: Save the archive (log-archive branch)
         env:
@@ -69,12 +78,27 @@ jobs:
             sleep $((i * 5))
           done
 
-      - name: Open an issue on a surplus (once per open issue)
+      - name: Push the refit proposal (a person opens and merges the PR)
+        if: hashFiles('candidate.json') != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -B refit-proposal
+          cp candidate.json babel_surfer/calibration.json
+          git add babel_surfer/calibration.json
+          git commit -q -m "Calibration refit proposed by the weekly audit"
+          git push -q -f origin refit-proposal
+
+      - name: Open an issue (once per open issue)
         if: hashFiles('audit-alert.md') != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          title="Surfing Babel: the calibration audit found a surplus of high scores"
+          if python -c "import json,sys; sys.exit(0 if json.load(open('archive/audit.json')).get('status') == 'flagged' else 1)"; then
+            title="Surfing Babel: the calibration audit found a surplus of high scores"
+          else
+            title="Surfing Babel: a calibration refit is proposed"
+          fi
           open=$(gh issue list --repo "${{ github.repository }}" --state open --search "in:title \"$title\"" \
                  --json title --jq "map(select(.title == \"$title\")) | length")
           if [ "${open:-0}" = "0" ]; then
