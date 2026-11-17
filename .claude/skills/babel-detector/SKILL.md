@@ -62,6 +62,17 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
   arrive at about 0.45/s, so classification has several times the headroom it needs. Scans
   classify in a forkserver pool whose initializer is `use_calibration`.
 
+- **Ties: score a value by the frames at or above it.** Colours is stepped (about 700 distinct
+  values in 100,000 frames). The upper knots counted only frames strictly above a value, so
+  a common step read 4.1 sigma for something 9 in 100,000 frames reach (3.7 sigma). Colours
+  then gave 15 frames over 4 sigma where 6 were expected, measured by fitting on one log and
+  scoring another (2026-11-17). Continuous tests are unaffected.
+- **Judge a calibration out of sample, and keep an old log to do it.** gh-pages keeps only
+  the latest 100,000 frames, so a copy of an earlier `scores.npy` is the only independent
+  sample. Two non-overlapping logs gave the decisive check (fit on one, score the other,
+  both ways), and together they gave a 200,000-frame package refit (held-out headline 53
+  over 4 sigma against 53.8 expected). One 100,000-frame audit can show a test at 9 against
+  3.2 by chance: palette did, then read 10 against 6.3 over both logs.
 - **Live refits stop once a test is fitted on 50,000 or more frames.** `refit_live` waits for
   `REFIT_GROWTH`× the frames a test was fitted on, but `scores.npy` keeps only the last
   100,000. After the package refit from 100,000 frames, only a package calibration change
