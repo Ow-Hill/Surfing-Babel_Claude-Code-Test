@@ -31,6 +31,10 @@ description: Ship and run Surfing Babel. Covers the branch → PR → CI → mer
   agent".
 - Before saying something is live, check it with `scripts/status.py`. If a deploy is
   queued, schedule a follow-up check (`send_later`) instead of polling.
+- Branches written by workflows, each a single force-pushed commit: `gh-pages` (the site),
+  `probe-data` (the blind-spot probe), `log-archive` (weekly score-log snapshots and the
+  calibration audit). Never merge them or base work on them. An audit issue ("the calibration
+  audit found a surplus") means a refit: see the babel-detector skill.
 - Keep the scan's critical path free of one-off work. Each merge hands the scan to a new run,
   and a detector change used to cost about 9 minutes of no scanning there: 4.5 min of
   benchmark and 4 min re-fetching saved frames. The benchmark now runs in the background

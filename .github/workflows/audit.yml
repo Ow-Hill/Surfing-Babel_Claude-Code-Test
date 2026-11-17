@@ -1,0 +1,84 @@
+name: Audit the calibration
+
+# Archives a snapshot of the site's score log (the latest 100,000 frames) on
+# the log-archive branch, never overlapping the previous snapshot, and checks
+# the calibration on every snapshot scanned after the calibration was fitted
+# (babel_surfer/audit.py). A test that reaches 3 or 4 sigma far more often
+# than static opens an issue: its finds are likely false. It makes no
+# requests to Babelia.
+
+on:
+  schedule:
+    - cron: "41 5 * * 0"          # weekly (Sunday); the log turns over every ~2 days
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - run: pip install -r requirements.txt
+
+      - name: The site's score log and the archive so far
+        run: |
+          mkdir -p site-data archive
+          git fetch -q --depth=1 origin gh-pages
+          for f in scores.npy stats.json calibration.json; do
+            git show "FETCH_HEAD:data/$f" > "site-data/$f" || rm -f "site-data/$f"
+          done
+          if git fetch -q --depth=1 origin log-archive; then
+            for f in $(git ls-tree --name-only FETCH_HEAD); do
+              git show "FETCH_HEAD:$f" > "archive/$f"
+            done
+          fi
+
+      - name: Archive and audit
+        run: |
+          python -m babel_surfer.audit --archive archive --scores site-data/scores.npy \
+            --stats site-data/stats.json --audit archive --data site-data --alert audit-alert.md
+
+      - name: Save the archive (log-archive branch)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd archive
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -b log-archive
+          git add -A
+          git commit -q -m "Score log archive $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do
+            git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" log-archive && break
+            sleep $((i * 5))
+          done
+
+      - name: Open an issue on a surplus (once per open issue)
+        if: hashFiles('audit-alert.md') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Surfing Babel: the calibration audit found a surplus of high scores"
+          open=$(gh issue list --repo "${{ github.repository }}" --state open --search "in:title \"$title\"" \
+                 --json title --jq "map(select(.title == \"$title\")) | length")
+          if [ "${open:-0}" = "0" ]; then
+            gh issue create --repo "${{ github.repository }}" --title "$title" --body-file audit-alert.md
+          else
+            echo "an issue for this is already open"
+          fi

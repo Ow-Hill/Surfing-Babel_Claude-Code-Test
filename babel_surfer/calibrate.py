@@ -71,6 +71,8 @@ def main(argv=None) -> int:
     ap.add_argument("--out", type=Path, default=CALIBRATION_FILE)
     ap.add_argument("--from-log", type=Path,
                     help="fit empirical null maps from a real-frame score log (scores.npy)")
+    ap.add_argument("--scanned-through", type=int, metavar="N",
+                    help="with --from-log: the scan total when the log's newest frame was logged")
     ap.add_argument("--simulate-missing", type=int, metavar="FRAMES",
                     help="fit null maps on this many simulated frames for tests without one")
     ap.add_argument("--refit-live", type=Path, metavar="DATA_DIR",
@@ -84,7 +86,7 @@ def main(argv=None) -> int:
             print(f"{t:10s} held-out sd {v['sd']:.2f}  >3σ {v['over_3']}/{v['expected_3']}  max {v['max']}")
         return 0
     if args.from_log:
-        report = calibrate_from_log(args.from_log, args.out)
+        report = calibrate_from_log(args.from_log, args.out, scanned_through=args.scanned_through)
         print(format_report(report))
         return 0
 
@@ -254,10 +256,13 @@ def ready_tests(raw: dict) -> list[str]:
 
 
 def calibrate_from_log(log_path: Path, out: Path = CALIBRATION_FILE,
-                       base: Path | None = None) -> dict:
+                       base: Path | None = None, scanned_through: int | None = None) -> dict:
     """Fit empirical null maps for every test with at least MIN_LOG_FRAMES
     real frames in the log; other tests keep their current (simulated) maps.
-    ``base``: the calibration to start from (default: ``out`` itself)."""
+    ``base``: the calibration to start from (default: ``out`` itself).
+    ``scanned_through``: the scan total when the log's newest frame was
+    logged; the weekly audit (audit.py) judges the fit only on frames scanned
+    after it."""
     src = base or out
     data = json.loads(src.read_text()) if src.exists() else {}
     legacy = data.get("tests") or {}
@@ -312,7 +317,7 @@ def calibrate_from_log(log_path: Path, out: Path = CALIBRATION_FILE,
     data["map_sources"] = sources
     data["maps_source"] = {"frames": int(len(log)), "log": log_path.name,
                            "method": "empirical CDF + generalised Pareto tail (xi >= 0)",
-                           "validation": validation}
+                           "scanned_through": scanned_through, "validation": validation}
     out.write_text(_compact_json(data))
     classifier._calibration_cache = None
     return {"validation": validation, "before": before, "ready": ready, "rejected": rejected}
@@ -378,7 +383,11 @@ def refit_live(data_dir: Path) -> bool:
     if not pending:
         return False
     live = data_dir / "calibration.json"
-    rep = calibrate_from_log(log_path, live, base=effective)
+    try:
+        through = int(json.loads((data_dir / "stats.json").read_text())["scanned"])
+    except (OSError, ValueError, KeyError):
+        through = None
+    rep = calibrate_from_log(log_path, live, base=effective, scanned_through=through)
     if rep.get("rejected"):
         print(f"::warning::refit rejected for {', '.join(rep['rejected'])}: too many held-out frames above "
               "3 or 4 sigma for static; keeping their previous maps")
