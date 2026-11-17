@@ -14,7 +14,8 @@
     <p class="site-nav"><a href="agent.html">How this was built (by an AI agent) →</a></p>
     <p class="lede">The <a href="https://babelia.libraryofbabel.info/slideshow.html">Babel Image Archive</a>
       contains every possible 640×416 image, which means it is almost entirely static. A scanner runs on a schedule,
-      pulls frames from the archive's slideshow and keeps any that look like <em>something</em>.</p>
+      pulls frames from the archive's slideshow and keeps any that look like <em>something</em>. A picture turning
+      up by chance is astronomically unlikely, so what this site really measures is how strange random static gets.</p>
     <p class="howto"><b>How to read this page:</b> every frame gets a score in <b>σ</b>, meaning how unusual it is
       compared with random static. Frames at <span class="thr">4</span>σ or more are kept as <b>finds</b>. Expect
       unusually patterned static, not pictures; a real picture would score far higher.
@@ -38,7 +39,7 @@
   <section class="wrap stats" id="stats" aria-label="Scan totals">
     <div class="stat"><b id="s-scanned">–</b><small>frames scanned</small></div>
     <div class="stat"><b id="s-finds">–</b><small>finds (≥ <span class="thr">4</span>σ) · <span id="s-rate">–</span></small></div>
-    <div class="stat"><b id="s-best">–</b><small>highest score so far</small></div>
+    <div class="stat"><b id="s-best">–</b><small>highest score so far<span id="s-best-chance"></span></small></div>
     <div class="stat"><b id="s-last">–</b><small>last scan finished<span id="s-pace"></span></small></div>
   </section>
 
@@ -249,6 +250,7 @@
     <div class="d-body">
       <p id="d-note" class="d-note" hidden></p>
       <div id="d-score"><span id="d-tier" class="tag"></span> <b id="d-sigma"></b> <span class="muted" id="d-reason"></span></div>
+      <p id="d-chance" class="muted small" hidden></p>
       <p id="d-desc" class="d-desc" hidden></p>
       <div class="actions">
         <button id="d-open" class="btn" type="button">Open in Babelia</button>
