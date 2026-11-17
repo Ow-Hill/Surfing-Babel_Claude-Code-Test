@@ -176,6 +176,8 @@ function openDetail(item, list = null, label = "") {
   Overlay.show(item);
 
   $("d-score").hidden = item.sigma == null;
+  $("d-chance").hidden = true;          // never leave the previous frame's line behind
+  $("d-chance").textContent = "";
   if (item.sigma != null) {
     $("d-tier").textContent = item.tier;
     $("d-tier").className = `tag ${tierClass(item.tier)}`;
@@ -186,6 +188,8 @@ function openDetail(item, list = null, label = "") {
         (item.visibility.ratio != null ? ` (${item.visibility.ratio}× what static shows` +
           (item.visibility.label !== "invisible" && visCue(item.visibility) ? `: ${visCue(item.visibility)}` : "") + ")" : "") : "") +
       (item.combined != null ? ` · all tests combined: ${fmtSigma(item.combined)}` : "");
+    $("d-chance").hidden = !(item.sigma >= 3);
+    if (!$("d-chance").hidden) $("d-chance").textContent = chanceLine(item.sigma);
   }
 
   $("d-loc").value = item.location || item.locationPreview;
@@ -561,9 +565,20 @@ function renderFinds(totalFinds) {
   if (view.filter !== "all" && !finds.some((f) => f.reason === view.filter)) view.filter = "all";
   const list = visibleFinds();
   const items = list.map((f) => findItem(f));
-  $("finds").replaceChildren(...list.map((f, i) =>
+  const tiles = list.map((f, i) =>
     tile({ img: `data/${f.image}`, loc: f.location, sigma: f.sigma, tier: f.tier, visibility: f.visibility,
-           caption: shortDesc(f.description), onClick: () => openDetail(items[i], items, "Find") })));
+           caption: shortDesc(f.description), onClick: () => openDetail(items[i], items, "Find") }));
+  // A2: when sorted by what a person would see, mark where the visible ones end
+  const seen = (f) => f.visibility && f.visibility.label && f.visibility.label !== "invisible";
+  const nSeen = list.filter(seen).length;
+  if (view.sort === "visible" && nSeen < list.length) {
+    const sep = document.createElement("p");
+    sep.className = "gallery-sep muted small";
+    sep.textContent = (nSeen ? "" : "None of these would stand out to a person. ") +
+      `Statistically rare but invisible to the eye: ${fmtInt(list.length - nSeen)}`;
+    tiles.splice(nSeen, 0, sep);
+  }
+  $("finds").replaceChildren(...tiles);
   $("finds-controls").hidden = finds.length < 2;
   // filter chips by strongest test, with counts
   const counts = {};
@@ -594,6 +609,15 @@ function pMaxOver(z, k) {
 }
 // Frames scanned in the 24 hours up to the latest run, and how much of that
 // time a scan was running (scans relay into each other, so this should be near 100%).
+function paceFramesPerDay(runs) {
+  const scans = (runs || []).filter((r) => r.scanned && r.finished_at && r.started_at);
+  if (scans.length < 2) return null;
+  const end = scans[scans.length - 1].finished_at;
+  const span = Math.min(86400, end - scans[0].started_at);
+  const frames = scans.filter((r) => r.finished_at > end - span).reduce((n, r) => n + r.scanned, 0);
+  return span >= 3600 ? frames * 86400 / span : null;
+}
+
 function scanPace(runs) {
   const scans = (runs || []).filter((r) => r.scanned && r.finished_at && r.started_at);
   if (!scans.length) return "";
@@ -605,6 +629,41 @@ function scanPace(runs) {
   const busy = day.reduce((t, r) => t + (r.finished_at - Math.max(r.started_at, from)), 0);
   const perDay = Math.round(frames * 86400 / span / 100) * 100;
   return ` · about ${fmtInt(perDay)} frames a day, scanning ${Math.round(100 * Math.min(1, busy / span))}% of the time`;
+}
+
+// The score the best of `draws` independent N(0,1) test scores reaches with
+// probability 1/2: what chance alone gives as "highest so far" (17 tests a frame).
+function expectedBest(draws) {
+  let lo = 0, hi = 12;
+  for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (pMaxOver(m, draws) > 0.5) lo = m; else hi = m; }
+  return (lo + hi) / 2;
+}
+// How often pure static puts one of the tests at `sigma` or above: log10 of
+// "once every N frames". In log space, because far out the probability
+// underflows (a 96-sigma find would read "once every Infinity frames").
+function log10OnceEvery(sigma) {
+  const p = pMaxOver(sigma, N_TESTS);
+  if (p > 1e-300) return -Math.log10(p);
+  const lnTail = -sigma * sigma / 2 - Math.log(sigma * Math.sqrt(2 * Math.PI));   // Mills ratio
+  return -(lnTail + Math.log(N_TESTS)) / Math.LN10;
+}
+
+function chanceLine(sigma) {
+  const lg = log10OnceEvery(sigma);
+  if (lg > 12) {
+    return `Pure static essentially never scores this high in any of the ${N_TESTS} tests (about once in ` +
+      `10^${Math.round(lg)} frames): this is far beyond chance at any scanning pace.`;
+  }
+  const every = Math.pow(10, lg);
+  const perDay = DATA.perDay ? DATA.perDay / every : null;
+  const soFar = DATA.scanned ? DATA.scanned / every : null;
+  const base = `Pure static scores this high in one of the ${N_TESTS} tests about once every ` +
+    `${fmtInt(Math.round(every))} frames` + (perDay ? ` (about ${fmtExpected(perDay)} a day at the scanner's pace)` : "");
+  if (soFar == null || soFar >= 0.2) {
+    return base + ". So a find like this is expected by chance; it is the strangest static, not a picture.";
+  }
+  return base + `. Chance would give one about ${fmtExpected(soFar)} times in all ${fmtInt(DATA.scanned)} frames ` +
+    "scanned so far: rare, though one such frame among many finds can still be luck.";
 }
 
 function fmtExpected(x) { return x >= 10 ? fmtInt(Math.round(x)) : x >= 1 ? x.toFixed(1) : x.toFixed(2); }
@@ -738,6 +797,11 @@ async function load() {
   $("s-rate").textContent = rate;
   document.querySelectorAll(".rate-text").forEach((e) => (e.textContent = totalFinds ? `about ${rate}` : "very rarely (the exact rate is still being measured)"));
   $("s-best").textContent = stats.best ? fmtSigma(stats.best.sigma) : "–";
+  // A1: the record grows with the number of frames; say what chance alone gives
+  $("s-best-chance").textContent = stats.scanned > 1000
+    ? ` · chance alone gives about ${fmtSigma(expectedBest(stats.scanned * N_TESTS))} at this many frames` : "";
+  DATA.perDay = paceFramesPerDay(stats.runs);
+  DATA.scanned = stats.scanned || 0;
   $("s-last").textContent = ago(stats.last_run && stats.last_run.finished_at);
   $("s-pace").textContent = scanPace(stats.runs);
   renderHist(stats, bench);

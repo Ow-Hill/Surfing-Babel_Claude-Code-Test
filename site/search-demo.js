@@ -241,8 +241,10 @@
         ` title="${(i / 2).toFixed(1)}${i < 8 ? `–${((i + 1) / 2).toFixed(1)}` : "+"}σ: ${n} frames"></div>`).join("");
       $("sd-hist").hidden = false;
       $("sd-axis").hidden = false;
+      const chance = sigmaFromP(Math.LN2 / (N * 3));      // the median best of 3,000 test scores
       out.textContent = `1,000 frames of pure static: ${finds} find${finds === 1 ? "" : "s"} (4σ or more), ` +
-        `${near} near miss${near === 1 ? "" : "es"}, strongest ${best.toFixed(2)}σ. ` +
+        `${near} near miss${near === 1 ? "" : "es"}, strongest ${best.toFixed(2)}σ, where chance predicts ` +
+        `about ${chance.toFixed(1)}σ for the best of this many. ` +
         "Static is expected to reach 4σ in these three tests about once in 5,000 frames, so finds stay rare " +
         "however long the scan runs, and any one of them is most likely chance.";
       state.loc = start + N;

@@ -346,3 +346,5 @@ body.present .prompt { font-size: 1rem; }
 .sd-hbar.over { background: var(--t-striking); }
 .sd-focus { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 8px; }
 @media (prefers-reduced-motion: reduce) { .sd-fill { transition: none; } }
+
+.gallery-sep { grid-column: 1 / -1; margin: 6px 0 0; padding-top: 8px; border-top: 1px dashed var(--line); }
