@@ -226,9 +226,9 @@ def test_a_tied_value_is_as_rare_as_the_frames_at_or_above_it():
     srt = np.sort(v)
     worst = 0.0
     for x in np.unique(srt[-200:]):
-        if m["u"] < x <= m["x"][-1]:                           # the knotted upper tail
+        if x > m["u"]:                                         # every step reached, to the top
             at_or_above = (len(v) - np.searchsorted(srt, x, side="left")) / len(v)
             worst = max(worst, nullmap.sigma(m, float(x)) + NormalDist().inv_cdf(at_or_above))
-    assert worst < 0.05                                        # (counting strictly above: +0.16)
+    assert worst < 0.05             # (counting strictly above: +0.16; smooth tail past the knots: +0.5)
     fresh = np.round(np.random.default_rng(1).gumbel(size=200_000) / 0.5) * 0.5
     assert (nullmap.sigma_array(m, fresh) > 3).sum() <= 270 * 1.15   # (strictly above: 381)
