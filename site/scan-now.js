@@ -2,8 +2,10 @@
 //
 // GitHub Pages is static, and Babelia sends no CORS headers (a browser can't
 // read its pixels), so scans run in GitHub Actions. Starting one needs a token
-// with Actions write access. The owner pastes a fine-grained token once; it
-// is kept only in this browser's localStorage and sent only to api.github.com.
+// with Actions write access. The owner pastes a fine-grained token; by default
+// it is kept only for this browser session (sessionStorage), or in this
+// browser's localStorage if they tick "Remember", and sent only to
+// api.github.com.
 // Anyone can see scan status: that uses GitHub's public, unauthenticated API.
 
 (() => {
@@ -15,9 +17,16 @@
   const $ = (id) => document.getElementById(id);
 
   const store = {
-    get() { try { return localStorage.getItem(TOKEN_KEY) || ""; } catch { return ""; } },
-    set(v) { try { localStorage.setItem(TOKEN_KEY, v); } catch {} },
-    clear() { try { localStorage.removeItem(TOKEN_KEY); } catch {} },
+    get() {
+      try { return sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY) || ""; }
+      catch { return ""; }
+    },
+    set(v, remember) {
+      try { (remember ? localStorage : sessionStorage).setItem(TOKEN_KEY, v); } catch {}
+    },
+    clear() {
+      try { sessionStorage.removeItem(TOKEN_KEY); localStorage.removeItem(TOKEN_KEY); } catch {}
+    },
   };
 
   let pollTimer = null;
@@ -175,7 +184,7 @@
     $("scan-go").disabled = true;
     try {
       await dispatch(token, minutes);
-      if (typed && $("scan-remember").checked) store.set(typed);
+      if (typed) store.set(typed, $("scan-remember").checked);
       $("scan-token").value = "";
       $("scan-dialog").close();
       setStatus(busy ? "scan queued: it starts when the current one finishes" : "scan requested…", "running");

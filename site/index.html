@@ -287,14 +287,14 @@
   <dialog id="scan-dialog" class="scan-dialog" aria-labelledby="scan-h">
     <form id="scan-form">
       <h2 id="scan-h">Start a scan</h2>
-      <p class="muted">Scans run in GitHub Actions, about 1,900 frames per hour, and publish here when they finish.</p>
+      <p class="muted">Scans run in GitHub Actions, about 2,200 frames per hour, and publish here when they finish.</p>
       <label for="scan-minutes">Length</label>
       <select id="scan-minutes">
-        <option value="5">5 minutes (~150 frames)</option>
-        <option value="15" selected>15 minutes (~470 frames)</option>
-        <option value="30">30 minutes (~950 frames)</option>
-        <option value="60">1 hour (~1,900 frames)</option>
-        <option value="180">3 hours (~5,600 frames)</option>
+        <option value="5">5 minutes (~180 frames)</option>
+        <option value="15" selected>15 minutes (~550 frames)</option>
+        <option value="30">30 minutes (~1,100 frames)</option>
+        <option value="60">1 hour (~2,200 frames)</option>
+        <option value="180">3 hours (~6,600 frames)</option>
       </select>
       <p id="scan-summary" class="summary"></p>
       <div id="scan-token-row">
@@ -303,7 +303,8 @@
         <p class="hint muted">Only someone who can run this repository's workflows can start a scan. Use a
           <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">fine-grained token</a>
           limited to this repository with <b>Actions: Read and write</b>. It is sent only to api.github.com.</p>
-        <label class="check"><input id="scan-remember" type="checkbox" checked> Remember in this browser</label>
+        <label class="check"><input id="scan-remember" type="checkbox"> Remember in this browser
+          (otherwise only until you close it)</label>
       </div>
       <p id="scan-error" class="error" role="alert" hidden></p>
       <div class="actions">

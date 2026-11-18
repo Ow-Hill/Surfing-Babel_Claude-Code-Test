@@ -155,3 +155,22 @@ def test_benchmark_file_has_everything_the_site_reads(tmp_path, monkeypatch):
         assert {"label", "file", "thumb", "sigma", "tier"} <= set(e)
         assert (out / e["file"]).exists() and (out / e["thumb"]).exists()
         assert (out / e["thumb"]).stat().st_size < (out / e["file"]).stat().st_size
+
+
+def test_a_demo_is_located_fetched_and_kept_offline_afterwards(tmp_path, monkeypatch):
+    """seeded.generate: upload the picture, fetch the frame at the location
+    Babelia answers, keep both; ensure() then never touches the network."""
+    from babel_surfer.calibrate import babel_static
+    frame = babel_static(np.random.default_rng(2))
+    calls = []
+    monkeypatch.setattr(seeded, "search_location", lambda png, name: calls.append(("search", name)) or "4242")
+    monkeypatch.setattr(seeded, "fetch", lambda loc, timeout=180: calls.append(("fetch", loc)) or frame)
+    demo = seeded.DEMOS[0]
+    seeded.generate(tmp_path, demo)
+    assert calls == [("search", f"{demo['slug']}.png"), ("fetch", "4242")]
+    assert (tmp_path / f"{demo['slug']}.location.txt").read_text() == "4242"
+    assert (tmp_path / f"{demo['slug']}.jpg").read_bytes() == frame
+    monkeypatch.setattr(seeded, "search_location", lambda *a: pytest.fail("network used"))
+    monkeypatch.setattr(seeded, "fetch", lambda *a, **k: pytest.fail("network used"))
+    entries = seeded.ensure(tmp_path, network=False)
+    assert [e["slug"] for e in entries] == [demo["slug"]] and entries[0]["location_digits"] == 4
