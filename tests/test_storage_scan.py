@@ -544,3 +544,10 @@ def test_politeness_climbs_on_a_server_that_gains_a_little_per_step():
             p.release((7.4 + 0.88 * p.limit) * rng.lognormal(0, 0.3), _t.time())
         ends.append(p.limit)
     assert sum(e >= 7 for e in ends) >= 5
+
+
+def test_leaderboards_of_retired_tests_are_dropped(tmp_path):
+    (tmp_path / "leaders.json").write_text(json.dumps({"strokes": [{"location": "1", "sigma": 5.0}],
+                                                       "shape": [], "combined": []}))
+    s = Store(tmp_path)
+    assert "strokes" not in s.leaders and "shape" in s.leaders and "combined" in s.leaders

@@ -263,9 +263,11 @@ class Store:
                                       "edges": HIST_EDGES, "counts": counts}
 
     def _tidy(self) -> None:
-        """Migrate older data: shrink full-size images, apply the finds cap
-        and delete images nothing refers to."""
+        """Migrate older data: shrink full-size images, apply the finds cap,
+        drop leaderboards of retired tests and delete images nothing refers to."""
         self._cap_finds()
+        for t in [t for t in self.leaders if t not in TESTS and t != "combined"]:
+            del self.leaders[t]                       # e.g. "strokes", replaced by "marks"
         keep = self._referenced()
         for p in self.image_dir.glob("*.heat.png"):      # replaced by maps.json
             p.unlink()

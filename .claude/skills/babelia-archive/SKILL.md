@@ -67,6 +67,10 @@ description: Facts about the Babel Image Archive (babelia.libraryofbabel.info) t
 - **Fingerprint:** in every real frame, red at row y correlates with green at row y+156, and
   green with blue (about +14σ). `classifier.fingerprint_z` measures it, and the repetition
   test excludes that offset. A frame without the fingerprint would itself be news.
+- **Image → location is exactly affine mod a measured N** (designed uploads, 2026-11-18;
+  data on the `research-babelia` branch). Inside a segment it is one constant × 16^digit in
+  the strip layout; segments have unrelated constants, so frames can't be generated locally
+  yet. Spend uploads sparingly: 20 of ~40 agreed are used.
 - **Babelia's map is affine in location, and one block is exactly additive.**
   image(L+k) = image(L) + k·A, read as a big number: a row runs from least to most significant
   left to right, blue < green < red within a pixel. In the block y ≥ 380, x ≥ 480 this predicts

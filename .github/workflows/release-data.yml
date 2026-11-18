@@ -1,0 +1,62 @@
+name: Publish the score-log archive
+
+# Plan item G1: once a month, attach every archived score-log snapshot
+# (log-archive branch) to a release, so the measured static is downloadable
+# open data: 100,000 frames per snapshot, 17 test statistics each. See
+# docs/data-format.md. It makes no requests to Babelia.
+
+on:
+  schedule:
+    - cron: "17 6 2 * *"          # monthly, the 2nd
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-data
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262   # v4.4.0
+
+      - name: The archived snapshots
+        run: |
+          mkdir -p archive
+          git fetch -q --depth=1 origin log-archive
+          for f in $(git ls-tree --name-only FETCH_HEAD); do
+            git show "FETCH_HEAD:$f" > "archive/$f"
+          done
+          ls -la archive
+
+      - name: Release them (new snapshots only)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="data-$(date -u +%Y-%m)"
+          {
+            echo "Score logs from the Surfing Babel scanner: every frame scanned from Babelia's slideshow,"
+            echo "with each of the 17 tests' calibrated score and raw statistic. Each \`scores-<N>.npz\` holds"
+            echo "the 100,000 frames scanned up to scan total N (NumPy: \`np.load(f)['log']\`). Columns and"
+            echo "meanings: docs/data-format.md. Frames are pure static: this is a measurement of how random"
+            echo "Babelia's frames look, not a collection of pictures."
+          } > notes.md
+          if gh release view "$tag" --repo "${{ github.repository }}" > /dev/null 2>&1; then
+            gh release upload "$tag" archive/scores-*.npz --repo "${{ github.repository }}"  || true
+          else
+            # snapshots already attached to an earlier release are not repeated
+            have=$(gh release list --repo "${{ github.repository }}" --limit 100 --json tagName --jq '.[].tagName' \
+                   | grep '^data-' | xargs -r -I{} gh release view {} --repo "${{ github.repository }}" \
+                   --json assets --jq '.assets[].name' 2>/dev/null || true)
+            new=""
+            for f in archive/scores-*.npz; do
+              echo "$have" | grep -qx "$(basename "$f")" || new="$new $f"
+            done
+            if [ -z "$new" ]; then echo "no new snapshots"; exit 0; fi
+            gh release create "$tag" $new --repo "${{ github.repository }}" \
+              --title "Score-log data $(date -u +%Y-%m)" --notes-file notes.md
+          fi

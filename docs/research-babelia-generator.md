@@ -183,3 +183,48 @@ image = A·L + B as big numbers, then (image₁ − image₂) = A·(L₁ − L�
 18% JPEG recovery noise makes that division useless as it stands, so it needs a frame whose
 values are known exactly (a location whose frame we can check digit by digit, e.g. by uploading
 a picture Babelia renders losslessly) before the algebra can be run.
+
+## Working backwards: designed uploads to the image search (2026-11-17/18)
+
+Plan item E1. 20 uploads to `/imagesearch.cgi`, one at a time and at least a minute apart:
+640×416 PNGs at Babelia's 16 levels, all black except a value or two. The data (each image's
+non-zero values, the returned 961,760-digit locations, the modulus, the scripts) is on the
+`research-babelia` branch.
+
+**Exact data.** The frames at two returned locations reproduce the uploads value for value
+(100%), so this channel has no JPEG recovery noise.
+
+**The image → location map is affine modulo a measured N.**
+- **Linear.** Doubling one value doubles the change in the location, to the last digit, and
+  two changes add exactly. So every position has a constant K, and location = L(black) +
+  Σ value × K (mod N).
+- **The modulus.** N came from one wrapped doubling. It has 961,760 digits (about 69,544 ×
+  16^798,720), is divisible by 3, and is not prime.
+- **Confirmed.** It predicted the location of a never-uploaded image (five values at three
+  positions) exactly.
+
+**Inside a segment, the layout is the frame's own.** Relative to red at (0,0), green is 16⁻¹,
+blue 16⁻², the next pixel 16³, and the next row 16⁴⁸⁰: the 160 px strips read like text, blue
+< green < red, found before from the other direction (carries between neighbouring
+locations). Rows 0–103 of the first strip share one constant A (row 52 is exactly
+A·16^24,960). Inside block 31, the last pixel is the block's start × 16^15,359 exactly.
+
+**But segments have unrelated constants.** Rows 104 and 156 (first strip), row 208 (third
+strip) and block 31 each start their own run of powers of 16:
+- **No power-of-16 relation:** none is A·16^e, or another's constant × 16^e, for any
+  0 ≤ e < 800,000.
+- **No simple algebraic relation:** relative to a single-number model, the correction factors
+  are full-size and unrelated (not equal, not squares of each other).
+
+**What it means.** The map is a sum over segments, each a base-16 number with its own constant.
+Inverting a sum with unrelated constants is, in general, a hard (knapsack-like) problem. Yet
+Babelia computes frames from locations quickly, so the construction must have structure this
+view hasn't found yet. The likeliest is a chained, block-by-block design whose overall effect
+is affine. Local generation is not in reach yet.
+
+**Next, if pursued** (20 of the ~40 agreed uploads remain):
+1. Find the segment boundaries by bisection on rows within the first strip (rows 52–104 and
+   104–156): about 6 uploads per boundary.
+2. With two or three adjacent segment constants, look for the chaining rule. For example, is
+   a segment's constant a function of the previous segment's digits, as in a Feistel or
+   cipher-block-chaining construction?
