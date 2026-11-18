@@ -185,6 +185,7 @@ class Politeness:
     SPELL_WINDOW = 300.0               # seconds of outcomes judged for a bad spell...
     SPELL_ERRORS = 5                   # ...at least this many failures...
     SPELL_SHARE = 1 / 3                # ...and this share of requests failing...
+    SPELL_SPAN = 60.0                  # ...spread over at least this long (a burst is not an outage)...
     SPELL_PAUSE = 180.0                # ...pauses all requests this long
     RATE_WINDOW = 60.0                 # seconds: max_rate counts requests started in this window
 
@@ -260,12 +261,18 @@ class Politeness:
         """A bad spell (Babelia answering 500s for minutes on end, as on
         2026-11-10): stepping down and back up keeps sending requests into
         it. When at least SPELL_ERRORS of the last SPELL_WINDOW seconds'
-        requests failed, and at least SPELL_SHARE of them, pause for
-        SPELL_PAUSE seconds. Called with the lock held."""
+        requests failed, at least SPELL_SHARE of them, and the failures span
+        SPELL_SPAN seconds or more, pause for SPELL_PAUSE seconds. The span
+        matters: a burst (every in-flight request failing at once) is one
+        hiccup, which steps down once; without it a burst early in a chunk
+        paused everything for 3 minutes. Called with the lock held."""
         now = time.time()
         self.outcomes = [o for o in self.outcomes if o[0] > now - self.SPELL_WINDOW] + [(now, failed)]
         bad, n = sum(f for _, f in self.outcomes), len(self.outcomes)
-        if failed and bad >= self.SPELL_ERRORS and bad >= self.SPELL_SHARE * n and now >= self.pause_until:
+        fails = [t for t, f in self.outcomes if f]
+        span = fails[-1] - fails[0] if fails else 0.0
+        if failed and bad >= self.SPELL_ERRORS and bad >= self.SPELL_SHARE * n \
+                and span >= self.SPELL_SPAN and now >= self.pause_until:
             self.pause_until = now + self.SPELL_PAUSE
             self.pauses += 1
             self.outcomes = []
