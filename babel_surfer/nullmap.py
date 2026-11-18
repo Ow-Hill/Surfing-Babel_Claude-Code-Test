@@ -105,6 +105,19 @@ def fit(values: np.ndarray) -> dict:
             if above >= TAIL_K:
                 xs = np.append(xs, x)
                 ps = np.append(ps, 1.0 - above / len(v))
+    # A stepped tail (fewer than half its top 300 values distinct: colours,
+    # 41 of 300) jumps between steps, and the smooth tail beyond the last
+    # knot overstated the steps there: colours read 4.56 sigma for a value 2
+    # in 195,530 frames reach (4.26), and 8 of the site's finds sat on such
+    # steps where about 1 was expected (2026-11-18). So a stepped statistic
+    # gets a knot at every step it has reached, down to a single frame; only
+    # values beyond everything seen are extrapolated.
+    top = srt[-300:]
+    if len(np.unique(top)) < 0.5 * len(top):
+        for x in np.unique(srt[srt > xs[-1] + 1e-9]):
+            at_or_above = len(v) - np.searchsorted(srt, x, side="left")
+            xs = np.append(xs, float(x))
+            ps = np.append(ps, 1.0 - at_or_above / len(v))
     if atom_info:
         xs = np.concatenate([[atom_info["x"]], xs])
         ps = np.concatenate([[atom], ps])
