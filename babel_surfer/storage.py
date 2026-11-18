@@ -111,6 +111,10 @@ class Store:
         self.near = _read(self.dir / "near_misses.json", [])
         self.leaders = _read(self.dir / "leaders.json", {})
         self.flags = _read(self.dir / "flags.json", [])       # frames people flagged
+        # every find ever made (the site shows the top MAX_FINDS), and one line
+        # of totals per day, kept for good (stats.json keeps only recent runs)
+        self.finds_log = _read(self.dir / "finds_log.json", [])
+        self.history = _read(self.dir / "history.json", [])
         self.stats.setdefault("finds_total", len(self.finds))
         self.stats.setdefault("test_hist", {"lo": TEST_HIST_LO, "step": TEST_HIST_STEP, "counts": {}})
         self.stats.setdefault("fingerprint", {"n": 0, "sum": 0.0, "sumsq": 0.0, "min": None})
@@ -378,6 +382,11 @@ class Store:
         before, e.g. re-mined), only a newly stored find adds to the total, so
         re-mining the same frames never inflates it."""
         if result.is_interesting:
+            if not any(f["location"] == location for f in self.finds) and (
+                    count or not any(f["location"] == location for f in self.finds_log)):
+                self.finds_log.append({"location": location, "sigma": result.sigma, "tier": entry.get("tier"),
+                                       "reason": result.reason, "found_at": entry.get("found_at"),
+                                       "detector": self._detector})
             if not any(f["location"] == location for f in self.finds):
                 lowest = min((f["sigma"] for f in self.finds), default=float("-inf"))
                 if len(self.finds) >= MAX_FINDS and result.sigma <= lowest:
@@ -473,6 +482,9 @@ class Store:
             locs = {f["location"] for f in run.get("new_finds", [])}
             moved = [f for f in self.finds if f["location"] in locs]
             self.finds = [f for f in self.finds if f["location"] not in locs]
+            since = run.get("started_at", float("inf"))   # also finds below the top MAX_FINDS
+            self.finds_log = [f for f in self.finds_log
+                              if f["location"] not in locs and (f.get("found_at") or 0) < since]
             self.stats["finds_total"] = max(len(self.finds), self.stats.get("finds_total", 0) - len(locs))
             q = self.stats.setdefault("quarantine", [])
             q.extend({k: f.get(k) for k in ("location", "sigma", "reason", "found_at")} for f in moved)
@@ -501,8 +513,32 @@ class Store:
                 run["fingerprint_mean"] = round(run.pop("fp_sum") / run["fp_n"], 2)
             run.pop("fp_sum", None)
             self.stats["runs"] = (self.stats["runs"] + [run])[-RUN_HISTORY:]
+            if primary and run.get("scanned"):
+                self._add_to_history(run)
             if primary:
                 self.stats["last_run"] = run
+
+    def _add_to_history(self, run: dict) -> None:
+        """Fold a scan into its UTC day's line of history.json: frames, finds,
+        errors by kind, scanning time, and request-weighted latency and load."""
+        day = time.strftime("%Y-%m-%d", time.gmtime(run.get("finished_at") or time.time()))
+        if not self.history or self.history[-1]["day"] != day:
+            self.history.append({"day": day, "runs": 0, "frames": 0, "finds": 0, "errors": 0,
+                                 "seconds": 0.0, "error_kinds": {}, "latency_s_x_frames": 0.0,
+                                 "in_flight_x_seconds": 0.0})
+        h = self.history[-1]
+        secs = max(0.0, (run.get("finished_at") or 0) - (run.get("started_at") or 0))
+        c = run.get("concurrency") or {}
+        h["runs"] += 1
+        h["frames"] += run.get("scanned", 0)
+        h["finds"] += run.get("finds", 0)
+        h["errors"] += run.get("errors", 0)
+        h["seconds"] = round(h["seconds"] + secs, 1)
+        for k, v in (run.get("error_kinds") or {}).items():
+            h["error_kinds"][k] = h["error_kinds"].get(k, 0) + v
+        h["latency_s_x_frames"] = round(h["latency_s_x_frames"]
+                                        + (c.get("latency_median_s") or 0) * run.get("scanned", 0), 1)
+        h["in_flight_x_seconds"] = round(h["in_flight_x_seconds"] + (c.get("in_flight") or 0) * secs, 1)
 
     def save(self) -> None:
         with self._save_lock:
@@ -517,6 +553,8 @@ class Store:
             _write(self.dir / "near_misses.json", self.near)
             _write(self.dir / "flags.json", self.flags)
             _write(self.dir / "leaders.json", self.leaders)
+            _write(self.dir / "finds_log.json", self.finds_log)
+            _write(self.dir / "history.json", self.history)
             log, self._score_log = self._score_log, []
         if log:
             self._append_score_log(log)

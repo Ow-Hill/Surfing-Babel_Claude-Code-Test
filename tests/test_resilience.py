@@ -280,3 +280,68 @@ def test_each_scan_records_its_frames_fingerprint_and_a_lost_one_alerts_once(tmp
     assert not fp.exists()
     assert alerts.build_fingerprint_alert({"last_run": {"fingerprint_mean": 14.1, "fp_n": 900,
                                                         "finished_at": 1}}, None) is None
+
+
+def test_a_chunk_starts_at_the_level_the_last_one_ended(tmp_path, monkeypatch):
+    """D1: a relay chunk picks up where the previous ended (if within the
+    hour), instead of ramping up from 3 every 30 minutes; never above the cap."""
+    import time as _t
+    monkeypatch.setattr(scan_mod, "fetch", lambda loc: FRAME)
+    monkeypatch.setattr(scan_mod, "classify", lambda data, threshold=4.0: fake(1.0))
+    store = Store(tmp_path)
+    store.stats["last_run"] = {"finished_at": _t.time() - 60, "concurrency": {"final": 7}}
+    store.save()
+    run = scan_mod.scan(str(tmp_path), minutes=1, workers=3, max_workers=8, start=0, max_frames=2, processes=0)
+    assert run["workers"] == 7 and run["concurrency"]["history"][0][1] == 7
+    store = Store(tmp_path)
+    store.stats["last_run"] = {"finished_at": _t.time() - 7200, "concurrency": {"final": 7}}
+    store.save()
+    run = scan_mod.scan(str(tmp_path), minutes=1, workers=3, max_workers=8, start=10, max_frames=2, processes=0)
+    assert run["workers"] == 3                          # two hours ago: start afresh
+
+
+def test_requests_pause_when_babelia_is_mostly_failing(monkeypatch):
+    """D3: when at least a third of recent requests fail (an outage), stop
+    sending for a while instead of stepping down and straight back up."""
+    import threading
+    import time as _t
+    monkeypatch.setattr(scan_mod.Politeness, "SPELL_PAUSE", 0.4)
+    p = scan_mod.Politeness(start=5, min_workers=1, max_workers=8)
+    stop = threading.Event()
+    for ok in (True, True, True, False, False, False, False):       # 4 of 7 failing...
+        p.acquire(stop)
+        p.release(1.0 if ok else None, _t.time())
+    assert p.pauses == 0                                            # ...but fewer than 5 failures
+    p.acquire(stop)
+    p.release(None, _t.time())                                      # the 5th: pause
+    assert p.pauses == 1
+    t0 = _t.time()
+    assert p.acquire(stop) and _t.time() - t0 >= 0.35               # held until the pause ends
+    p.release(1.0, _t.time())
+    q = scan_mod.Politeness(start=5, min_workers=1, max_workers=8)  # scattered failures: no pause
+    for i in range(60):
+        q.acquire(stop)
+        q.release(None if i % 10 == 0 else 1.0, _t.time())
+    assert q.pauses == 0
+
+
+def test_history_finds_log_and_status_summary(tmp_path, monkeypatch):
+    """F1 a line per day, G2 every find ever (the site shows the top 100),
+    F2 a health summary, all from an ordinary scan."""
+    import time as _t
+    from babel_surfer import build_site, storage as st
+    monkeypatch.setattr(st, "MAX_FINDS", 2)
+    sig = iter([9.0, 8.0, 7.0, 1.0, 1.0])
+    monkeypatch.setattr(scan_mod, "fetch", lambda loc: FRAME)
+    monkeypatch.setattr(scan_mod, "classify",
+                        lambda data, threshold=4.0: (lambda z: fake(z, z >= 4))(next(sig, 1.0)))
+    run = scan_mod.scan(str(tmp_path), minutes=1, workers=1, start=0, max_frames=5, processes=0)
+    s = Store(tmp_path)
+    assert run["finds"] == 3 and len(s.finds) == 2                # the top 2 on the site...
+    assert sorted(f["sigma"] for f in s.finds_log) == [7.0, 8.0, 9.0]   # ...all 3 in the log
+    day = s.history[-1]
+    assert day["day"] == _t.strftime("%Y-%m-%d", _t.gmtime()) and day["frames"] == 5 and day["finds"] == 3
+    summary = build_site.status_summary(s.stats)
+    assert summary["healthy"] and summary["last_24h"]["frames"] == 5 and summary["frames_total"] == 5
+    s.stats["halted"] = {"at": 1, "reason": "x"}
+    assert not build_site.status_summary(s.stats)["healthy"]
