@@ -167,3 +167,22 @@ Known so far (`docs/research-babelia-generator.md`):
     days, but is new traffic of a different kind.
 - Items marked **R** are research: time-box them and record what is ruled out, as
   `research-babelia-generator.md` does.
+
+---
+
+## Progress (2026-11-18)
+
+| Items | Status |
+|---|---|
+| A1–A4, H4 | Done (#48). The record shows what chance gives; each find says how often static scores that high; a separator marks the invisible finds. |
+| A5 | **Kept** the flag button: it is on the live strip and every detail view, costs nothing when unused, and needs a GitHub account, which likely explains its zero uses. |
+| B1–B5 | In progress. |
+| C1–C5 | Done (#47); stepped tails fixed further in #49 after the live check of #44 showed colours still over-reading. |
+| D1–D3, F1–F5, G2 | Done (#50). Pooled latency: 8.7 s at 5 in flight, 10.3 s at 8 (8 gives about 35% more frames). |
+| E1 | Done; E2–E4 open. Image → location is exactly affine mod a measured N; segments have unrelated constants, so local generation is not in reach (#51, `research-babelia` branch; 20 of ~40 agreed uploads used). |
+| G1, G3 | Done (#51). |
+| H1–H3, J1 | Done (#48). The browser tests found two bugs on their first run. |
+| I1, I3, I5, J3 | Done (this batch). |
+| I2 | **Dropped, measured:** 4 parallel workers took 4:06 against about 3:00 serially (the session fixtures and the tests' own process pools are duplicated per worker). |
+| I4 | **Declined:** mypy reports 58 issues, all annotation precision in numpy code; the two that looked real are benign. |
+| J2 | **Reviewed, no change:** each workflow's permissions are only what it uses. |

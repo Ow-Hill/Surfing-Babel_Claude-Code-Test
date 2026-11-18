@@ -12,7 +12,6 @@ Scores every logged frame from its raw statistics with the *current* calibration
 """
 import argparse
 import json
-import statistics
 import sys
 from pathlib import Path
 
