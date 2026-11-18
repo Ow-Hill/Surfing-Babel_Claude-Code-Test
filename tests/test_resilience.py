@@ -306,11 +306,18 @@ def test_requests_pause_when_babelia_is_mostly_failing(monkeypatch):
     import threading
     import time as _t
     monkeypatch.setattr(scan_mod.Politeness, "SPELL_PAUSE", 0.4)
-    p = scan_mod.Politeness(start=5, min_workers=1, max_workers=8)
     stop = threading.Event()
+    burst = scan_mod.Politeness(start=5, min_workers=1, max_workers=8)
+    for _ in range(6):                                              # all failing within a second:
+        burst.acquire(stop)
+        burst.release(None, _t.time())
+    assert burst.pauses == 0                                        # a burst, not an outage
+    monkeypatch.setattr(scan_mod.Politeness, "SPELL_SPAN", 0.05)    # failures spread out from here
+    p = scan_mod.Politeness(start=5, min_workers=1, max_workers=8)
     for ok in (True, True, True, False, False, False, False):       # 4 of 7 failing...
         p.acquire(stop)
         p.release(1.0 if ok else None, _t.time())
+        _t.sleep(0.02)
     assert p.pauses == 0                                            # ...but fewer than 5 failures
     p.acquire(stop)
     p.release(None, _t.time())                                      # the 5th: pause
