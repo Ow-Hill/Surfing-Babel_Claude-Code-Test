@@ -112,6 +112,15 @@ def build(out: Path, trials: int = 8, null_frames: int = 500, force_bench: bool 
     demos = seeded.ensure(out / "demo", network=network)
     print(f"{len(demos)} seeded demo(s)")
 
+    # F2: a small health summary
+    stats_file = out / "data" / "stats.json"
+    if stats_file.exists():
+        try:
+            summary = status_summary(json.loads(stats_file.read_text()))
+            (out / "data" / "status.json").write_text(json.dumps(summary, indent=1))
+        except (ValueError, KeyError, TypeError) as e:
+            print(f"status.json not written: {e}")
+
     # Atom feed of finds
     finds_file = out / "data" / "finds.json"
     finds = json.loads(finds_file.read_text()) if finds_file.exists() else []
@@ -126,6 +135,37 @@ def build(out: Path, trials: int = 8, null_frames: int = 500, force_bench: bool 
     (out / "agent" / "spec_results.json").write_text(json.dumps(spec, ensure_ascii=False))
     print(f"demo slot: {spec['variant']}, spec {spec['status']} "
           f"({spec.get('passed', 0)}/{spec.get('total', 0)})")
+
+
+def status_summary(stats: dict, now: float | None = None) -> dict:
+    """data/status.json: is the scan healthy, in one small file a person or
+    another tool can read without the GitHub API."""
+    from . import classifier
+    import time as _time
+    now = now or _time.time()
+    scans = [r for r in stats.get("runs") or [] if r.get("scanned") and r.get("finished_at")]
+    day = [r for r in scans if r["finished_at"] > now - 86400]
+    busy = sum(r["finished_at"] - max(r.get("started_at", r["finished_at"]), now - 86400) for r in day)
+    kinds: dict = {}
+    for r in day:
+        for k, v in (r.get("error_kinds") or {}).items():
+            kinds[k] = kinds.get(k, 0) + v
+    last = scans[-1] if scans else {}
+    fp = [r["fingerprint_mean"] for r in day if r.get("fingerprint_mean") is not None]
+    healthy = bool(last) and now - last["finished_at"] < 2 * 3600 and not stats.get("halted")
+    return {
+        "updated_at": round(now), "healthy": healthy,
+        "last_scan_finished_at": round(last["finished_at"]) if last else None,
+        "halted": stats.get("halted"),
+        "frames_total": stats.get("scanned", 0), "finds_total": stats.get("finds_total", 0),
+        "best": stats.get("best"),
+        "last_24h": {"frames": sum(r["scanned"] for r in day), "finds": sum(r.get("finds", 0) for r in day),
+                     "scanning_share": round(min(1.0, busy / 86400), 3), "fetch_errors": kinds,
+                     "rejected_frames": sum(r.get("rejected", 0) for r in day),
+                     "unconfirmed_finds": sum(r.get("unconfirmed", 0) for r in day),
+                     "fingerprint_mean": round(sum(fp) / len(fp), 2) if fp else None},
+        "calibration": classifier.calibration_hash(),
+    }
 
 
 def probe_results() -> str | None:

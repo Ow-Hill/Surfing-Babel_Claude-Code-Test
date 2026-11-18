@@ -176,6 +176,17 @@ jobs:
               rm -f alert.md
             fi
             publish || echo "::error::publish failed"
+            # F3: GitHub's Pages deploy occasionally fails on its side (one did on
+            # 2026-11-10), leaving the site stale until the next chunk. Look again
+            # once the deploy has had time to run, and re-run it once if it failed.
+            ( sleep 240
+              last=$(gh run list --repo "${{ github.repository }}" --workflow "pages build and deployment" \
+                     --limit 1 --json databaseId,conclusion --jq '.[0] | "\(.databaseId) \(.conclusion)"' 2>/dev/null)
+              set -- $last
+              if [ "${2:-}" = "failure" ]; then
+                gh run rerun "$1" --repo "${{ github.repository }}" --failed \
+                  && echo "re-ran the failed Pages deploy $1" || echo "::warning::could not re-run Pages deploy $1"
+              fi ) &
             # an implausible find rate halts scanning until someone resumes it
             if python -c "import json, sys; sys.exit(0 if json.load(open('public/data/stats.json')).get('halted') else 1)"; then
               echo "::error::scanning is halted (implausible find rate); see the halt issue, then run with resume=1"

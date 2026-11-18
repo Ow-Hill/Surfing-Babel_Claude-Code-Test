@@ -76,6 +76,16 @@ try:
                 if c.get("by_level"):
                     print("    median latency by requests at once: " + ", ".join(
                         f"{k}: {v[1]}s ({v[0]})" for k, v in c["by_level"].items()))
+        # D2: per-run medians by level are skewed (low levels are only sampled at
+        # the start and end of a run); pooled across runs, weighted by requests
+        pool = {}
+        for r in scans:
+            for k, (n, med) in ((r.get("concurrency") or {}).get("by_level") or {}).items():
+                w, total = pool.get(k, (0, 0.0))
+                pool[k] = (w + n, total + n * med)
+        if pool:
+            print("  latency by requests at once, all kept runs: " + ", ".join(
+                f"{k}: {t / w:.1f}s ({w:,})" for k, (w, t) in sorted(pool.items(), key=lambda kv: int(kv[0]))))
         if kinds:
             print("  fetch errors by kind: " + ", ".join(f"{k} {v}" for k, v in sorted(kinds.items(), key=lambda kv: -kv[1])))
         print(f"  guards: {guards['rejected']} frames not genuine Babelia frames, "
@@ -85,6 +95,25 @@ try:
           + ("yes" if s.get("log_calibration") else "not yet (new code not live, or re-mine pending)"))
 except (ValueError, json.JSONDecodeError):
     print("  could not read data/stats.json")
+
+print("== Actions minutes, last 30 days (F5)")
+try:
+    since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)).strftime("%Y-%m-%d")
+    mins = {}
+    for page in range(1, 11):
+        runs = get(f"/actions/runs?per_page=100&page={page}&created=>={since}").get("workflow_runs", [])
+        for r in runs:
+            if r.get("run_started_at") and r.get("updated_at"):
+                a0 = dt.datetime.fromisoformat(r["run_started_at"].replace("Z", "+00:00"))
+                a1 = dt.datetime.fromisoformat(r["updated_at"].replace("Z", "+00:00"))
+                mins[r["name"]] = mins.get(r["name"], 0) + max(0, (a1 - a0).total_seconds()) / 60
+        if len(runs) < 100:
+            break
+    for name, m in sorted(mins.items(), key=lambda kv: -kv[1]):
+        print(f"  {name:32s} {m:8,.0f} min")
+    print("  (public repositories run Actions free; this shows the load, not a bill)")
+except Exception as e:
+    print(f"  could not count: {e}")
 
 print("== calibration audit (log-archive branch)")
 if subprocess.run(["git", "fetch", "-q", "--depth=1", "origin", "log-archive"],

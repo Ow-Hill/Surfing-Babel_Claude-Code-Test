@@ -182,6 +182,10 @@ class Politeness:
 
     WINDOW = 12
     DRIFT = 1.03
+    SPELL_WINDOW = 300.0               # seconds of outcomes judged for a bad spell...
+    SPELL_ERRORS = 5                   # ...at least this many failures...
+    SPELL_SHARE = 1 / 3                # ...and this share of requests failing...
+    SPELL_PAUSE = 180.0                # ...pauses all requests this long
     RATE_WINDOW = 60.0                 # seconds: max_rate counts requests started in this window
 
     def __init__(self, start: int, min_workers: int = 1, max_workers: int = 5,
@@ -201,6 +205,9 @@ class Politeness:
         self.history: list[tuple[float, int]] = [(time.time(), self.limit)]
         self.changed_at = 0.0          # when the level last changed
         self._cv = threading.Condition()
+        self.outcomes: list[tuple[float, bool]] = []  # (time, failed) for bad-spell detection
+        self.pause_until = 0.0
+        self.pauses = 0
 
     def acquire(self, stop: threading.Event) -> bool:
         with self._cv:
@@ -208,6 +215,9 @@ class Politeness:
                 if stop.is_set():
                     return False
                 now = time.time()
+                if now < self.pause_until:               # Babelia is failing: give it a rest
+                    self._cv.wait(min(1.0, self.pause_until - now))
+                    continue
                 self.starts = [t for t in self.starts if t > now - self.RATE_WINDOW]
                 if self.active < self.limit and (self.max_rate is None or len(self.starts) < self.max_rate):
                     break
@@ -225,6 +235,7 @@ class Politeness:
             self.active -= 1
             if started is not None:
                 self.busy += time.time() - started
+            self._spell(latency is None)
             if latency is not None:
                 self.seen.append(latency)
             if started is not None and started < self.changed_at:
@@ -244,6 +255,22 @@ class Politeness:
                     elif med < 1.3 * self.baseline:
                         self._set(self.limit + 1, f"fast ({med:.1f}s)")
             self._cv.notify_all()
+
+    def _spell(self, failed: bool) -> None:
+        """A bad spell (Babelia answering 500s for minutes on end, as on
+        2026-11-10): stepping down and back up keeps sending requests into
+        it. When at least SPELL_ERRORS of the last SPELL_WINDOW seconds'
+        requests failed, and at least SPELL_SHARE of them, pause for
+        SPELL_PAUSE seconds. Called with the lock held."""
+        now = time.time()
+        self.outcomes = [o for o in self.outcomes if o[0] > now - self.SPELL_WINDOW] + [(now, failed)]
+        bad, n = sum(f for _, f in self.outcomes), len(self.outcomes)
+        if failed and bad >= self.SPELL_ERRORS and bad >= self.SPELL_SHARE * n and now >= self.pause_until:
+            self.pause_until = now + self.SPELL_PAUSE
+            self.pauses += 1
+            self.outcomes = []
+            log.warning("Babelia is failing (%d of the last %d requests): pausing %.0f s",
+                        bad, n, self.SPELL_PAUSE)
 
     def release_unused(self) -> None:
         """Give back a slot that never made a request (no latency to learn from)."""
@@ -309,6 +336,12 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
     start = random.randrange(SLIDESHOW_MAX) if start is None else start
     counter = Location(start, max_frames)
     max_workers = max(workers, max_workers or workers)
+    # D1: a relay chunk starts where the previous one ended (if it ended in
+    # the last hour) instead of ramping up from `workers` every 30 minutes
+    last = store.stats.get("last_run") or {}
+    level = (last.get("concurrency") or {}).get("final")
+    if level and time.time() - (last.get("finished_at") or 0) < 3600:
+        workers = max(workers, min(int(level), max_workers))
     polite = Politeness(workers, 1, max_workers, max_rate)
     run = {"started_at": time.time(), "start_location": str(start + 1),
            "scanned": 0, "finds": 0, "errors": 0, "workers": workers, "max_workers": max_workers,
@@ -502,6 +535,7 @@ def scan(out: str, minutes: float, workers: int = 3, start: int | None = None,
     run["concurrency"] = {"final": polite.limit, "max_used": max(n for _, n in polite.history),
                           "baseline_latency_s": round(polite.baseline or 0, 2),
                           "changes": len(polite.history) - 1,
+                          "pauses": polite.pauses,
                           **latency_summary(polite.seen),
                           # does Babelia slow down when we send more at once? {level: [requests, median s]}
                           "by_level": {str(k): [len(v), round(statistics.median(v), 2)]
