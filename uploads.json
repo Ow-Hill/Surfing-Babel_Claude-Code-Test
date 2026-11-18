@@ -1,0 +1,206 @@
+{
+ "about": "Designed uploads to Babelia's image search (2026-11-17/18). Each image is 640x416, all values 0 except nonzero_values [y, x, channel 0=R 1=G 2=B, level 0-15]; 'combo' is (0,0) RGB=1 plus (1,0) R=1 and (0,1) R=1. Locations are decimal. N is the modulus measured from them. See docs/research-babelia-generator.md.",
+ "images": {
+  "black": {
+   "nonzero_values": [],
+   "location_file": "black.loc.gz"
+  },
+  "blk1_B1": {
+   "nonzero_values": [
+    [
+     52,
+     0,
+     2,
+     1
+    ]
+   ],
+   "location_file": "blk1_B1.loc.gz"
+  },
+  "blk2_B1": {
+   "nonzero_values": [
+    [
+     104,
+     0,
+     2,
+     1
+    ]
+   ],
+   "location_file": "blk2_B1.loc.gz"
+  },
+  "blk3_B1": {
+   "nonzero_values": [
+    [
+     156,
+     0,
+     2,
+     1
+    ]
+   ],
+   "location_file": "blk3_B1.loc.gz"
+  },
+  "combo": {
+   "nonzero_values": null,
+   "location_file": "combo.loc.gz"
+  },
+  "p00_B1": {
+   "nonzero_values": [
+    [
+     0,
+     0,
+     2,
+     1
+    ]
+   ],
+   "location_file": "p00_B1.loc.gz"
+  },
+  "p00_B2": {
+   "nonzero_values": [
+    [
+     0,
+     0,
+     2,
+     2
+    ]
+   ],
+   "location_file": "p00_B2.loc.gz"
+  },
+  "p00_G1": {
+   "nonzero_values": [
+    [
+     0,
+     0,
+     1,
+     1
+    ]
+   ],
+   "location_file": "p00_G1.loc.gz"
+  },
+  "p00_G2": {
+   "nonzero_values": [
+    [
+     0,
+     0,
+     1,
+     2
+    ]
+   ],
+   "location_file": "p00_G2.loc.gz"
+  },
+  "p00_R1+p10_R1": {
+   "nonzero_values": [
+    [
+     0,
+     0,
+     0,
+     1
+    ],
+    [
+     0,
+     1,
+     0,
+     1
+    ]
+   ],
+   "location_file": "p00_R1+p10_R1.loc.gz"
+  },
+  "p00_R1": {
+   "nonzero_values": [
+    [
+     0,
+     0,
+     0,
+     1
+    ]
+   ],
+   "location_file": "p00_R1.loc.gz"
+  },
+  "p00_R2": {
+   "nonzero_values": [
+    [
+     0,
+     0,
+     0,
+     2
+    ]
+   ],
+   "location_file": "p00_R2.loc.gz"
+  },
+  "p01_R1": {
+   "nonzero_values": [
+    [
+     1,
+     0,
+     0,
+     1
+    ]
+   ],
+   "location_file": "p01_R1.loc.gz"
+  },
+  "p01_R2": {
+   "nonzero_values": [
+    [
+     1,
+     0,
+     0,
+     2
+    ]
+   ],
+   "location_file": "p01_R2.loc.gz"
+  },
+  "p10_R1": {
+   "nonzero_values": [
+    [
+     0,
+     1,
+     0,
+     1
+    ]
+   ],
+   "location_file": "p10_R1.loc.gz"
+  },
+  "p10_R2": {
+   "nonzero_values": [
+    [
+     0,
+     1,
+     0,
+     2
+    ]
+   ],
+   "location_file": "p10_R2.loc.gz"
+  },
+  "pblock_B1": {
+   "nonzero_values": [
+    [
+     384,
+     480,
+     2,
+     1
+    ]
+   ],
+   "location_file": "pblock_B1.loc.gz"
+  },
+  "plast_R1": {
+   "nonzero_values": [
+    [
+     415,
+     639,
+     0,
+     1
+    ]
+   ],
+   "location_file": "plast_R1.loc.gz"
+  },
+  "pmid_R1": {
+   "nonzero_values": [
+    [
+     208,
+     320,
+     0,
+     1
+    ]
+   ],
+   "location_file": "pmid_R1.loc.gz"
+  }
+ }
+}
