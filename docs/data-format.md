@@ -91,7 +91,11 @@ log["raw_colours"][:10]
 used only when its `base` matches the package calibration's scoring hash.
 
 `sensitivity.json` is copied from the `probe-data` branch: the blind-spot probe's results per
-signal family, plus random variants (`misses`, `closest`, `fixed`, `history`).
+signal family, plus random variants (`misses`, `closest`, `fixed`, `history`). `load` (this run)
+and `load_total` (all runs) count, for the explored variants the detector catches, which test
+fires first (`first`) and which fires with no other test (`only`).
+
+`audit.json` rows (on `log-archive`) also carry `distinct_per_100k` and `stepped_tail` per test.
 
 ## Other branches
 

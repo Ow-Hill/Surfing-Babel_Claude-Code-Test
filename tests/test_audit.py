@@ -158,3 +158,27 @@ def test_command_line_proposes_on_request(tmp_path, fitted, small, monkeypatch):
     alert, cand = tmp_path / "alert.md", tmp_path / "candidate.json"
     audit.main(["--audit", str(d), "--alert", str(alert), "--propose", str(cand), "--always", "--repo", "o/r"])
     assert cand.exists() and (d / "proposal.json").exists() and "refit-proposal" in alert.read_text()
+
+
+def test_steps_finds_a_stepped_statistic_and_leaves_a_smooth_one_alone():
+    """Plan item B5: the audit lists each test's distinct values per 100,000
+    frames and flags a stepped tail by nullmap's rule (colours was mis-scored
+    for exactly this, #44 and #49)."""
+    rng = np.random.default_rng(1)
+    smooth = audit.steps(rng.normal(size=20_000))
+    assert smooth == {"distinct_per_100k": 100_000, "stepped_tail": False}
+    stepped = audit.steps(np.round(rng.normal(size=20_000) * 4) / 4)
+    assert stepped["stepped_tail"] and stepped["distinct_per_100k"] < 1000
+    assert audit.steps([np.nan]) == {}
+
+
+def test_the_audit_reports_steps_for_every_test(tmp_path, fitted, small):
+    d = tmp_path / "arch"
+    d.mkdir()
+    for i, s in enumerate((130_000, 150_000)):
+        np.savez_compressed(d / f"scores-{s}.npz", log=make_log(6 + i, 20_000, (i + 1) * 10**9))
+    rep = audit.audit(d, fitted)
+    for t, row in rep["tests"].items():
+        if t != "combined":
+            assert {"distinct_per_100k", "stepped_tail"} <= set(row)
+    assert "distinct/100k" in audit.format_report(rep)

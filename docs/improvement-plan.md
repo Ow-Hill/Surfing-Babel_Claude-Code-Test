@@ -176,7 +176,11 @@ Known so far (`docs/research-babelia-generator.md`):
 |---|---|
 | A1–A4, H4 | Done (#48). The record shows what chance gives; each find says how often static scores that high; a separator marks the invisible finds. |
 | A5 | **Kept** the flag button: it is on the live strip and every detail view, costs nothing when unused, and needs a GitHub account, which likely explains its zero uses. |
-| B1–B5 | In progress. |
+| B1 | In progress. |
+| B2 | **Measured, no new test.** A second statistic on a different principle (the mean shift of short strips, with R, G and B pooled) catches the two closest-call outlines that have strong colours, at 8–25 sd above static. It misses marks whose colour is near static's average, and short strokes. For those, flatness is the only signal, and a second flatness test would share the weak points of `marks`. Catching 2 of 5 variants does not pay for an 18th test, which brings more false finds and another calibration cycle. Instead, the probe now counts the variants that `marks` catches **alone** (B3), so a loss of cover shows up. Angled lines already have `angled` as a second test. |
+| B3 | Done. For each explored variant, the probe records the test that fires first at its detect strength and whether it fires alone. `load_total` sums the counts over runs; re-checks are not counted twice. |
+| B4 | The kit is done: `python -m babel_surfer.rate make` and `fit` give 50 simulated frames, a rating page that works offline, the agreement with raters and the best-fitting cut-offs. **It needs raters**: the cut-offs change only after real ratings come in. |
+| B5 | Done. The audit lists each test's distinct values per 100,000 frames and flags a stepped tail by nullmap's rule. |
 | C1–C5 | Done (#47); stepped tails fixed further in #49 after the live check of #44 showed colours still over-reading. |
 | D1–D3, F1–F5, G2 | Done (#50). Pooled latency: 8.7 s at 5 in flight, 10.3 s at 8 (8 gives about 35% more frames). |
 | E1 | Done; E2–E4 open. Image → location is exactly affine mod a measured N; segments have unrelated constants, so local generation is not in reach (#51, `research-babelia` branch; 20 of ~40 agreed uploads used). |
