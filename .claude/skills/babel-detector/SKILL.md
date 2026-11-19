@@ -88,6 +88,13 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
     to the `refit-proposal` branch and opens an issue. A person opens the PR and merges it.
     Run it by hand: Actions → "Audit the calibration" → propose = 1.
   - A live `data/calibration.json` whose `base` no longer matches is deleted at scan start.
+- **Watch for single points of failure.** `sensitivity.json` → `load_total.only` counts the
+  explored variants that a single test catches alone, today mostly `marks` on drawn strokes and
+  outlines. A second test on mean shift was measured and rejected (plan B2). If that count grows,
+  or `marks` changes, re-run the probe before merging.
+- **Visibility cut-offs (2.0 and 1.4) are unverified against people.** The kit is
+  `python -m babel_surfer.rate make` / `fit`. Change `visibility.LIKELY`/`FAINT` only from
+  real ratings, never invented ones.
 - **Hashes cover only what changes scores** (`classifier.scoring_bytes`: `tests`, `maps`,
   `combined_tests`, `tone_expected`). Metadata such as `maps_source` never triggers
   re-scoring, re-mining or the benchmark; any change to a map does.

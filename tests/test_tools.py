@@ -174,3 +174,30 @@ def test_a_demo_is_located_fetched_and_kept_offline_afterwards(tmp_path, monkeyp
     monkeypatch.setattr(seeded, "fetch", lambda *a, **k: pytest.fail("network used"))
     entries = seeded.ensure(tmp_path, network=False)
     assert [e["slug"] for e in entries] == [demo["slug"]] and entries[0]["location_digits"] == 4
+
+
+def test_probe_counts_which_test_catches_each_variant_first_and_adds_runs_up(tmp_path, monkeypatch):
+    """Plan item B3: per run, the test that fires first on each explored
+    variant and whether it fired alone; summed across runs in load_total.
+    Re-checked earlier misses are not counted again."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    def make(job):
+        name, seed, strength = job
+        if strength < 0.3:
+            return set(), 1.0
+        alone = int(name.split("#")[1]) % 2 if "#" in name else 0
+        return ({"marks"} if alone else {"marks", "curves"}), 9.0
+    monkeypatch.setattr(sensitivity, "ProcessPoolExecutor", ThreadPoolExecutor)
+    monkeypatch.setattr(sensitivity, "_make", make)
+    monkeypatch.setattr(sensitivity, "_eye", lambda job: 1.0)             # never seen: no misses
+    out = tmp_path / "sensitivity.json"
+    args = ["--trials", "1", "--steps", "3", "--explore", "4", "--family", "small dot (8px)", "--out", str(out)]
+    assert sensitivity.main(args + ["--seed", "1"]) == 0
+    first = json.loads(out.read_text())
+    assert first["load"]["variants"] == 4 and first["load"]["only"] == {"marks": 2}
+    assert sum(first["load"]["first"].values()) == 4
+    assert sensitivity.main(args + ["--seed", "2"]) == 0
+    second = json.loads(out.read_text())
+    assert second["load_total"]["variants"] == 8 and second["load_total"]["only"] == {"marks": 4}
+    assert "first" in sensitivity.report(second) and "alone" in sensitivity.report(second)

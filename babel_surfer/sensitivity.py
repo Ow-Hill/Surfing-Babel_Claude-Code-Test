@@ -326,6 +326,7 @@ def run(trials: int = 6, steps: int = 6, explore: int = 0, seed: int = 0, famili
     if explore > 1000:
         raise ValueError("explore at most 1000 variants a run (ids are V2 + seed*1000 + i)")
     names = list(FAMILIES if families is None else families)
+    explored = {f"variant#{V2 + seed * 1000 + i}" for i in range(explore)}
     variants = list(dict.fromkeys([f"variant#{V2 + seed * 1000 + i}" for i in range(explore)]
                                   + [f"variant#{int(i)}" for i in recheck]))
     t0 = time.time()
@@ -340,6 +341,11 @@ def run(trials: int = 6, steps: int = 6, explore: int = 0, seed: int = 0, famili
         at = [(n, seed * 7 + 5, det[n][0]) for n in names + variants if det[n][0]]
         eye_at = dict(zip([a[0] for a in at], pool.map(_eye, at)))
     rows, misses = [], []
+    # Plan item B3: which tests carry the load. For each explored variant the
+    # detector finds, the test that fires most often at the strength it is
+    # first detected from ("first"), and whether it is the only test that
+    # fires there ("only": a variant with no second line of defence).
+    load = {"variants": 0, "first": {}, "only": {}}
     for n in names + variants:
         s, smp = det[n]
         by = {}
@@ -348,6 +354,12 @@ def run(trials: int = 6, steps: int = 6, explore: int = 0, seed: int = 0, famili
                 for tests, _ in res:
                     for t in tests:
                         by[t] = by.get(t, 0) + 1
+        if n in explored and by:            # (re-checks would count twice across runs)
+            first = max(sorted(by), key=by.get)
+            load["variants"] += 1
+            load["first"][first] = load["first"].get(first, 0) + 1
+            if len(by) == 1:
+                load["only"][first] = load["only"].get(first, 0) + 1
         e = eye[n][0]
         row = {"signal": n if n in FAMILIES else variant(int(n.split("#")[1]))[0],
                "detect": round(s, 4) if s else None, "eye": round(e, 4) if e else None,
@@ -365,7 +377,7 @@ def run(trials: int = 6, steps: int = 6, explore: int = 0, seed: int = 0, famili
     misses = [m for m in misses if m["blind"]]
     return {"generated": int(time.time()), "seconds": round(time.time() - t0),
             "trials": trials, "steps": steps, "seed": seed, "threshold_sigma": classifier.INTERESTING_SIGMA,
-            "families": rows, "explored": explore, "checked": checked, "misses": misses,
+            "families": rows, "explored": explore, "checked": checked, "misses": misses, "load": load,
             "closest": [{**m, "margin": round(m["eye"] / m["detect"], 2)} for m in closest],
             "summary": {"families": len(rows), "blind": sum(r["blind"] for r in rows),
                         "never_detected": sum(r["detect"] is None for r in rows)}}
@@ -387,10 +399,18 @@ def merge_history(old: dict | None, new: dict, keep: int = 60) -> dict:
             fixed.insert(0, {**m, "fixed": new["generated"]})
         else:
             misses.append(m)                       # not re-checked this run: keep
+    total = {k: dict(v) if isinstance(v, dict) else v for k, v in (old.get("load_total") or
+             {"variants": 0, "first": {}, "only": {}}).items()}
+    nl = new.get("load") or {}
+    total["variants"] += nl.get("variants", 0)
+    for k in ("first", "only"):
+        for t, c in (nl.get(k) or {}).items():
+            total[k][t] = total[k].get(t, 0) + c
     hist = old.get("history", [])
     hist.append({"generated": new["generated"], **new["summary"], "explored": new["explored"],
                  "misses": len(misses), "fixed": len(fixed) - len(old.get("fixed", []))})
-    return {**new, "misses": misses[:keep], "fixed": fixed[:keep], "history": hist[-keep:]}
+    return {**new, "misses": misses[:keep], "fixed": fixed[:keep], "history": hist[-keep:],
+            "load_total": total}
 
 
 def report(res: dict) -> str:
@@ -405,6 +425,12 @@ def report(res: dict) -> str:
     out.append(f"{s['blind']} of {s['families']} families are seen by eye before the detector finds them; "
                f"{s['never_detected']} are never detected. Explored {res['explored']} random variants and "
                f"re-checked earlier misses: {len(res['misses'])} visible misses, {len(res.get('fixed', []))} fixed.")
+    load = res.get("load_total") or res.get("load")
+    if load and load["variants"]:
+        out.append(f"Which test catches a variant first ({load['variants']} variants caught; "
+                   "'alone' = no other test fires there):")
+        for t, c in sorted(load["first"].items(), key=lambda kv: -kv[1]):
+            out.append(f"  {t:10s} first {c:5d}  alone {load['only'].get(t, 0):5d}")
     for m in res.get("closest", []):
         out.append(f"  closest call: {m['signal']} (seen at {m['margin']:.2f}x the strength it is detected from)")
     return "\n".join(out)
