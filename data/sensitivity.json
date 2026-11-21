@@ -1,0 +1,585 @@
+{
+ "generated": 1795175998,
+ "seconds": 854,
+ "trials": 6,
+ "steps": 6,
+ "seed": 21,
+ "threshold_sigma": 4.0,
+ "families": [
+  {
+   "signal": "large disc",
+   "detect": 0.0392,
+   "eye": 0.0649,
+   "by": [
+    "tone"
+   ],
+   "eye_at_detect": 1.04,
+   "blind": false
+  },
+  {
+   "signal": "landscape",
+   "detect": 0.0422,
+   "eye": 0.1075,
+   "by": [
+    "tone"
+   ],
+   "eye_at_detect": 1.15,
+   "blind": false
+  },
+  {
+   "signal": "word 'BABEL'",
+   "detect": 0.034,
+   "eye": 0.1334,
+   "by": [
+    "tone"
+   ],
+   "eye_at_detect": 1.11,
+   "blind": false
+  },
+  {
+   "signal": "horizon line (2px)",
+   "detect": 0.075,
+   "eye": 0.3162,
+   "by": [
+    "lines"
+   ],
+   "eye_at_detect": 1.04,
+   "blind": false
+  },
+  {
+   "signal": "small square (24px)",
+   "detect": 0.1075,
+   "eye": 0.2207,
+   "by": [
+    "marks",
+    "spot",
+    "blob"
+   ],
+   "eye_at_detect": 1.47,
+   "blind": false
+  },
+  {
+   "signal": "thin arc (3px)",
+   "detect": 0.2054,
+   "eye": 0.5233,
+   "by": [
+    "marks"
+   ],
+   "eye_at_detect": 1.49,
+   "blind": false
+  },
+  {
+   "signal": "pen stroke (2px)",
+   "detect": 0.2738,
+   "eye": 0.5233,
+   "by": [
+    "marks"
+   ],
+   "eye_at_detect": 1.18,
+   "blind": false
+  },
+  {
+   "signal": "face-like spots",
+   "detect": 0.0866,
+   "eye": 0.2054,
+   "by": [
+    "marks",
+    "face",
+    "spot"
+   ],
+   "eye_at_detect": 1.13,
+   "blind": false
+  },
+  {
+   "signal": "few-colour patch (64px)",
+   "detect": 0.0931,
+   "eye": 0.2207,
+   "by": [
+    "colours"
+   ],
+   "eye_at_detect": 1.06,
+   "blind": false
+  },
+  {
+   "signal": "grey patch (64px)",
+   "detect": 0.0698,
+   "eye": 0.2054,
+   "by": [
+    "colours"
+   ],
+   "eye_at_detect": 1.04,
+   "blind": false
+  },
+  {
+   "signal": "diagonal line (2px, 30\u00b0)",
+   "detect": 0.1241,
+   "eye": 0.487,
+   "by": [
+    "angled"
+   ],
+   "eye_at_detect": 1.04,
+   "blind": false
+  },
+  {
+   "signal": "tiled static",
+   "detect": 0.1155,
+   "eye": null,
+   "by": [
+    "repetition"
+   ],
+   "eye_at_detect": 1.08,
+   "blind": false
+  },
+  {
+   "signal": "mirror-symmetric static",
+   "detect": 0.1241,
+   "eye": null,
+   "by": [
+    "symmetry"
+   ],
+   "eye_at_detect": 1.28,
+   "blind": false
+  },
+  {
+   "signal": "small dot (8px)",
+   "detect": 0.2207,
+   "eye": 0.487,
+   "by": [
+    "marks"
+   ],
+   "eye_at_detect": 1.17,
+   "blind": false
+  },
+  {
+   "signal": "outline box (1px)",
+   "detect": 0.3652,
+   "eye": null,
+   "by": [
+    "lines"
+   ],
+   "eye_at_detect": 1.24,
+   "blind": false
+  },
+  {
+   "signal": "rings (2px)",
+   "detect": 0.2054,
+   "eye": 0.5233,
+   "by": [
+    "spectrum"
+   ],
+   "eye_at_detect": 1.25,
+   "blind": false
+  },
+  {
+   "signal": "small text (18px)",
+   "detect": 0.3398,
+   "eye": 0.6494,
+   "by": [
+    "spot",
+    "curves"
+   ],
+   "eye_at_detect": 1.27,
+   "blind": false
+  },
+  {
+   "signal": "soft colour blob",
+   "detect": 0.0604,
+   "eye": 0.1075,
+   "by": [
+    "colours",
+    "spot",
+    "contrast"
+   ],
+   "eye_at_detect": 1.18,
+   "blind": false
+  },
+  {
+   "signal": "brightness gradient",
+   "detect": 0.0365,
+   "eye": 0.1241,
+   "by": [
+    "tone",
+    "colours"
+   ],
+   "eye_at_detect": 1.11,
+   "blind": false
+  },
+  {
+   "signal": "stripes (8px period)",
+   "detect": 0.034,
+   "eye": 0.1241,
+   "by": [
+    "tone"
+   ],
+   "eye_at_detect": 1.05,
+   "blind": false
+  },
+  {
+   "signal": "one-channel patch (64px)",
+   "detect": 0.0698,
+   "eye": 0.2548,
+   "by": [
+    "spot",
+    "blob"
+   ],
+   "eye_at_detect": 1.04,
+   "blind": false
+  },
+  {
+   "signal": "coarse-level patch (96px)",
+   "detect": 0.1334,
+   "eye": 1.0,
+   "by": [
+    "colours",
+    "tone"
+   ],
+   "eye_at_detect": 1.04,
+   "blind": false
+  },
+  {
+   "signal": "2px checker patch (96px)",
+   "detect": 0.0487,
+   "eye": 0.154,
+   "by": [
+    "colours",
+    "contrast"
+   ],
+   "eye_at_detect": 1.25,
+   "blind": false
+  }
+ ],
+ "explored": 40,
+ "checked": [
+  100021000,
+  100021001,
+  100021002,
+  100021003,
+  100021004,
+  100021005,
+  100021006,
+  100021007,
+  100021008,
+  100021009,
+  100021010,
+  100021011,
+  100021012,
+  100021013,
+  100021014,
+  100021015,
+  100021016,
+  100021017,
+  100021018,
+  100021019,
+  100021020,
+  100021021,
+  100021022,
+  100021023,
+  100021024,
+  100021025,
+  100021026,
+  100021027,
+  100021028,
+  100021029,
+  100021030,
+  100021031,
+  100021032,
+  100021033,
+  100021034,
+  100021035,
+  100021036,
+  100021037,
+  100021038,
+  100021039
+ ],
+ "misses": [],
+ "closest": [
+  {
+   "signal": "outline 64px w2 solid rgb(238, 102, 119) at (195,85)",
+   "detect": 0.2548,
+   "eye": 0.3162,
+   "by": [
+    "marks"
+   ],
+   "eye_at_detect": 1.55,
+   "blind": false,
+   "id": 100021026,
+   "margin": 1.24
+  },
+  {
+   "signal": "outline 8px w4 grey static at (556,29)",
+   "detect": 0.2943,
+   "eye": 0.487,
+   "by": [
+    "marks"
+   ],
+   "eye_at_detect": 1.41,
+   "blind": false,
+   "id": 100021039,
+   "margin": 1.65
+  },
+  {
+   "signal": "16 dots over 256x128px solid rgb(238, 85, 51) at (394,215)",
+   "detect": 0.3162,
+   "eye": 0.5233,
+   "by": [
+    "marks"
+   ],
+   "eye_at_detect": 1.14,
+   "blind": false,
+   "id": 100021035,
+   "margin": 1.65
+  },
+  {
+   "signal": "outline 128px w4 solid rgb(255, 17, 153) at (282,101)",
+   "detect": 0.154,
+   "eye": 0.2738,
+   "by": [
+    "marks",
+    "curves"
+   ],
+   "eye_at_detect": 1.23,
+   "blind": false,
+   "id": 100021014,
+   "margin": 1.78
+  },
+  {
+   "signal": "polyline 32px w3 solid rgb(238, 0, 102) at (394,58)",
+   "detect": 0.2943,
+   "eye": 0.5233,
+   "by": [
+    "marks"
+   ],
+   "eye_at_detect": 1.25,
+   "blind": false,
+   "id": 100021019,
+   "margin": 1.78
+  }
+ ],
+ "summary": {
+  "families": 23,
+  "blind": 0,
+  "never_detected": 0
+ },
+ "fixed": [
+  {
+   "signal": "outline 8px w2 rgb(17, 136, 119) at (42,104)",
+   "detect": 0.8058,
+   "eye": 0.7499,
+   "by": [
+    "flat"
+   ],
+   "eye_at_detect": 1.97,
+   "blind": true,
+   "id": 100023,
+   "fixed": 1794114526
+  },
+  {
+   "signal": "ellipse 8px w2 rgb(102, 119, 85) at (341,22)",
+   "detect": 0.6043,
+   "eye": 0.5233,
+   "by": [
+    "strokes",
+    "contrast"
+   ],
+   "eye_at_detect": 2.34,
+   "blind": true,
+   "id": 100020,
+   "fixed": 1794114526
+  },
+  {
+   "signal": "ellipse 8px w1 rgb(119, 68, 153) at (89,70)",
+   "detect": 0.6494,
+   "eye": 0.6043,
+   "by": [
+    "strokes",
+    "contrast"
+   ],
+   "eye_at_detect": 2.99,
+   "blind": true,
+   "id": 100009,
+   "fixed": 1794114526
+  }
+ ],
+ "history": [
+  {
+   "generated": 1794112526,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 3,
+   "fixed": 0
+  },
+  {
+   "generated": 1794114526,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 3
+  },
+  {
+   "generated": 1794225084,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794262629,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794264304,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794310345,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794395881,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794483377,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794568442,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794652936,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794741116,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794829464,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794917483,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794950720,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794951432,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794954468,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1794972395,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1795003239,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1795089650,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  },
+  {
+   "generated": 1795175998,
+   "families": 23,
+   "blind": 0,
+   "never_detected": 0,
+   "explored": 40,
+   "misses": 0,
+   "fixed": 0
+  }
+ ]
+}

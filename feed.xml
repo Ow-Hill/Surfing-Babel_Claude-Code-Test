@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/</id>
+  <title>Surfing Babel: finds</title>
+  <subtitle>Frames from the Babel Image Archive that scored as more than static.</subtitle>
+  <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/"/>
+  <link rel="self" href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/feed.xml"/>
+  <updated>2026-11-21T10:14:08Z</updated>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#4637237873456091</id>
+    <title>anomaly · 4.5σ · location 4637237873456091</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#4637237873456091"/>
+    <updated>2026-11-21T10:14:08Z</updated>
+    <summary>Statistically unusual static, not a picture: a small mark about 6 px across whose colour hardly changes, around the left side (4.5σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=4637237873456091</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#4637237873455560</id>
+    <title>anomaly · 4.3σ · location 4637237873455560</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#4637237873455560"/>
+    <updated>2026-11-21T10:00:22Z</updated>
+    <summary>Statistically unusual static, not a picture: part of the frame repeats at an offset of (360, 167) px (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=4637237873455560</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#4170321771267258</id>
+    <title>anomaly · 4.5σ · location 4170321771267258</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#4170321771267258"/>
+    <updated>2026-11-21T03:54:47Z</updated>
+    <summary>Statistically unusual static, not a picture: a darker vertical band near x ≈ 566 px (4.5σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=4170321771267258</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5424722023204167</id>
+    <title>anomaly · 4.3σ · location 5424722023204167</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5424722023204167"/>
+    <updated>2026-11-20T19:46:00Z</updated>
+    <summary>Statistically unusual static, not a picture: a yellower region around the centre, roughly 88 px across (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=5424722023204167</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#7882797613707779</id>
+    <title>anomaly · 5.1σ · location 7882797613707779</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#7882797613707779"/>
+    <updated>2026-11-20T09:01:50Z</updated>
+    <summary>Statistically unusual static, not a picture: alternating: neighbouring pixels disagree more than static, mostly vertically (r = -0.012) (5.1σ). Nothing local: no shapes, lines or patterns stand out. Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=7882797613707779</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#186015281773098</id>
+    <title>anomaly · 4.3σ · location 186015281773098</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#186015281773098"/>
+    <updated>2026-11-20T03:14:13Z</updated>
+    <summary>Statistically unusual static, not a picture: a patch around the bottom-right that is noisier than static (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=186015281773098</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#3499423910522244</id>
+    <title>anomaly · 4.5σ · location 3499423910522244</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#3499423910522244"/>
+    <updated>2026-11-20T00:07:01Z</updated>
+    <summary>Statistically unusual static, not a picture: a soft, round patch around the bottom-right, roughly 24 px across (4.5σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=3499423910522244</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#3499423910522032</id>
+    <title>anomaly · 4.4σ · location 3499423910522032</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#3499423910522032"/>
+    <updated>2026-11-20T00:01:51Z</updated>
+    <summary>Statistically unusual static, not a picture: a faint greener line at 135° through the bottom-left (4.4σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=3499423910522032</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1107440852573632</id>
+    <title>anomaly · 4.3σ · location 1107440852573632</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1107440852573632"/>
+    <updated>2026-11-19T23:54:05Z</updated>
+    <summary>Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the left side, roughly 32 px across (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1107440852573632</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1107440852573075</id>
+    <title>anomaly · 4.5σ · location 1107440852573075</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1107440852573075"/>
+    <updated>2026-11-19T23:40:27Z</updated>
+    <summary>Statistically unusual static, not a picture: a faint line or curve around the top-right, roughly 56 px across (4.5σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1107440852573075</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1320171941550707</id>
+    <title>anomaly · 4.7σ · location 1320171941550707</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1320171941550707"/>
+    <updated>2026-11-19T20:26:17Z</updated>
+    <summary>Statistically unusual static, not a picture: part of the frame repeats at an offset of (-131, 141) px (4.7σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1320171941550707</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1109577495421936</id>
+    <title>anomaly · 4.3σ · location 1109577495421936</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1109577495421936"/>
+    <updated>2026-11-19T19:46:51Z</updated>
+    <summary>Statistically unusual static, not a picture: part of the frame repeats at an offset of (217, 11) px (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1109577495421936</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5104235785600236</id>
+    <title>anomaly · 4.6σ · location 5104235785600236</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5104235785600236"/>
+    <updated>2026-11-19T15:01:17Z</updated>
+    <summary>Statistically unusual static, not a picture: a redder spot around the bottom-right, roughly 88 px across (4.6σ). Also a soft, round patch around the bottom, roughly 40 px across (3.5σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=5104235785600236</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#7120889853296426</id>
+    <title>anomaly · 4.3σ · location 7120889853296426</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#7120889853296426"/>
+    <updated>2026-11-19T13:21:20Z</updated>
+    <summary>Statistically unusual static, not a picture: a redder spot around the bottom-right, roughly 88 px across (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=7120889853296426</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#2170208408866761</id>
+    <title>anomaly · 4.4σ · location 2170208408866761</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#2170208408866761"/>
+    <updated>2026-11-19T07:28:12Z</updated>
+    <summary>Statistically unusual static, not a picture: more large-scale variation than static, like a photo's soft shading; nothing local (4.4σ). Also a darker region around the top, roughly 120 px across (3.7σ); a face-like arrangement, two spots above a third, about 60 px across, around the top (3.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=2170208408866761</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#6019362353565839</id>
+    <title>anomaly · 4.3σ · location 6019362353565839</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#6019362353565839"/>
+    <updated>2026-11-19T06:18:57Z</updated>
+    <summary>Statistically unusual static, not a picture: a small mark about 12 px across whose colour hardly changes, around the top-left (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=6019362353565839</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#2265228590402617</id>
+    <title>anomaly · 4.6σ · location 2265228590402617</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#2265228590402617"/>
+    <updated>2026-11-18T23:15:17Z</updated>
+    <summary>Statistically unusual static, not a picture: a hint of mirror symmetry about a horizontal line at y ≈ 193 px (4.6σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=2265228590402617</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#2265228590402509</id>
+    <title>anomaly · 4.3σ · location 2265228590402509</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#2265228590402509"/>
+    <updated>2026-11-18T23:12:21Z</updated>
+    <summary>Statistically unusual static, not a picture: alternating: neighbouring pixels disagree more than static, mostly horizontally (r = -0.010) (4.3σ). Nothing local: no shapes, lines or patterns stand out. Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=2265228590402509</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#889769383081004</id>
+    <title>anomaly · 4.3σ · location 889769383081004</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#889769383081004"/>
+    <updated>2026-11-18T22:12:34Z</updated>
+    <summary>Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the top, roughly 32 px across (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=889769383081004</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5601270181701409</id>
+    <title>anomaly · 4.4σ · location 5601270181701409</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5601270181701409"/>
+    <updated>2026-11-18T12:20:50Z</updated>
+    <summary>Statistically unusual static, not a picture: a darker horizontal band near y ≈ 174 px (4.4σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=5601270181701409</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1641429811438513</id>
+    <title>anomaly · 4.5σ · location 1641429811438513</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1641429811438513"/>
+    <updated>2026-11-18T10:32:28Z</updated>
+    <summary>Statistically unusual static, not a picture: part of the frame repeats at an offset of (193, 144) px (4.5σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1641429811438513</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1641429811438179</id>
+    <title>anomaly · 4.5σ · location 1641429811438179</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1641429811438179"/>
+    <updated>2026-11-18T10:23:59Z</updated>
+    <summary>Statistically unusual static, not a picture: a darker horizontal band near y ≈ 210 px (4.5σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1641429811438179</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#4730075639136832</id>
+    <title>anomaly · 4.5σ · location 4730075639136832</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#4730075639136832"/>
+    <updated>2026-11-18T09:04:22Z</updated>
+    <summary>Statistically unusual static, not a picture: a thin stroke whose colour hardly changes along it, at least 16 px long, around the centre (4.5σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=4730075639136832</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#4730075639136127</id>
+    <title>anomaly · 4.6σ · location 4730075639136127</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#4730075639136127"/>
+    <updated>2026-11-18T08:46:46Z</updated>
+    <summary>Statistically unusual static, not a picture: a patch around the bottom that is flatter (less varied) than static (4.6σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=4730075639136127</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#2673956172997365</id>
+    <title>anomaly · 4.5σ · location 2673956172997365</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#2673956172997365"/>
+    <updated>2026-11-18T07:08:28Z</updated>
+    <summary>Statistically unusual static, not a picture: a hint of mirror symmetry about a horizontal line at y ≈ 165 px (4.5σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=2673956172997365</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5009279459770829</id>
+    <title>anomaly · 4.3σ · location 5009279459770829</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5009279459770829"/>
+    <updated>2026-11-18T06:07:25Z</updated>
+    <summary>Statistically unusual static, not a picture: more large-scale variation than static, like a photo's soft shading; nothing local (4.3σ). Nothing local: no shapes, lines or patterns stand out. Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=5009279459770829</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#7247178623714588</id>
+    <title>anomaly · 4.6σ · location 7247178623714588</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#7247178623714588"/>
+    <updated>2026-11-18T03:41:20Z</updated>
+    <summary>Statistically unusual static, not a picture: alternating: neighbouring pixels disagree more than static, mostly vertically (r = -0.005) (4.6σ). Nothing local: no shapes, lines or patterns stand out. Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=7247178623714588</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#8316945891318809</id>
+    <title>anomaly · 4.5σ · location 8316945891318809</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#8316945891318809"/>
+    <updated>2026-11-17T17:46:28Z</updated>
+    <summary>Statistically unusual static, not a picture: the red-blue channels move together (r = +0.011; static gives ≈ 0) (4.5σ). Nothing local: no shapes, lines or patterns stand out. Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=8316945891318809</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#3517066698300323</id>
+    <title>anomaly · 4.7σ · location 3517066698300323</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#3517066698300323"/>
+    <updated>2026-11-17T17:15:57Z</updated>
+    <summary>Statistically unusual static, not a picture: the red-blue channels move together (r = +0.011; static gives ≈ 0) (4.7σ). Nothing local: no shapes, lines or patterns stand out. Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=3517066698300323</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5013636801032929</id>
+    <title>anomaly · 5.3σ · location 5013636801032929</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5013636801032929"/>
+    <updated>2026-11-17T16:46:52Z</updated>
+    <summary>Statistically unusual static, not a picture: smoother: neighbouring pixels agree more than static, mostly diagonally (r = +0.002) (5.3σ). Nothing local: no shapes, lines or patterns stand out. Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=5013636801032929</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#410860195002997</id>
+    <title>anomaly · 4.3σ · location 410860195002997</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#410860195002997"/>
+    <updated>2026-11-17T15:15:08Z</updated>
+    <summary>Statistically unusual static, not a picture: a faint bluer line at 150° through the bottom-left (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=410860195002997</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#7527622586633635</id>
+    <title>anomaly · 4.5σ · location 7527622586633635</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#7527622586633635"/>
+    <updated>2026-11-17T14:31:33Z</updated>
+    <summary>Statistically unusual static, not a picture: a hint of mirror symmetry about a horizontal line at y ≈ 311 px (4.5σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=7527622586633635</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5022154778285879</id>
+    <title>anomaly · 4.3σ · location 5022154778285879</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5022154778285879"/>
+    <updated>2026-11-17T09:01:49Z</updated>
+    <summary>Statistically unusual static, not a picture: a bluer spot around the left side, roughly 80 px across (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=5022154778285879</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5022154778284954</id>
+    <title>anomaly · 4.3σ · location 5022154778284954</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5022154778284954"/>
+    <updated>2026-11-17T08:38:08Z</updated>
+    <summary>Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the top, roughly 24 px across (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=5022154778284954</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1420043193432657</id>
+    <title>anomaly · 4.3σ · location 1420043193432657</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1420043193432657"/>
+    <updated>2026-11-17T03:24:13Z</updated>
+    <summary>Statistically unusual static, not a picture: a yellower spot around the bottom-left, roughly 96 px across (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1420043193432657</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1066934215023014</id>
+    <title>anomaly · 4.3σ · location 1066934215023014</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1066934215023014"/>
+    <updated>2026-11-16T22:25:09Z</updated>
+    <summary>Statistically unusual static, not a picture: a small mark about 6 px across whose colour hardly changes, around the bottom-right (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1066934215023014</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1566454547595698</id>
+    <title>anomaly · 4.8σ · location 1566454547595698</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1566454547595698"/>
+    <updated>2026-11-16T11:54:20Z</updated>
+    <summary>Statistically unusual static, not a picture: the red-green channels move in opposition (r = -0.011; static gives ≈ 0) (4.8σ). Nothing local: no shapes, lines or patterns stand out. Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1566454547595698</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1643244792846261</id>
+    <title>anomaly · 4.3σ · location 1643244792846261</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1643244792846261"/>
+    <updated>2026-11-16T10:06:40Z</updated>
+    <summary>Statistically unusual static, not a picture: part of the frame repeats at an offset of (-101, 92) px (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1643244792846261</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1290440545436527</id>
+    <title>anomaly · 4.4σ · location 1290440545436527</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1290440545436527"/>
+    <updated>2026-11-16T06:34:39Z</updated>
+    <summary>Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the top-left, roughly 24 px across (4.4σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1290440545436527</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1290440545436427</id>
+    <title>anomaly · 4.5σ · location 1290440545436427</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1290440545436427"/>
+    <updated>2026-11-16T06:31:57Z</updated>
+    <summary>Statistically unusual static, not a picture: part of the frame repeats at an offset of (-210, 209) px (4.5σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1290440545436427</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#2058420196812725</id>
+    <title>anomaly · 4.5σ · location 2058420196812725</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#2058420196812725"/>
+    <updated>2026-11-16T03:53:15Z</updated>
+    <summary>Statistically unusual static, not a picture: a face-like arrangement, two spots above a third, about 60 px across, around the top-right (4.5σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=2058420196812725</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#2208756131462110</id>
+    <title>anomaly · 4.3σ · location 2208756131462110</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#2208756131462110"/>
+    <updated>2026-11-15T21:02:06Z</updated>
+    <summary>Statistically unusual static, not a picture: a thin stroke whose colour hardly changes along it, at least 16 px long, around the bottom-left (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=2208756131462110</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#3747810859185949</id>
+    <title>anomaly · 4.3σ · location 3747810859185949</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#3747810859185949"/>
+    <updated>2026-11-15T20:33:39Z</updated>
+    <summary>Statistically unusual static, not a picture: a darker region around the bottom, roughly 88 px across (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=3747810859185949</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5986085442982241</id>
+    <title>anomaly · 4.3σ · location 5986085442982241</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5986085442982241"/>
+    <updated>2026-11-15T18:16:52Z</updated>
+    <summary>Statistically unusual static, not a picture: part of the frame repeats at an offset of (-93, 30) px (4.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=5986085442982241</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#3090900197540420</id>
+    <title>anomaly · 4.5σ · location 3090900197540420</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#3090900197540420"/>
+    <updated>2026-11-15T17:11:14Z</updated>
+    <summary>Statistically unusual static, not a picture: alternating: neighbouring pixels disagree more than static, mostly horizontally (r = -0.011) (4.5σ). Nothing local: no shapes, lines or patterns stand out. Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=3090900197540420</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#4513314220246432</id>
+    <title>anomaly · 4.3σ · location 4513314220246432</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#4513314220246432"/>
+    <updated>2026-11-15T12:14:42Z</updated>
+    <summary>Statistically unusual static, not a picture: alternating: neighbouring pixels disagree more than static, mostly vertically (r = -0.010) (4.3σ). Nothing local: no shapes, lines or patterns stand out. Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=4513314220246432</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#6990327186461174</id>
+    <title>anomaly · 5.3σ · location 6990327186461174</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#6990327186461174"/>
+    <updated>2026-11-15T07:57:20Z</updated>
+    <summary>Statistically unusual static, not a picture: a thin stroke whose colour hardly changes along it, at least 16 px long, around the top-left (5.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=6990327186461174</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1026014640218738</id>
+    <title>anomaly · 4.3σ · location 1026014640218738</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1026014640218738"/>
+    <updated>2026-11-15T01:06:17Z</updated>
+    <summary>Statistically unusual static, not a picture: an area drawn with fewer colours than static allows around the centre, roughly 24 px across (4.3σ). Also a small mark about 8 px across whose colour hardly changes, around the centre (3.3σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1026014640218738</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1026014640218473</id>
+    <title>anomaly · 4.4σ · location 1026014640218473</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#1026014640218473"/>
+    <updated>2026-11-15T00:58:34Z</updated>
+    <summary>Statistically unusual static, not a picture: a darker region around the centre, roughly 96 px across (4.4σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=1026014640218473</summary>
+  </entry>
+  <entry>
+    <id>https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5268502459671117</id>
+    <title>anomaly · 4.8σ · location 5268502459671117</title>
+    <link href="https://ow-hill.github.io/Surfing-Babel_Claude-Code-Test/#5268502459671117"/>
+    <updated>2026-11-14T21:43:31Z</updated>
+    <summary>Statistically unusual static, not a picture: a patch around the left side that is noisier than static (4.8σ). Full image: https://babelia.libraryofbabel.info/babelia.cgi?location=5268502459671117</summary>
+  </entry>
+</feed>

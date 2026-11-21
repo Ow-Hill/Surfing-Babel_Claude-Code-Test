@@ -1,0 +1,5449 @@
+{
+ "scanned": 720140,
+ "errors": 746,
+ "hist_edges": [
+  -2,
+  -1,
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  8,
+  12,
+  16,
+  40
+ ],
+ "hist": [
+  0,
+  0,
+  543,
+  71403,
+  436529,
+  196771,
+  14554,
+  332,
+  8,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "runs": [
+  {
+   "started_at": 1795150814.1955879,
+   "start_location": "1939635395800405",
+   "scanned": 1200,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1200,
+   "max_sigma": 3.772,
+   "finished_at": 1795152625.6158676,
+   "end_location": "1939635395801605",
+   "frames_per_hour": 2385,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 6.01,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 7.48,
+    "latency_p90_s": 9.74,
+    "by_level": {
+     "8": [
+      1200,
+      7.48
+     ]
+    },
+    "in_flight": 4.99,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.09
+  },
+  {
+   "started_at": 1795152633.420861,
+   "start_location": "2697516262868950",
+   "scanned": 1200,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1200,
+   "max_sigma": 3.784,
+   "finished_at": 1795154443.272918,
+   "end_location": "2697516262870150",
+   "frames_per_hour": 2387,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.8,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 6.8,
+    "latency_p90_s": 8.8,
+    "by_level": {
+     "8": [
+      1200,
+      6.8
+     ]
+    },
+    "in_flight": 4.47,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.11
+  },
+  {
+   "started_at": 1795154452.2136817,
+   "start_location": "5526274830494472",
+   "scanned": 1190,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1190,
+   "max_sigma": 3.937,
+   "finished_at": 1795156257.843496,
+   "end_location": "5526274830495662",
+   "frames_per_hour": 2373,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.92,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 7.72,
+    "latency_p90_s": 9.44,
+    "by_level": {
+     "7": [
+      8,
+      7.06
+     ],
+     "8": [
+      1169,
+      7.73
+     ]
+    },
+    "in_flight": 5.08,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      21.6,
+      7
+     ],
+     [
+      22.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.11
+  },
+  {
+   "started_at": 1795156266.0227432,
+   "start_location": "3710507848328762",
+   "scanned": 1200,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1200,
+   "max_sigma": 3.925,
+   "finished_at": 1795158076.5554352,
+   "end_location": "3710507848329962",
+   "frames_per_hour": 2386,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 4.9,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 7.12,
+    "latency_p90_s": 9.43,
+    "by_level": {
+     "8": [
+      1200,
+      7.12
+     ]
+    },
+    "in_flight": 4.69,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.06
+  },
+  {
+   "started_at": 1795158084.607795,
+   "start_location": "3206413394192461",
+   "scanned": 1200,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1200,
+   "max_sigma": 3.983,
+   "finished_at": 1795159887.405921,
+   "end_location": "3206413394193661",
+   "frames_per_hour": 2396,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.66,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 7.56,
+    "latency_p90_s": 11.15,
+    "by_level": {
+     "8": [
+      1200,
+      7.56
+     ]
+    },
+    "in_flight": 5.24,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.08
+  },
+  {
+   "started_at": 1795159895.734622,
+   "start_location": "8008600669086998",
+   "scanned": 300,
+   "finds": 0,
+   "errors": 33,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "error_kinds": {
+    "HTTP 522": 33
+   },
+   "fp_n": 300,
+   "max_sigma": 3.757,
+   "finished_at": 1795161703.754394,
+   "end_location": "8008600669087331",
+   "frames_per_hour": 597,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 4.64,
+    "changes": 16,
+    "pauses": 5,
+    "latency_median_s": 4.18,
+    "latency_p90_s": 7.97,
+    "by_level": {
+     "2": [
+      8,
+      2.92
+     ],
+     "3": [
+      8,
+      3.42
+     ],
+     "4": [
+      8,
+      3.98
+     ],
+     "5": [
+      16,
+      4.62
+     ],
+     "6": [
+      8,
+      3.31
+     ],
+     "7": [
+      24,
+      4.48
+     ],
+     "8": [
+      201,
+      4.38
+     ]
+    },
+    "in_flight": 2.25,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      1.6,
+      7
+     ],
+     [
+      2.8,
+      6
+     ],
+     [
+      7.0,
+      5
+     ],
+     [
+      11.2,
+      4
+     ],
+     [
+      15.4,
+      3
+     ],
+     [
+      19.6,
+      2
+     ],
+     [
+      22.8,
+      3
+     ],
+     [
+      23.0,
+      4
+     ],
+     [
+      23.2,
+      5
+     ],
+     [
+      23.8,
+      6
+     ],
+     [
+      24.0,
+      7
+     ],
+     [
+      24.2,
+      8
+     ],
+     [
+      27.4,
+      7
+     ],
+     [
+      27.8,
+      8
+     ],
+     [
+      29.4,
+      7
+     ],
+     [
+      29.9,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.15
+  },
+  {
+   "started_at": 1795161737.059752,
+   "start_location": "8694874147340529",
+   "scanned": 1199,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1199,
+   "max_sigma": 4.093,
+   "finished_at": 1795163541.158953,
+   "end_location": "8694874147341728",
+   "frames_per_hour": 2393,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.11,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 8.22,
+    "latency_p90_s": 10.56,
+    "by_level": {
+     "7": [
+      8,
+      8.5
+     ],
+     "8": [
+      1179,
+      8.18
+     ]
+    },
+    "in_flight": 5.42,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      28.4,
+      7
+     ],
+     [
+      28.7,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.07
+  },
+  {
+   "started_at": 1795163551.458581,
+   "start_location": "7882797613706612",
+   "scanned": 1199,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1199,
+   "max_sigma": 5.135,
+   "new_finds": [
+    {
+     "location": "7882797613707779",
+     "sigma": 5.135,
+     "tier": "anomaly",
+     "reason": "texture",
+     "description": "Statistically unusual static, not a picture: alternating: neighbouring pixels disagree more than static, mostly vertically (r = -0.012) (5.1\u03c3). Nothing local: no shapes, lines or patterns stand out."
+    }
+   ],
+   "finished_at": 1795165362.2381136,
+   "end_location": "7882797613707811",
+   "frames_per_hour": 2384,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.81,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 7.75,
+    "latency_p90_s": 10.22,
+    "by_level": {
+     "8": [
+      1200,
+      7.75
+     ]
+    },
+    "in_flight": 5.18,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "fingerprint_mean": 14.12
+  },
+  {
+   "started_at": 1795165372.4109294,
+   "start_location": "3017002001052862",
+   "scanned": 1176,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1176,
+   "max_sigma": 3.915,
+   "finished_at": 1795167187.9502008,
+   "end_location": "3017002001054038",
+   "frames_per_hour": 2332,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.97,
+    "changes": 6,
+    "pauses": 0,
+    "latency_median_s": 8.51,
+    "latency_p90_s": 12.98,
+    "by_level": {
+     "6": [
+      20,
+      8.0
+     ],
+     "7": [
+      44,
+      8.37
+     ],
+     "8": [
+      1078,
+      8.65
+     ]
+    },
+    "in_flight": 5.84,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      23.7,
+      7
+     ],
+     [
+      24.1,
+      6
+     ],
+     [
+      24.6,
+      7
+     ],
+     [
+      25.0,
+      8
+     ],
+     [
+      27.8,
+      7
+     ],
+     [
+      28.5,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.05
+  },
+  {
+   "started_at": 1795167197.7057974,
+   "start_location": "4829291392175779",
+   "scanned": 1026,
+   "finds": 0,
+   "errors": 2,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1026,
+   "max_sigma": 3.657,
+   "error_kinds": {
+    "HTTP 500": 2
+   },
+   "finished_at": 1795169004.56465,
+   "end_location": "4829291392176807",
+   "frames_per_hour": 2044,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.71,
+    "changes": 10,
+    "pauses": 0,
+    "latency_median_s": 9.22,
+    "latency_p90_s": 13.92,
+    "by_level": {
+     "4": [
+      8,
+      8.01
+     ],
+     "5": [
+      16,
+      13.94
+     ],
+     "6": [
+      16,
+      25.76
+     ],
+     "7": [
+      53,
+      14.37
+     ],
+     "8": [
+      881,
+      8.99
+     ]
+    },
+    "in_flight": 6.01,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      5.4,
+      7
+     ],
+     [
+      6.9,
+      6
+     ],
+     [
+      8.6,
+      5
+     ],
+     [
+      9.6,
+      4
+     ],
+     [
+      10.0,
+      5
+     ],
+     [
+      10.4,
+      6
+     ],
+     [
+      10.7,
+      7
+     ],
+     [
+      11.6,
+      8
+     ],
+     [
+      19.1,
+      7
+     ],
+     [
+      20.2,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.12
+  },
+  {
+   "started_at": 1795169014.5135324,
+   "start_location": "3039754198474301",
+   "scanned": 1134,
+   "finds": 0,
+   "errors": 10,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1134,
+   "max_sigma": 3.638,
+   "error_kinds": {
+    "HTTP 500": 10
+   },
+   "finished_at": 1795170827.4894469,
+   "end_location": "3039754198475445",
+   "frames_per_hour": 2252,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 5.72,
+    "changes": 8,
+    "pauses": 0,
+    "latency_median_s": 7.17,
+    "latency_p90_s": 11.48,
+    "by_level": {
+     "5": [
+      12,
+      7.53
+     ],
+     "6": [
+      18,
+      8.13
+     ],
+     "7": [
+      32,
+      11.98
+     ],
+     "8": [
+      1038,
+      6.86
+     ]
+    },
+    "in_flight": 5.07,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      4.3,
+      7
+     ],
+     [
+      5.4,
+      8
+     ],
+     [
+      26.1,
+      7
+     ],
+     [
+      26.4,
+      6
+     ],
+     [
+      26.8,
+      5
+     ],
+     [
+      27.6,
+      6
+     ],
+     [
+      28.0,
+      7
+     ],
+     [
+      28.2,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.09
+  },
+  {
+   "started_at": 1795170837.3762693,
+   "start_location": "5104251923108927",
+   "scanned": 1200,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1200,
+   "max_sigma": 3.763,
+   "finished_at": 1795172648.0478604,
+   "end_location": "5104251923110127",
+   "frames_per_hour": 2386,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 5.22,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 7.78,
+    "latency_p90_s": 10.14,
+    "by_level": {
+     "8": [
+      1200,
+      7.78
+     ]
+    },
+    "in_flight": 5.14,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.08
+  },
+  {
+   "started_at": 1795172658.2095942,
+   "start_location": "7338280160509199",
+   "scanned": 1169,
+   "finds": 1,
+   "errors": 4,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1169,
+   "max_sigma": 4.088,
+   "error_kinds": {
+    "HTTP 500": 4
+   },
+   "finished_at": 1795174464.9233177,
+   "end_location": "7338280160510372",
+   "frames_per_hour": 2329,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 5.34,
+    "changes": 8,
+    "pauses": 0,
+    "latency_median_s": 7.67,
+    "latency_p90_s": 11.07,
+    "by_level": {
+     "6": [
+      14,
+      11.09
+     ],
+     "7": [
+      74,
+      9.99
+     ],
+     "8": [
+      1035,
+      7.2
+     ]
+    },
+    "in_flight": 5.21,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      3.3,
+      7
+     ],
+     [
+      3.7,
+      6
+     ],
+     [
+      4.4,
+      7
+     ],
+     [
+      4.6,
+      8
+     ],
+     [
+      22.5,
+      7
+     ],
+     [
+      24.1,
+      8
+     ],
+     [
+      26.5,
+      7
+     ],
+     [
+      26.8,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.13
+  },
+  {
+   "started_at": 1795174475.2031462,
+   "start_location": "8153941159069660",
+   "scanned": 1087,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1087,
+   "max_sigma": 4.225,
+   "finished_at": 1795176279.702016,
+   "end_location": "8153941159070747",
+   "frames_per_hour": 2169,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.0,
+    "changes": 8,
+    "pauses": 0,
+    "latency_median_s": 8.26,
+    "latency_p90_s": 13.45,
+    "by_level": {
+     "5": [
+      32,
+      15.58
+     ],
+     "6": [
+      16,
+      14.8
+     ],
+     "7": [
+      52,
+      10.39
+     ],
+     "8": [
+      944,
+      7.67
+     ]
+    },
+    "in_flight": 5.53,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      10.6,
+      7
+     ],
+     [
+      11.6,
+      6
+     ],
+     [
+      12.5,
+      5
+     ],
+     [
+      14.4,
+      6
+     ],
+     [
+      14.7,
+      7
+     ],
+     [
+      15.0,
+      8
+     ],
+     [
+      29.0,
+      7
+     ],
+     [
+      30.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.09
+  },
+  {
+   "started_at": 1795176289.819929,
+   "start_location": "6216464724613093",
+   "scanned": 1200,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1200,
+   "max_sigma": 3.941,
+   "finished_at": 1795178098.667421,
+   "end_location": "6216464724614293",
+   "frames_per_hour": 2388,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.17,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 7.56,
+    "latency_p90_s": 10.1,
+    "by_level": {
+     "7": [
+      48,
+      9.17
+     ],
+     "8": [
+      1146,
+      7.46
+     ]
+    },
+    "in_flight": 5.09,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      10.2,
+      7
+     ],
+     [
+      11.5,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.1
+  },
+  {
+   "started_at": 1795178108.5699136,
+   "start_location": "6571831811720861",
+   "scanned": 1178,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1178,
+   "max_sigma": 4.052,
+   "finished_at": 1795179917.9110246,
+   "end_location": "6571831811722039",
+   "frames_per_hour": 2344,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 6.68,
+    "changes": 8,
+    "pauses": 0,
+    "latency_median_s": 8.89,
+    "latency_p90_s": 12.61,
+    "by_level": {
+     "7": [
+      120,
+      9.53
+     ],
+     "8": [
+      1012,
+      8.57
+     ]
+    },
+    "in_flight": 5.84,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      13.1,
+      7
+     ],
+     [
+      13.8,
+      8
+     ],
+     [
+      15.9,
+      7
+     ],
+     [
+      17.0,
+      8
+     ],
+     [
+      18.7,
+      7
+     ],
+     [
+      19.5,
+      8
+     ],
+     [
+      19.9,
+      7
+     ],
+     [
+      20.9,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.09
+  },
+  {
+   "started_at": 1795179951.584456,
+   "start_location": "1146577495098196",
+   "scanned": 1122,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1122,
+   "max_sigma": 4.037,
+   "finished_at": 1795181760.3489861,
+   "end_location": "1146577495099318",
+   "frames_per_hour": 2233,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 12.07,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 9.55,
+    "latency_p90_s": 15.14,
+    "by_level": {
+     "7": [
+      8,
+      12.57
+     ],
+     "8": [
+      1102,
+      9.51
+     ]
+    },
+    "in_flight": 6.52,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      25.0,
+      7
+     ],
+     [
+      25.4,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.11
+  },
+  {
+   "started_at": 1795181771.676676,
+   "start_location": "1112816371935095",
+   "scanned": 1065,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1065,
+   "max_sigma": 3.826,
+   "finished_at": 1795183581.5638142,
+   "end_location": "1112816371936160",
+   "frames_per_hour": 2118,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 5.25,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 12.11,
+    "latency_p90_s": 16.69,
+    "by_level": {
+     "8": [
+      1065,
+      12.11
+     ]
+    },
+    "in_flight": 7.31,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.12
+  },
+  {
+   "started_at": 1795183592.4237916,
+   "start_location": "7481264967391028",
+   "scanned": 1168,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1168,
+   "max_sigma": 3.59,
+   "finished_at": 1795185402.7088623,
+   "end_location": "7481264967392196",
+   "frames_per_hour": 2323,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 4.12,
+    "changes": 8,
+    "pauses": 0,
+    "latency_median_s": 7.12,
+    "latency_p90_s": 11.62,
+    "by_level": {
+     "7": [
+      52,
+      9.07
+     ],
+     "8": [
+      1065,
+      6.84
+     ]
+    },
+    "in_flight": 5.19,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      0.8,
+      7
+     ],
+     [
+      1.3,
+      8
+     ],
+     [
+      10.1,
+      7
+     ],
+     [
+      10.4,
+      8
+     ],
+     [
+      10.9,
+      7
+     ],
+     [
+      11.2,
+      8
+     ],
+     [
+      24.2,
+      7
+     ],
+     [
+      25.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.07
+  },
+  {
+   "started_at": 1795185414.089168,
+   "start_location": "8380304108171037",
+   "scanned": 1151,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1151,
+   "max_sigma": 4.256,
+   "new_finds": [
+    {
+     "location": "8380304108171220",
+     "sigma": 4.256,
+     "tier": "anomaly",
+     "reason": "face",
+     "description": "Statistically unusual static, not a picture: a face-like arrangement, two spots above a third, about 15 px across, around the top-right (4.3\u03c3)."
+    }
+   ],
+   "finished_at": 1795187226.9259312,
+   "end_location": "8380304108172188",
+   "frames_per_hour": 2286,
+   "concurrency": {
+    "final": 7,
+    "max_used": 8,
+    "baseline_latency_s": 5.57,
+    "changes": 1,
+    "pauses": 0,
+    "latency_median_s": 11.17,
+    "latency_p90_s": 14.07,
+    "by_level": {
+     "7": [
+      5,
+      14.05
+     ],
+     "8": [
+      1140,
+      11.13
+     ]
+    },
+    "in_flight": 7.07,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      29.9,
+      7
+     ]
+    ]
+   },
+   "fingerprint_mean": 14.06
+  },
+  {
+   "started_at": 1795187238.0621257,
+   "start_location": "2963832347196026",
+   "scanned": 889,
+   "finds": 2,
+   "errors": 19,
+   "workers": 7,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 889,
+   "max_sigma": 4.102,
+   "error_kinds": {
+    "HTTP 500": 17,
+    "HTTP 525": 2
+   },
+   "finished_at": 1795189046.8639622,
+   "end_location": "2963832347196934",
+   "frames_per_hour": 1769,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.99,
+    "changes": 15,
+    "pauses": 0,
+    "latency_median_s": 12.86,
+    "latency_p90_s": 19.82,
+    "by_level": {
+     "2": [
+      6,
+      8.0
+     ],
+     "3": [
+      15,
+      6.82
+     ],
+     "4": [
+      8,
+      6.93
+     ],
+     "5": [
+      20,
+      8.12
+     ],
+     "6": [
+      40,
+      10.86
+     ],
+     "7": [
+      32,
+      11.35
+     ],
+     "8": [
+      722,
+      13.43
+     ]
+    },
+    "in_flight": 7.1,
+    "history": [
+     [
+      -0.0,
+      7
+     ],
+     [
+      0.4,
+      8
+     ],
+     [
+      3.7,
+      7
+     ],
+     [
+      4.0,
+      6
+     ],
+     [
+      4.3,
+      5
+     ],
+     [
+      5.0,
+      4
+     ],
+     [
+      5.4,
+      3
+     ],
+     [
+      6.3,
+      2
+     ],
+     [
+      6.8,
+      3
+     ],
+     [
+      7.1,
+      4
+     ],
+     [
+      7.5,
+      5
+     ],
+     [
+      8.2,
+      6
+     ],
+     [
+      9.5,
+      7
+     ],
+     [
+      9.8,
+      8
+     ],
+     [
+      23.5,
+      7
+     ],
+     [
+      24.2,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.1
+  },
+  {
+   "started_at": 1795189057.953279,
+   "start_location": "8116698572960375",
+   "scanned": 1090,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1090,
+   "max_sigma": 3.768,
+   "finished_at": 1795190869.9376829,
+   "end_location": "8116698572961465",
+   "frames_per_hour": 2166,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 4.53,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 11.43,
+    "latency_p90_s": 16.81,
+    "by_level": {
+     "8": [
+      1090,
+      11.43
+     ]
+    },
+    "in_flight": 7.07,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.12
+  },
+  {
+   "started_at": 1795190880.9888601,
+   "start_location": "5704961618451634",
+   "scanned": 1182,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1182,
+   "max_sigma": 3.738,
+   "finished_at": 1795192691.5441175,
+   "end_location": "5704961618452816",
+   "frames_per_hour": 2350,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.18,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 7.45,
+    "latency_p90_s": 12.2,
+    "by_level": {
+     "7": [
+      12,
+      6.19
+     ],
+     "8": [
+      1161,
+      7.55
+     ]
+    },
+    "in_flight": 5.32,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      13.0,
+      7
+     ],
+     [
+      13.3,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.11
+  },
+  {
+   "started_at": 1795192702.5919402,
+   "start_location": "1729487221052549",
+   "scanned": 791,
+   "finds": 0,
+   "errors": 20,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 791,
+   "max_sigma": 3.755,
+   "error_kinds": {
+    "HTTP 502": 5,
+    "HTTP 500": 12,
+    "HTTP 525": 2,
+    "cut off mid-download": 1
+   },
+   "finished_at": 1795194520.9660516,
+   "end_location": "1729487221053360",
+   "frames_per_hour": 1566,
+   "concurrency": {
+    "final": 7,
+    "max_used": 8,
+    "baseline_latency_s": 6.24,
+    "changes": 19,
+    "pauses": 0,
+    "latency_median_s": 7.66,
+    "latency_p90_s": 13.81,
+    "by_level": {
+     "1": [
+      7,
+      3.65
+     ],
+     "2": [
+      11,
+      4.9
+     ],
+     "3": [
+      44,
+      6.44
+     ],
+     "4": [
+      24,
+      11.74
+     ],
+     "5": [
+      26,
+      11.97
+     ],
+     "6": [
+      20,
+      11.42
+     ],
+     "7": [
+      16,
+      10.62
+     ],
+     "8": [
+      602,
+      7.72
+     ]
+    },
+    "in_flight": 4.88,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      6.6,
+      7
+     ],
+     [
+      7.4,
+      6
+     ],
+     [
+      10.4,
+      5
+     ],
+     [
+      13.5,
+      4
+     ],
+     [
+      14.5,
+      5
+     ],
+     [
+      15.2,
+      6
+     ],
+     [
+      16.1,
+      5
+     ],
+     [
+      16.4,
+      4
+     ],
+     [
+      16.7,
+      3
+     ],
+     [
+      17.1,
+      2
+     ],
+     [
+      17.6,
+      1
+     ],
+     [
+      18.4,
+      2
+     ],
+     [
+      18.7,
+      3
+     ],
+     [
+      20.3,
+      4
+     ],
+     [
+      20.5,
+      5
+     ],
+     [
+      20.8,
+      6
+     ],
+     [
+      21.1,
+      7
+     ],
+     [
+      21.3,
+      8
+     ],
+     [
+      30.3,
+      7
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.1
+  },
+  {
+   "started_at": 1795194532.2491558,
+   "start_location": "7645499588954324",
+   "scanned": 1183,
+   "finds": 0,
+   "errors": 0,
+   "workers": 7,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1183,
+   "max_sigma": 3.943,
+   "finished_at": 1795196339.434033,
+   "end_location": "7645499588955507",
+   "frames_per_hour": 2357,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 5.29,
+    "changes": 3,
+    "pauses": 0,
+    "latency_median_s": 8.92,
+    "latency_p90_s": 11.74,
+    "by_level": {
+     "7": [
+      16,
+      9.96
+     ],
+     "8": [
+      1148,
+      8.87
+     ]
+    },
+    "in_flight": 5.99,
+    "history": [
+     [
+      -0.0,
+      7
+     ],
+     [
+      0.3,
+      8
+     ],
+     [
+      12.4,
+      7
+     ],
+     [
+      12.8,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.06
+  },
+  {
+   "started_at": 1795196350.7154672,
+   "start_location": "4386905019202796",
+   "scanned": 1187,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1187,
+   "max_sigma": 4.059,
+   "finished_at": 1795198170.8774586,
+   "end_location": "4386905019203983",
+   "frames_per_hour": 2348,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 11.79,
+    "changes": 8,
+    "pauses": 0,
+    "latency_median_s": 9.57,
+    "latency_p90_s": 12.73,
+    "by_level": {
+     "6": [
+      16,
+      5.93
+     ],
+     "7": [
+      32,
+      7.39
+     ],
+     "8": [
+      1108,
+      9.7
+     ]
+    },
+    "in_flight": 6.17,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      10.4,
+      7
+     ],
+     [
+      10.7,
+      6
+     ],
+     [
+      11.0,
+      7
+     ],
+     [
+      11.2,
+      8
+     ],
+     [
+      12.5,
+      7
+     ],
+     [
+      12.8,
+      6
+     ],
+     [
+      13.0,
+      7
+     ],
+     [
+      13.3,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.05
+  },
+  {
+   "started_at": 1795198204.5100262,
+   "start_location": "2621528493526504",
+   "scanned": 1200,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1200,
+   "max_sigma": 3.71,
+   "finished_at": 1795200009.959742,
+   "end_location": "2621528493527704",
+   "frames_per_hour": 2393,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 5.04,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 8.59,
+    "latency_p90_s": 11.43,
+    "by_level": {
+     "8": [
+      1200,
+      8.59
+     ]
+    },
+    "in_flight": 5.61,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.05
+  },
+  {
+   "started_at": 1795200019.7674937,
+   "start_location": "8232850951949221",
+   "scanned": 1192,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1192,
+   "max_sigma": 4.034,
+   "finished_at": 1795201824.9729629,
+   "end_location": "8232850951950413",
+   "frames_per_hour": 2377,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 9.64,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 9.19,
+    "latency_p90_s": 11.8,
+    "by_level": {
+     "8": [
+      1193,
+      9.19
+     ]
+    },
+    "in_flight": 6.05,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.04
+  },
+  {
+   "started_at": 1795201834.2905173,
+   "start_location": "69335982857968",
+   "scanned": 1172,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1172,
+   "max_sigma": 4.102,
+   "finished_at": 1795203644.24827,
+   "end_location": "69335982859140",
+   "frames_per_hour": 2331,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 10.76,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 10.14,
+    "latency_p90_s": 13.09,
+    "by_level": {
+     "7": [
+      16,
+      11.73
+     ],
+     "8": [
+      1144,
+      10.07
+     ]
+    },
+    "in_flight": 6.58,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      20.3,
+      7
+     ],
+     [
+      20.9,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.07
+  },
+  {
+   "started_at": 1795203653.259328,
+   "start_location": "5424722023203999",
+   "scanned": 936,
+   "finds": 2,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 936,
+   "max_sigma": 4.338,
+   "new_finds": [
+    {
+     "location": "5424722023204167",
+     "sigma": 4.338,
+     "tier": "anomaly",
+     "reason": "shape",
+     "description": "Statistically unusual static, not a picture: a yellower region around the centre, roughly 88 px across (4.3\u03c3)."
+    }
+   ],
+   "finished_at": 1795205464.6438,
+   "end_location": "5424722023204935",
+   "frames_per_hour": 1860,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 12.34,
+    "changes": 4,
+    "pauses": 0,
+    "latency_median_s": 12.94,
+    "latency_p90_s": 19.9,
+    "by_level": {
+     "7": [
+      28,
+      16.62
+     ],
+     "8": [
+      884,
+      12.81
+     ]
+    },
+    "in_flight": 7.56,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      10.7,
+      7
+     ],
+     [
+      11.7,
+      8
+     ],
+     [
+      27.8,
+      7
+     ],
+     [
+      28.7,
+      8
+     ]
+    ]
+   },
+   "fingerprint_mean": 14.1
+  },
+  {
+   "started_at": 1795205473.7135668,
+   "start_location": "8749007276316514",
+   "scanned": 1025,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1025,
+   "max_sigma": 4.042,
+   "finished_at": 1795207282.7363355,
+   "end_location": "8749007276317539",
+   "frames_per_hour": 2040,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 14.7,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 13.97,
+    "latency_p90_s": 16.21,
+    "by_level": {
+     "8": [
+      1026,
+      13.97
+     ]
+    },
+    "in_flight": 7.96,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.1
+  },
+  {
+   "started_at": 1795207291.760999,
+   "start_location": "5436307677681737",
+   "scanned": 1105,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1105,
+   "max_sigma": 3.841,
+   "finished_at": 1795209102.48619,
+   "end_location": "5436307677682842",
+   "frames_per_hour": 2197,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 5.62,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 9.65,
+    "latency_p90_s": 15.39,
+    "by_level": {
+     "8": [
+      1105,
+      9.65
+     ]
+    },
+    "in_flight": 6.32,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.04
+  },
+  {
+   "started_at": 1795209111.783329,
+   "start_location": "7904521179919326",
+   "scanned": 1193,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1193,
+   "max_sigma": 3.743,
+   "finished_at": 1795210918.4604385,
+   "end_location": "7904521179920519",
+   "frames_per_hour": 2377,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 9.52,
+    "changes": 4,
+    "pauses": 0,
+    "latency_median_s": 7.35,
+    "latency_p90_s": 10.92,
+    "by_level": {
+     "7": [
+      36,
+      8.66
+     ],
+     "8": [
+      1133,
+      7.2
+     ]
+    },
+    "in_flight": 5.1,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      3.5,
+      7
+     ],
+     [
+      3.8,
+      8
+     ],
+     [
+      18.9,
+      7
+     ],
+     [
+      19.7,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.09
+  },
+  {
+   "started_at": 1795210927.480859,
+   "start_location": "5459389677968042",
+   "scanned": 1199,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1199,
+   "max_sigma": 4.115,
+   "finished_at": 1795212732.605718,
+   "end_location": "5459389677969241",
+   "frames_per_hour": 2391,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 11.96,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 8.92,
+    "latency_p90_s": 11.26,
+    "by_level": {
+     "8": [
+      1200,
+      8.92
+     ]
+    },
+    "in_flight": 5.94,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.06
+  },
+  {
+   "started_at": 1795212741.6381428,
+   "start_location": "1318960915198577",
+   "scanned": 1154,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1154,
+   "max_sigma": 3.975,
+   "finished_at": 1795214552.5661926,
+   "end_location": "1318960915199731",
+   "frames_per_hour": 2294,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 12.48,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 11.29,
+    "latency_p90_s": 14.08,
+    "by_level": {
+     "8": [
+      1154,
+      11.29
+     ]
+    },
+    "in_flight": 7.19,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.05
+  },
+  {
+   "started_at": 1795214561.794911,
+   "start_location": "6183832689139789",
+   "scanned": 1172,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1172,
+   "max_sigma": 3.803,
+   "finished_at": 1795216372.2552645,
+   "end_location": "6183832689140961",
+   "frames_per_hour": 2330,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 12.92,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 10.81,
+    "latency_p90_s": 13.49,
+    "by_level": {
+     "8": [
+      1172,
+      10.81
+     ]
+    },
+    "in_flight": 7.03,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.13
+  },
+  {
+   "started_at": 1795216404.5731456,
+   "start_location": "6115937648181017",
+   "scanned": 1181,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1181,
+   "max_sigma": 4.092,
+   "finished_at": 1795218213.4816377,
+   "end_location": "6115937648182198",
+   "frames_per_hour": 2350,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 5.79,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 10.43,
+    "latency_p90_s": 12.87,
+    "by_level": {
+     "7": [
+      8,
+      8.64
+     ],
+     "8": [
+      1161,
+      10.46
+     ]
+    },
+    "in_flight": 6.73,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      17.3,
+      7
+     ],
+     [
+      17.7,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.09
+  },
+  {
+   "started_at": 1795218224.2134867,
+   "start_location": "5167837873704464",
+   "scanned": 1172,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1172,
+   "max_sigma": 4.05,
+   "finished_at": 1795220030.749488,
+   "end_location": "5167837873705636",
+   "frames_per_hour": 2336,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.97,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 9.92,
+    "latency_p90_s": 13.45,
+    "by_level": {
+     "8": [
+      1173,
+      9.92
+     ]
+    },
+    "in_flight": 6.51,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.14
+  },
+  {
+   "started_at": 1795220041.666212,
+   "start_location": "4944940595111276",
+   "scanned": 1152,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1152,
+   "max_sigma": 3.542,
+   "finished_at": 1795221848.6665025,
+   "end_location": "4944940595112428",
+   "frames_per_hour": 2295,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 4.24,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 10.37,
+    "latency_p90_s": 13.81,
+    "by_level": {
+     "7": [
+      12,
+      15.68
+     ],
+     "8": [
+      1127,
+      10.34
+     ]
+    },
+    "in_flight": 6.52,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      14.0,
+      7
+     ],
+     [
+      14.8,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.1
+  },
+  {
+   "started_at": 1795221859.636218,
+   "start_location": "3438957483511363",
+   "scanned": 1184,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1184,
+   "max_sigma": 3.893,
+   "finished_at": 1795223667.4700801,
+   "end_location": "3438957483512547",
+   "frames_per_hour": 2358,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.08,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 9.94,
+    "latency_p90_s": 12.67,
+    "by_level": {
+     "8": [
+      1184,
+      9.94
+     ]
+    },
+    "in_flight": 6.59,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.11
+  },
+  {
+   "started_at": 1795223678.1391602,
+   "start_location": "1047670593397918",
+   "scanned": 1197,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1197,
+   "max_sigma": 3.643,
+   "finished_at": 1795225487.7905967,
+   "end_location": "1047670593399115",
+   "frames_per_hour": 2381,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 5.3,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 8.54,
+    "latency_p90_s": 11.0,
+    "by_level": {
+     "7": [
+      8,
+      8.53
+     ],
+     "8": [
+      1177,
+      8.54
+     ]
+    },
+    "in_flight": 5.6,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      16.0,
+      7
+     ],
+     [
+      16.3,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.06
+  },
+  {
+   "started_at": 1795225498.4338577,
+   "start_location": "3559188854938010",
+   "scanned": 1194,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1194,
+   "max_sigma": 4.185,
+   "finished_at": 1795227307.7114391,
+   "end_location": "3559188854939204",
+   "frames_per_hour": 2376,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.47,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 7.57,
+    "latency_p90_s": 10.13,
+    "by_level": {
+     "8": [
+      1195,
+      7.57
+     ]
+    },
+    "in_flight": 5.16,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.09
+  },
+  {
+   "started_at": 1795227318.465574,
+   "start_location": "5899353723941243",
+   "scanned": 1195,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1195,
+   "max_sigma": 3.647,
+   "finished_at": 1795229129.1189141,
+   "end_location": "5899353723942438",
+   "frames_per_hour": 2376,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 12.66,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 9.16,
+    "latency_p90_s": 11.82,
+    "by_level": {
+     "7": [
+      8,
+      8.87
+     ],
+     "8": [
+      1174,
+      9.15
+     ]
+    },
+    "in_flight": 5.78,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      15.3,
+      7
+     ],
+     [
+      15.7,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.12
+  },
+  {
+   "started_at": 1795229139.7670293,
+   "start_location": "3734477721147763",
+   "scanned": 1193,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1193,
+   "max_sigma": 4.079,
+   "finished_at": 1795230946.2803898,
+   "end_location": "3734477721148956",
+   "frames_per_hour": 2377,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.65,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 10.33,
+    "latency_p90_s": 12.13,
+    "by_level": {
+     "8": [
+      1194,
+      10.33
+     ]
+    },
+    "in_flight": 6.84,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.05
+  },
+  {
+   "started_at": 1795230957.091119,
+   "start_location": "6026911175508559",
+   "scanned": 1139,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1139,
+   "max_sigma": 4.04,
+   "finished_at": 1795232766.551625,
+   "end_location": "6026911175509698",
+   "frames_per_hour": 2266,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 11.33,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 10.41,
+    "latency_p90_s": 14.84,
+    "by_level": {
+     "7": [
+      16,
+      10.52
+     ],
+     "8": [
+      1112,
+      10.38
+     ]
+    },
+    "in_flight": 6.85,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      14.8,
+      7
+     ],
+     [
+      15.3,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.11
+  },
+  {
+   "started_at": 1795232777.1097498,
+   "start_location": "4170321771266935",
+   "scanned": 1198,
+   "finds": 2,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1198,
+   "max_sigma": 4.539,
+   "new_finds": [
+    {
+     "location": "4170321771267258",
+     "sigma": 4.539,
+     "tier": "anomaly",
+     "reason": "lines",
+     "description": "Statistically unusual static, not a picture: a darker vertical band near x \u2248 566 px (4.5\u03c3)."
+    }
+   ],
+   "finished_at": 1795234586.476344,
+   "end_location": "4170321771268133",
+   "frames_per_hour": 2384,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 7.99,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 9.84,
+    "latency_p90_s": 12.31,
+    "by_level": {
+     "8": [
+      1200,
+      9.84
+     ]
+    },
+    "in_flight": 6.52,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "fingerprint_mean": 14.07
+  },
+  {
+   "started_at": 1795234629.7928472,
+   "start_location": "4743992789484204",
+   "scanned": 1184,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1184,
+   "max_sigma": 3.69,
+   "finished_at": 1795236433.4256935,
+   "end_location": "4743992789485388",
+   "frames_per_hour": 2363,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 9.0,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 10.08,
+    "latency_p90_s": 12.55,
+    "by_level": {
+     "8": [
+      1184,
+      10.08
+     ]
+    },
+    "in_flight": 6.55,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.08
+  },
+  {
+   "started_at": 1795236444.0097258,
+   "start_location": "3680438939988755",
+   "scanned": 1199,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1199,
+   "max_sigma": 4.083,
+   "finished_at": 1795238255.617216,
+   "end_location": "3680438939989954",
+   "frames_per_hour": 2383,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.29,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 9.97,
+    "latency_p90_s": 11.5,
+    "by_level": {
+     "8": [
+      1200,
+      9.97
+     ]
+    },
+    "in_flight": 6.56,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.11
+  },
+  {
+   "started_at": 1795238265.511911,
+   "start_location": "5358855061071197",
+   "scanned": 1199,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1199,
+   "max_sigma": 4.063,
+   "finished_at": 1795240076.6887436,
+   "end_location": "5358855061072396",
+   "frames_per_hour": 2383,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 11.32,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 9.09,
+    "latency_p90_s": 11.48,
+    "by_level": {
+     "7": [
+      8,
+      8.9
+     ],
+     "8": [
+      1179,
+      9.1
+     ]
+    },
+    "in_flight": 6.03,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      13.0,
+      7
+     ],
+     [
+      13.3,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.08
+  },
+  {
+   "started_at": 1795240086.817381,
+   "start_location": "829926008803812",
+   "scanned": 1154,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1154,
+   "max_sigma": 3.956,
+   "finished_at": 1795241894.6835737,
+   "end_location": "829926008804966",
+   "frames_per_hour": 2298,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 10.38,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 11.45,
+    "latency_p90_s": 13.99,
+    "by_level": {
+     "8": [
+      1154,
+      11.45
+     ]
+    },
+    "in_flight": 7.0,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.03
+  },
+  {
+   "started_at": 1795241904.7326286,
+   "start_location": "298262512752974",
+   "scanned": 1108,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1108,
+   "max_sigma": 3.679,
+   "finished_at": 1795243715.8352768,
+   "end_location": "298262512754082",
+   "frames_per_hour": 2202,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.3,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 12.68,
+    "latency_p90_s": 14.56,
+    "by_level": {
+     "7": [
+      8,
+      10.79
+     ],
+     "8": [
+      1087,
+      12.69
+     ]
+    },
+    "in_flight": 7.86,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      12.3,
+      7
+     ],
+     [
+      12.7,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.1
+  },
+  {
+   "started_at": 1795243725.557604,
+   "start_location": "8333768499649385",
+   "scanned": 1123,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1123,
+   "max_sigma": 3.822,
+   "finished_at": 1795245531.5062733,
+   "end_location": "8333768499650508",
+   "frames_per_hour": 2239,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 8.08,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 12.24,
+    "latency_p90_s": 14.39,
+    "by_level": {
+     "8": [
+      1123,
+      12.24
+     ]
+    },
+    "in_flight": 7.74,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.07
+  },
+  {
+   "started_at": 1795245541.2543066,
+   "start_location": "4596788729295178",
+   "scanned": 1181,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1181,
+   "max_sigma": 3.775,
+   "finished_at": 1795247350.544249,
+   "end_location": "4596788729296359",
+   "frames_per_hour": 2350,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 6.97,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 9.77,
+    "latency_p90_s": 12.72,
+    "by_level": {
+     "7": [
+      24,
+      12.38
+     ],
+     "8": [
+      1144,
+      9.74
+     ]
+    },
+    "in_flight": 6.44,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      13.8,
+      7
+     ],
+     [
+      14.7,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.06
+  },
+  {
+   "started_at": 1795247360.542054,
+   "start_location": "5035757268934126",
+   "scanned": 1160,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1160,
+   "max_sigma": 4.108,
+   "finished_at": 1795249172.156168,
+   "end_location": "5035757268935286",
+   "frames_per_hour": 2305,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 9.62,
+    "changes": 8,
+    "pauses": 0,
+    "latency_median_s": 9.74,
+    "latency_p90_s": 13.14,
+    "by_level": {
+     "6": [
+      40,
+      8.54
+     ],
+     "7": [
+      48,
+      10.22
+     ],
+     "8": [
+      1031,
+      9.74
+     ]
+    },
+    "in_flight": 6.15,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      14.4,
+      7
+     ],
+     [
+      14.8,
+      6
+     ],
+     [
+      15.5,
+      7
+     ],
+     [
+      15.8,
+      8
+     ],
+     [
+      20.4,
+      7
+     ],
+     [
+      20.9,
+      6
+     ],
+     [
+      21.5,
+      7
+     ],
+     [
+      22.2,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.09
+  },
+  {
+   "started_at": 1795249182.091874,
+   "start_location": "7595348486882737",
+   "scanned": 1131,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1131,
+   "max_sigma": 3.681,
+   "finished_at": 1795250992.1178932,
+   "end_location": "7595348486883868",
+   "frames_per_hour": 2249,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.36,
+    "changes": 6,
+    "pauses": 0,
+    "latency_median_s": 10.02,
+    "latency_p90_s": 14.31,
+    "by_level": {
+     "6": [
+      20,
+      10.39
+     ],
+     "7": [
+      44,
+      9.31
+     ],
+     "8": [
+      1033,
+      9.98
+     ]
+    },
+    "in_flight": 6.43,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      11.0,
+      7
+     ],
+     [
+      11.7,
+      8
+     ],
+     [
+      16.1,
+      7
+     ],
+     [
+      16.7,
+      6
+     ],
+     [
+      17.5,
+      7
+     ],
+     [
+      17.8,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.06
+  },
+  {
+   "started_at": 1795251002.0769794,
+   "start_location": "2476201559158668",
+   "scanned": 1064,
+   "finds": 0,
+   "errors": 5,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1064,
+   "max_sigma": 3.741,
+   "error_kinds": {
+    "HTTP 500": 5
+   },
+   "finished_at": 1795252812.0112162,
+   "end_location": "2476201559159737",
+   "frames_per_hour": 2116,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 13.46,
+    "changes": 8,
+    "pauses": 0,
+    "latency_median_s": 12.08,
+    "latency_p90_s": 15.17,
+    "by_level": {
+     "5": [
+      7,
+      13.49
+     ],
+     "6": [
+      8,
+      12.9
+     ],
+     "7": [
+      24,
+      14.31
+     ],
+     "8": [
+      983,
+      11.95
+     ]
+    },
+    "in_flight": 7.58,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      11.9,
+      7
+     ],
+     [
+      12.2,
+      6
+     ],
+     [
+      12.5,
+      5
+     ],
+     [
+      13.2,
+      6
+     ],
+     [
+      13.6,
+      7
+     ],
+     [
+      14.0,
+      8
+     ],
+     [
+      29.0,
+      7
+     ],
+     [
+      30.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.05
+  },
+  {
+   "started_at": 1795252850.840694,
+   "start_location": "3622312257584316",
+   "scanned": 1113,
+   "finds": 1,
+   "errors": 4,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1113,
+   "max_sigma": 4.02,
+   "error_kinds": {
+    "HTTP 500": 4
+   },
+   "finished_at": 1795254659.677603,
+   "end_location": "3622312257585433",
+   "frames_per_hour": 2215,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 9.09,
+    "changes": 4,
+    "pauses": 0,
+    "latency_median_s": 12.22,
+    "latency_p90_s": 13.84,
+    "by_level": {
+     "6": [
+      14,
+      14.88
+     ],
+     "7": [
+      11,
+      10.93
+     ],
+     "8": [
+      1067,
+      12.22
+     ]
+    },
+    "in_flight": 7.72,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      18.5,
+      7
+     ],
+     [
+      19.0,
+      6
+     ],
+     [
+      19.9,
+      7
+     ],
+     [
+      20.3,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.09
+  },
+  {
+   "started_at": 1795254671.2536254,
+   "start_location": "4637237873455209",
+   "scanned": 1115,
+   "finds": 2,
+   "errors": 7,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1115,
+   "max_sigma": 4.543,
+   "new_finds": [
+    {
+     "location": "4637237873455560",
+     "sigma": 4.315,
+     "tier": "anomaly",
+     "reason": "repetition",
+     "description": "Statistically unusual static, not a picture: part of the frame repeats at an offset of (360, 167) px (4.3\u03c3)."
+    },
+    {
+     "location": "4637237873456091",
+     "sigma": 4.543,
+     "tier": "anomaly",
+     "reason": "marks",
+     "description": "Statistically unusual static, not a picture: a small mark about 6 px across whose colour hardly changes, around the left side (4.5\u03c3)."
+    }
+   ],
+   "error_kinds": {
+    "HTTP 500": 7
+   },
+   "finished_at": 1795256482.359571,
+   "end_location": "4637237873456331",
+   "frames_per_hour": 2216,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 11.42,
+    "changes": 6,
+    "pauses": 0,
+    "latency_median_s": 11.1,
+    "latency_p90_s": 13.66,
+    "by_level": {
+     "5": [
+      8,
+      10.1
+     ],
+     "6": [
+      22,
+      14.42
+     ],
+     "7": [
+      8,
+      12.07
+     ],
+     "8": [
+      1050,
+      11.01
+     ]
+    },
+    "in_flight": 7.19,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      25.8,
+      7
+     ],
+     [
+      26.3,
+      6
+     ],
+     [
+      27.1,
+      5
+     ],
+     [
+      27.6,
+      6
+     ],
+     [
+      28.3,
+      7
+     ],
+     [
+      28.7,
+      8
+     ]
+    ]
+   },
+   "fingerprint_mean": 14.12
+  },
+  {
+   "started_at": 1795256493.8489485,
+   "start_location": "6502239856712729",
+   "scanned": 1192,
+   "finds": 0,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1192,
+   "max_sigma": 3.934,
+   "finished_at": 1795258301.3955786,
+   "end_location": "6502239856713921",
+   "frames_per_hour": 2374,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 9.12,
+    "changes": 2,
+    "pauses": 0,
+    "latency_median_s": 9.62,
+    "latency_p90_s": 11.5,
+    "by_level": {
+     "7": [
+      8,
+      9.65
+     ],
+     "8": [
+      1171,
+      9.6
+     ]
+    },
+    "in_flight": 6.48,
+    "history": [
+     [
+      -0.0,
+      8
+     ],
+     [
+      9.1,
+      7
+     ],
+     [
+      9.5,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.06
+  },
+  {
+   "started_at": 1795258312.7813509,
+   "start_location": "6478857408941731",
+   "scanned": 1199,
+   "finds": 1,
+   "errors": 0,
+   "workers": 8,
+   "max_workers": 8,
+   "max_rate": 40.0,
+   "fp_n": 1199,
+   "max_sigma": 4.178,
+   "finished_at": 1795260121.2079184,
+   "end_location": "6478857408942930",
+   "frames_per_hour": 2387,
+   "concurrency": {
+    "final": 8,
+    "max_used": 8,
+    "baseline_latency_s": 10.53,
+    "changes": 0,
+    "pauses": 0,
+    "latency_median_s": 10.33,
+    "latency_p90_s": 12.22,
+    "by_level": {
+     "8": [
+      1200,
+      10.33
+     ]
+    },
+    "in_flight": 6.89,
+    "history": [
+     [
+      -0.0,
+      8
+     ]
+    ]
+   },
+   "new_finds": [],
+   "fingerprint_mean": 14.04
+  }
+ ],
+ "best": {
+  "location": "5013636801032929",
+  "sigma": 5.273
+ },
+ "updated_at": 1795260121.2082129,
+ "last_run": {
+  "started_at": 1795258312.7813509,
+  "start_location": "6478857408941731",
+  "scanned": 1199,
+  "finds": 1,
+  "errors": 0,
+  "workers": 8,
+  "max_workers": 8,
+  "max_rate": 40.0,
+  "fp_n": 1199,
+  "max_sigma": 4.178,
+  "finished_at": 1795260121.2079184,
+  "end_location": "6478857408942930",
+  "frames_per_hour": 2387,
+  "concurrency": {
+   "final": 8,
+   "max_used": 8,
+   "baseline_latency_s": 10.53,
+   "changes": 0,
+   "pauses": 0,
+   "latency_median_s": 10.33,
+   "latency_p90_s": 12.22,
+   "by_level": {
+    "8": [
+     1200,
+     10.33
+    ]
+   },
+   "in_flight": 6.89,
+   "history": [
+    [
+     -0.0,
+     8
+    ]
+   ]
+  },
+  "new_finds": [],
+  "fingerprint_mean": 14.04
+ },
+ "finds_total": 330,
+ "test_hist": {
+  "lo": -5.0,
+  "step": 0.25,
+  "counts": {
+   "shape": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1884,
+    1489,
+    2882,
+    4851,
+    7519,
+    10682,
+    14871,
+    19005,
+    22675,
+    25561,
+    27231,
+    27357,
+    26052,
+    22740,
+    18963,
+    14966,
+    10665,
+    7427,
+    4812,
+    3013,
+    1652,
+    875,
+    427,
+    207,
+    93,
+    59,
+    17,
+    2,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "blob": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1939,
+    1535,
+    2914,
+    4924,
+    7305,
+    10635,
+    14617,
+    18918,
+    22363,
+    25846,
+    27531,
+    27379,
+    25682,
+    22905,
+    19118,
+    14642,
+    10676,
+    7605,
+    5120,
+    2988,
+    1641,
+    866,
+    468,
+    201,
+    101,
+    36,
+    16,
+    3,
+    3,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "lines": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    176,
+    176,
+    473,
+    930,
+    1707,
+    2956,
+    4824,
+    7561,
+    10747,
+    14754,
+    18665,
+    22823,
+    25773,
+    27486,
+    26984,
+    25771,
+    23223,
+    19132,
+    14573,
+    10771,
+    7388,
+    4847,
+    2847,
+    1654,
+    900,
+    450,
+    242,
+    80,
+    32,
+    22,
+    8,
+    1,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "texture": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8,
+    163,
+    228,
+    463,
+    936,
+    1678,
+    3059,
+    4754,
+    7339,
+    10774,
+    14805,
+    18974,
+    22725,
+    25663,
+    27587,
+    27525,
+    25672,
+    22764,
+    18675,
+    14712,
+    10728,
+    7366,
+    4945,
+    3045,
+    1684,
+    899,
+    451,
+    190,
+    90,
+    41,
+    26,
+    5,
+    1,
+    1,
+    0,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "palette": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    176,
+    212,
+    496,
+    893,
+    1621,
+    2901,
+    4778,
+    7387,
+    10641,
+    14863,
+    18830,
+    22775,
+    26000,
+    27320,
+    27480,
+    26014,
+    22980,
+    19041,
+    14628,
+    10560,
+    7472,
+    4764,
+    2854,
+    1618,
+    868,
+    435,
+    186,
+    118,
+    44,
+    16,
+    4,
+    0,
+    2,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "tone": [
+    0,
+    0,
+    2,
+    3,
+    7,
+    22,
+    44,
+    93,
+    224,
+    452,
+    831,
+    1634,
+    2856,
+    4935,
+    7709,
+    10813,
+    14539,
+    18904,
+    95592,
+    425,
+    462,
+    6884,
+    25859,
+    22413,
+    18946,
+    14819,
+    10887,
+    7498,
+    4819,
+    2889,
+    1649,
+    933,
+    453,
+    232,
+    106,
+    29,
+    14,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "contrast": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    235225,
+    0,
+    0,
+    0,
+    0,
+    13255,
+    10920,
+    7587,
+    4685,
+    2925,
+    1725,
+    887,
+    423,
+    198,
+    101,
+    35,
+    9,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "angled": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    9,
+    185,
+    217,
+    467,
+    908,
+    1672,
+    2904,
+    4761,
+    7496,
+    10913,
+    14913,
+    18884,
+    22654,
+    25798,
+    27263,
+    27126,
+    25701,
+    22443,
+    19074,
+    14924,
+    10982,
+    7492,
+    4857,
+    2871,
+    1654,
+    955,
+    459,
+    253,
+    86,
+    35,
+    18,
+    2,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "repetition": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    62051,
+    1342,
+    22933,
+    25510,
+    27243,
+    27446,
+    25663,
+    22471,
+    19025,
+    14829,
+    10950,
+    7380,
+    4781,
+    2942,
+    1685,
+    890,
+    475,
+    214,
+    82,
+    41,
+    18,
+    1,
+    4,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "symmetry": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    25,
+    150,
+    184,
+    427,
+    841,
+    1670,
+    2817,
+    4899,
+    7608,
+    10694,
+    14760,
+    18723,
+    22530,
+    25851,
+    27419,
+    27435,
+    26020,
+    22775,
+    18943,
+    14675,
+    10919,
+    7388,
+    4833,
+    3002,
+    1709,
+    844,
+    437,
+    206,
+    119,
+    35,
+    24,
+    8,
+    1,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "spot": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    2,
+    12,
+    138,
+    233,
+    413,
+    870,
+    1671,
+    2840,
+    4839,
+    7329,
+    10693,
+    14817,
+    19164,
+    22788,
+    25694,
+    27716,
+    27021,
+    25718,
+    22765,
+    18981,
+    14858,
+    10895,
+    7481,
+    4792,
+    2910,
+    1633,
+    869,
+    472,
+    201,
+    100,
+    46,
+    13,
+    3,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "curves": [
+    1,
+    1,
+    2,
+    2,
+    6,
+    27,
+    29,
+    87,
+    195,
+    415,
+    951,
+    1680,
+    3000,
+    4749,
+    7395,
+    10595,
+    14596,
+    19144,
+    22876,
+    25792,
+    27429,
+    27184,
+    25903,
+    22695,
+    19008,
+    14930,
+    10909,
+    7316,
+    4771,
+    2908,
+    1667,
+    894,
+    472,
+    200,
+    77,
+    51,
+    15,
+    5,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "flat": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    116507,
+    0,
+    0,
+    22498,
+    27312,
+    26012,
+    22510,
+    18782,
+    14723,
+    10929,
+    7524,
+    4823,
+    2961,
+    1596,
+    1028,
+    365,
+    256,
+    95,
+    35,
+    15,
+    7,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "colours": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    36264,
+    0,
+    29248,
+    118,
+    20219,
+    25445,
+    27707,
+    29849,
+    23690,
+    26314,
+    18180,
+    10367,
+    11907,
+    6120,
+    6266,
+    3361,
+    1629,
+    662,
+    308,
+    163,
+    126,
+    8,
+    21,
+    2,
+    4,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "spectrum": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    203850,
+    0,
+    0,
+    0,
+    11075,
+    18837,
+    14815,
+    10870,
+    7419,
+    4776,
+    2936,
+    1690,
+    861,
+    462,
+    229,
+    90,
+    42,
+    15,
+    9,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "face": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    11,
+    123,
+    195,
+    477,
+    907,
+    1664,
+    2822,
+    4718,
+    7442,
+    10653,
+    14919,
+    18739,
+    22819,
+    25902,
+    27190,
+    27541,
+    25872,
+    22938,
+    18872,
+    14850,
+    10824,
+    7457,
+    4715,
+    2929,
+    1579,
+    962,
+    482,
+    228,
+    88,
+    43,
+    11,
+    4,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "marks": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    2,
+    14,
+    142,
+    190,
+    496,
+    919,
+    1647,
+    3003,
+    5034,
+    7398,
+    10874,
+    14832,
+    18661,
+    22590,
+    25778,
+    27839,
+    27625,
+    25709,
+    22611,
+    18647,
+    14733,
+    10892,
+    7503,
+    4717,
+    2849,
+    1644,
+    840,
+    446,
+    175,
+    91,
+    44,
+    17,
+    12,
+    3,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "combined": [
+    0,
+    0,
+    0,
+    0,
+    3,
+    12,
+    37,
+    86,
+    224,
+    489,
+    846,
+    1692,
+    2930,
+    4610,
+    7288,
+    10877,
+    14736,
+    19294,
+    22704,
+    25521,
+    27707,
+    27618,
+    25509,
+    22591,
+    18955,
+    14984,
+    10755,
+    7373,
+    4811,
+    2880,
+    1631,
+    948,
+    469,
+    233,
+    98,
+    41,
+    17,
+    4,
+    3,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "detector": "7155051039a2",
+  "since_log": true
+ },
+ "fingerprint": {
+  "n": 698570,
+  "sum": 9843997.810000343,
+  "sumsq": 139414503.1608968,
+  "min": {
+   "value": 9.4,
+   "location": "1112816371936098"
+  }
+ },
+ "hist_current": {
+  "detector": "7155051039a2",
+  "since": null,
+  "edges": [
+   -2,
+   -1,
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   8,
+   12,
+   16,
+   40
+  ],
+  "counts": [
+   0,
+   0,
+   14,
+   17211,
+   173201,
+   81404,
+   6030,
+   116,
+   2,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "log_calibration": "981bb7caa9f7"
+}

@@ -1,0 +1,27 @@
+{
+ "updated_at": 1795260128,
+ "healthy": true,
+ "last_scan_finished_at": 1795260121,
+ "halted": null,
+ "frames_total": 720140,
+ "finds_total": 330,
+ "best": {
+  "location": "5013636801032929",
+  "sigma": 5.273
+ },
+ "last_24h": {
+  "frames": 54737,
+  "finds": 28,
+  "scanning_share": 0.993,
+  "fetch_errors": {
+   "HTTP 500": 49,
+   "HTTP 525": 4,
+   "HTTP 502": 5,
+   "cut off mid-download": 1
+  },
+  "rejected_frames": 0,
+  "unconfirmed_finds": 0,
+  "fingerprint_mean": 14.08
+ },
+ "calibration": "981bb7caa9f7"
+}

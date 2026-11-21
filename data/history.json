@@ -1,0 +1,62 @@
+[
+ {
+  "day": "2026-11-18",
+  "runs": 39,
+  "frames": 44875,
+  "finds": 27,
+  "errors": 26,
+  "seconds": 70582.2,
+  "error_kinds": {
+   "HTTP 500": 23,
+   "HTTP 525": 1,
+   "cut off mid-download": 2
+  },
+  "latency_s_x_frames": 420567.1,
+  "in_flight_x_seconds": 438403.7
+ },
+ {
+  "day": "2026-11-19",
+  "runs": 46,
+  "frames": 52180,
+  "finds": 20,
+  "errors": 94,
+  "seconds": 82452.3,
+  "error_kinds": {
+   "HTTP 500": 40,
+   "HTTP 525": 4,
+   "HTTP 522": 50
+  },
+  "latency_s_x_frames": 417363.9,
+  "in_flight_x_seconds": 434602.2
+ },
+ {
+  "day": "2026-11-20",
+  "runs": 47,
+  "frames": 53096,
+  "finds": 22,
+  "errors": 89,
+  "seconds": 85096.6,
+  "error_kinds": {
+   "cut off mid-download": 2,
+   "HTTP 522": 33,
+   "HTTP 500": 45,
+   "HTTP 525": 4,
+   "HTTP 502": 5
+  },
+  "latency_s_x_frames": 454143.9,
+  "in_flight_x_seconds": 479370.7
+ },
+ {
+  "day": "2026-11-21",
+  "runs": 23,
+  "frames": 26746,
+  "finds": 13,
+  "errors": 16,
+  "seconds": 41604.3,
+  "error_kinds": {
+   "HTTP 500": 16
+  },
+  "latency_s_x_frames": 274166.0,
+  "in_flight_x_seconds": 276737.5
+ }
+]
