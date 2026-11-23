@@ -26,6 +26,8 @@ angled     lines and bands at 15-165 degrees (rows/columns are "lines").
 repetition 2-D autocorrelation at every offset: tiles, repeated motifs,
            periodic patterns.
 symmetry   mirror correlation about every vertical and horizontal axis.
+looks      how far a vision model (CLIP) puts the frame from static: a
+           general second opinion (looks.py; whole frame, not per channel).
 =========  ==============================================================
 
 Each test is run on luma (Y) and both chroma channels (Cb, Cr), so a shape
@@ -50,7 +52,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from . import nullmap, perceptual
+from . import looks, nullmap, perceptual
 
 CHANNELS = ("Y", "Cb", "Cr")
 SHAPE_SCALES = (4, 8, 16, 32, 64)
@@ -60,7 +62,9 @@ CORE_TESTS = ("shape", "blob", "lines", "texture", "palette", "tone",
               "contrast", "angled", "repetition", "symmetry")
 #: tests modelled on what people notice first (perceptual.py)
 PERCEPTUAL_TESTS = ("spot", "curves", "flat", "colours", "spectrum", "face", "marks")
-TESTS = CORE_TESTS + PERCEPTUAL_TESTS
+#: a vision model's view: how far the frame is from static to it (looks.py)
+VISION_TESTS = ("looks",)
+TESTS = CORE_TESTS + PERCEPTUAL_TESTS + VISION_TESTS
 CONTRAST_SCALES = (8, 16, 32)
 ANGLES = (15, 30, 45, 60, 75, 105, 120, 135, 150, 165)
 ANGLE_BANDS = (2, 4, 8)
@@ -606,6 +610,7 @@ def raw_scores(image: Image.Image | bytes | str | Path,
         out.update({t: 1e6 if t == "flat" else 0.0 for t in PERCEPTUAL_TESTS})
     else:
         out.update(perceptual.raw(rgb))
+    out["looks"] = looks.raw(image)
     if extras is not None:
         extras["fingerprint"] = fingerprint_z(rgb)
     return out

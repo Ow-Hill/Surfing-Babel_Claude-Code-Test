@@ -1,0 +1,17 @@
+name: Vision model
+description: >
+  The looks test's CLIP model (babel_surfer/looks.py), cached between runs.
+  The download is pinned to a revision and checked against its SHA-256 by
+  looks.download, so a cache or download that does not match is never used.
+runs:
+  using: composite
+  steps:
+    - id: key
+      shell: bash
+      run: echo "key=vision-$(python -c 'import re,pathlib;s=pathlib.Path("babel_surfer/looks.py").read_text();print(re.search(r"REVISION = \"(\w{12})",s).group(1))')" >> "$GITHUB_OUTPUT"
+    - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830   # v4.3.0
+      with:
+        path: ~/.cache/surfing-babel
+        key: ${{ steps.key.outputs.key }}
+    - shell: bash
+      run: python -m babel_surfer.looks download

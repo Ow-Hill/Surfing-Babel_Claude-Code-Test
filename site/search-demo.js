@@ -136,7 +136,7 @@
             "about 10 seconds a frame. The scanner keeps a few requests going at once, never more than 40 a " +
             "minute. (Here the frame is simulated in your browser, at a quarter of the size.)", focus: "frame" },
     { title: "Score it",
-      text: "The real detector runs 17 tests, each calibrated on real frames so it reads in σ: how far the frame " +
+      text: "The real detector runs 18 tests, each calibrated on real frames so it reads in σ: how far the frame " +
             "is from what static produces. Here are three simplified ones. Hide a signal and turn it up to " +
             "see which test notices first.", focus: "tests" },
     { title: "Keep the strange ones",

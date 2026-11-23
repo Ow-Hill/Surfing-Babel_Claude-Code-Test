@@ -39,6 +39,8 @@ jobs:
             echo "same=1" >> "$GITHUB_OUTPUT"; echo "already up to date"
           fi
 
+      - uses: ./.github/actions/vision-model        # the looks test's model (cached, hash-checked)
+
       - name: Raw statistics unchanged, and the suite passes?
         id: check
         if: steps.latest.outputs.same != '1'
