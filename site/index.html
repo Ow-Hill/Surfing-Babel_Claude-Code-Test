@@ -89,7 +89,7 @@
       </div>
     </div>
     <p class="muted small">A simplified model: frames are simulated in your browser and scored by three of the
-      ideas behind the real detector's 17 tests, with the same correction for looking in many places at once.</p>
+      ideas behind the real detector's 18 tests, with the same correction for looking in many places at once.</p>
   </section>
 
   <section class="wrap card" id="hist-card" aria-labelledby="hist-h">
@@ -183,15 +183,16 @@
     <section id="how" class="card how" aria-labelledby="how-h">
       <h2 id="how-h">How detection works</h2>
       <p>Each Babel pixel is an independent random 12-bit colour, so instead of asking “what is this a picture of?”
-        the detector asks “how unlikely is this frame if it were pure static?”. Seventeen tests each give a score in
+        the detector asks “how unlikely is this frame if it were pure static?”. Eighteen tests each give a score in
         <b>σ</b>: how many standard deviations the frame is from what static produces. Ten are classic statistical
         tests; seven are modelled on what people notice first (soft spots, curves, flat strokes, few-colour areas,
-        photo-like texture, face-like layouts, drawn marks). 0σ is typical static; in real scans 4σ or more turns up
+        photo-like texture, face-like layouts, drawn marks); one asks an image-recognition model whether the
+        frame looks like static to it. 0σ is typical static; in real scans 4σ or more turns up
         <span class="rate-text">rarely (the measured rate loads with the data)</span>; real static has never reached 8σ.</p>
 
       <p class="muted" id="fp-note"></p>
       <details>
-        <summary>The seventeen tests</summary>
+        <summary>The eighteen tests</summary>
         <div class="tests" id="tests-list"></div>
       </details>
 

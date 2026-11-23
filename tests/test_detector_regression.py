@@ -34,5 +34,6 @@ def test_classify_is_fast():
     t = time.perf_counter()
     for _ in range(3):
         C.classify(data)
-    # the first 16 tests take ~0.42 s (the original 10 took 0.60 s), the marks test ~0.45 s
-    assert (time.perf_counter() - t) / 3 < 1.0
+    # the first 16 tests take ~0.42 s (the original 10 took 0.60 s), the marks test ~0.45 s,
+    # the looks test ~0.13 s (one CPU thread). The scan waits ~9 s per frame on Babelia.
+    assert (time.perf_counter() - t) / 3 < 1.2

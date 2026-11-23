@@ -24,7 +24,7 @@ frames below 4σ, and `flags.json` the frames visitors flagged. Each entry:
 | `location` | the frame's location in Babelia's slideshow (a string of up to 16 digits) |
 | `sigma`, `tier`, `reason` | the strongest test's score, its tier (anomaly 4–8, faint 8–16, clear 16–40, striking ≥ 40) and which test it was |
 | `tests` | every test's σ |
-| `combined`, `sigma_global` | all tests' evidence pooled (calibrated); the headline after allowing for 17 tests (Šidák) |
+| `combined`, `sigma_global` | all tests' evidence pooled (calibrated); the headline after allowing for 18 tests (Šidák) |
 | `visibility` | how much it stands out to a person: `ratio` (× what static shows; ≥ 2 likely visible, 1.4–2 faint), `label`, `cue` and where |
 | `description` | one sentence on what the evidence maps show |
 | `image`, `maps`, `mask` | a preview JPEG, the evidence maps (JSON) and the tone mask, under `data/images/` |
@@ -75,7 +75,7 @@ A NumPy structured array, one row per frame:
 | column | type | meaning |
 |---|---|---|
 | `location` | uint64 | the frame's location |
-| `angled` … `tone` (17 tests, sorted) | float16 | each test's σ under the current calibration (rewritten when the log is re-mined) |
+| `angled` … `tone` (18 tests, sorted) | float16 | each test's σ under the current calibration (rewritten when the log is re-mined) |
 | `combined`, `fingerprint` | float16 | pooled score; the fingerprint's z |
 | `raw_angled` … `raw_tone` | float32 | each test's raw statistic, so the log can be re-scored under any calibration (`calibrate.raw_from_log`) |
 

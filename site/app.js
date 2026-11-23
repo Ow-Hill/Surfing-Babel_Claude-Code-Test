@@ -25,6 +25,7 @@ const TEST_INFO = {
   spectrum:   { name: "Photo-like", about: "more large-scale variation than static, as in photos and soft shading" },
   face:       { name: "Face-like", about: "two spots above a third: the layout people read as a face" },
   marks:      { name: "Drawn marks", about: "a thin stroke or small blot whose colour stays nearly constant, as pen and paint do" },
+  looks:      { name: "Vision model", about: "how far an image-recognition model (CLIP) puts the whole frame from static: a general second opinion" },
 };
 const N_TESTS = Object.keys(TEST_INFO).length;
 const testName = (k) => (TEST_INFO[k] ? TEST_INFO[k].name : k);
@@ -632,7 +633,7 @@ function scanPace(runs) {
 }
 
 // The score the best of `draws` independent N(0,1) test scores reaches with
-// probability 1/2: what chance alone gives as "highest so far" (17 tests a frame).
+// probability 1/2: what chance alone gives as "highest so far" (18 tests a frame).
 function expectedBest(draws) {
   let lo = 0, hi = 12;
   for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (pMaxOver(m, draws) > 0.5) lo = m; else hi = m; }

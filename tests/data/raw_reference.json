@@ -17,7 +17,8 @@
   "spectrum": 0.81419,
   "face": 2.430122,
   "fingerprint": 0.053683,
-  "marks": 0.309268
+  "marks": 0.309268,
+  "looks": 6.27806
  },
  "static-1": {
   "shape": 1.726518,
@@ -37,7 +38,8 @@
   "spectrum": 0.0,
   "face": 2.219829,
   "fingerprint": 1.847262,
-  "marks": -0.075642
+  "marks": -0.075642,
+  "looks": 6.23014
  },
  "static-2": {
   "shape": 2.018884,
@@ -57,7 +59,8 @@
   "spectrum": 1.529374,
   "face": 2.397167,
   "fingerprint": 0.747007,
-  "marks": 1.485507
+  "marks": 1.485507,
+  "looks": 6.26184
  },
  "static-3": {
   "shape": 0.989726,
@@ -77,7 +80,8 @@
   "spectrum": 0.0,
   "face": 2.344502,
   "fingerprint": -0.625612,
-  "marks": -0.145371
+  "marks": -0.145371,
+  "looks": 6.40069
  },
  "static-4": {
   "shape": 1.174463,
@@ -97,7 +101,8 @@
   "spectrum": 0.0,
   "face": 2.535663,
   "fingerprint": 1.795896,
-  "marks": 4.086277
+  "marks": 4.086277,
+  "looks": 6.10111
  },
  "static-5": {
   "shape": 1.348743,
@@ -117,7 +122,8 @@
   "spectrum": 0.0,
   "face": 3.385811,
   "fingerprint": -0.749556,
-  "marks": -0.336343
+  "marks": -0.336343,
+  "looks": 6.15109
  },
  "static-6": {
   "shape": 1.568245,
@@ -137,7 +143,8 @@
   "spectrum": 0.0,
   "face": 2.122631,
   "fingerprint": -0.345819,
-  "marks": 1.375396
+  "marks": 1.375396,
+  "looks": 6.11642
  },
  "static-7": {
   "shape": 1.098545,
@@ -157,7 +164,8 @@
   "spectrum": 0.875361,
   "face": 1.528011,
   "fingerprint": 0.004553,
-  "marks": 1.078417
+  "marks": 1.078417,
+  "looks": 6.05439
  },
  "static-8": {
   "shape": 1.228826,
@@ -177,7 +185,8 @@
   "spectrum": 0.0,
   "face": 2.341634,
   "fingerprint": -1.884798,
-  "marks": 0.9803
+  "marks": 0.9803,
+  "looks": 6.20667
  },
  "static-9": {
   "shape": 1.379737,
@@ -197,7 +206,8 @@
   "spectrum": 0.0,
   "face": 2.186624,
   "fingerprint": -0.533429,
-  "marks": 1.233227
+  "marks": 1.233227,
+  "looks": 6.18444
  },
  "static-10": {
   "shape": 2.007487,
@@ -217,7 +227,8 @@
   "spectrum": 1.412418,
   "face": 1.555469,
   "fingerprint": 0.87703,
-  "marks": 0.497758
+  "marks": 0.497758,
+  "looks": 6.23099
  },
  "static-11": {
   "shape": 1.202623,
@@ -237,7 +248,8 @@
   "spectrum": 1.653723,
   "face": 1.801397,
   "fingerprint": 0.760625,
-  "marks": 0.153347
+  "marks": 0.153347,
+  "looks": 6.0633
  },
  "disc": {
   "shape": 7.279166,
@@ -257,7 +269,8 @@
   "spectrum": 9.313816,
   "face": 3.042813,
   "fingerprint": 2.379075,
-  "marks": 5.508185
+  "marks": 5.508185,
+  "looks": 6.25129
  },
  "landscape": {
   "shape": 3.873755,
@@ -277,7 +290,8 @@
   "spectrum": 7.038602,
   "face": 3.457556,
   "fingerprint": -0.100846,
-  "marks": 2.977481
+  "marks": 2.977481,
+  "looks": 6.12317
  },
  "line": {
   "shape": 2.85173,
@@ -297,7 +311,8 @@
   "spectrum": 1.773291,
   "face": 2.884653,
   "fingerprint": -0.90879,
-  "marks": 5.807448
+  "marks": 5.807448,
+  "looks": 6.5827
  },
  "square": {
   "shape": 5.057062,
@@ -317,7 +332,8 @@
   "spectrum": 3.358246,
   "face": 10.249496,
   "fingerprint": 0.306352,
-  "marks": 30.418163
+  "marks": 30.418163,
+  "looks": 7.78242
  },
  "grey": {
   "shape": 1.843619,
@@ -337,7 +353,8 @@
   "spectrum": 0.91218,
   "face": 2.217543,
   "fingerprint": -0.30067,
-  "marks": 32.088653
+  "marks": 32.088653,
+  "looks": 6.24363
  },
  "diag": {
   "shape": 1.547896,
@@ -357,7 +374,8 @@
   "spectrum": 0.0,
   "face": 1.52829,
   "fingerprint": 0.36273,
-  "marks": 6.172636
+  "marks": 6.172636,
+  "looks": 6.17148
  },
  "tiled": {
   "shape": 1.22262,
@@ -377,7 +395,8 @@
   "spectrum": 0.0,
   "face": 2.593466,
   "fingerprint": -0.440875,
-  "marks": 2.985456
+  "marks": 2.985456,
+  "looks": 6.31882
  },
  "mirror": {
   "shape": 1.423731,
@@ -397,6 +416,7 @@
   "spectrum": 2.351017,
   "face": 3.879187,
   "fingerprint": 0.449671,
-  "marks": 0.10211
+  "marks": 0.10211,
+  "looks": 6.28658
  }
 }

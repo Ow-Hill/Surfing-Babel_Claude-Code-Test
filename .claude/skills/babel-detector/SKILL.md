@@ -1,6 +1,6 @@
 ---
 name: babel-detector
-description: Change Surfing Babel's detector without breaking its statistics. Covers the 17 tests, the blind-spot probe, empirical calibration (nullmap), re-mining the score log, live refits, the frame-wide sigma and visibility. Use before editing classifier.py, perceptual.py, nullmap.py, calibrate.py, remine.py, visibility.py or benchmark.py, or when asked to find more artifacts, add a test, explain a find, or check calibration.
+description: Change Surfing Babel's detector without breaking its statistics. Covers the 18 tests (looks.py: the vision model), the blind-spot probe, empirical calibration (nullmap), re-mining the score log, live refits, the frame-wide sigma and visibility. Use before editing classifier.py, perceptual.py, nullmap.py, calibrate.py, remine.py, visibility.py, looks.py or benchmark.py, or when asked to find more artifacts, add a test, explain a find, or check calibration.
 ---
 
 # Surfing Babel: detector
@@ -88,6 +88,12 @@ description: Change Surfing Babel's detector without breaking its statistics. Co
     to the `refit-proposal` branch and opens an issue. A person opens the PR and merges it.
     Run it by hand: Actions → "Audit the calibration" → propose = 1.
   - A live `data/calibration.json` whose `base` no longer matches is deleted at scan start.
+- **The looks test needs its model** (`python -m babel_surfer.looks download`; workflows use
+  `.github/actions/vision-model`, cached and hash-checked). Without it, classify raises; never
+  let it score 0. Its raw value is a **log** distance: do not drop the log (the raw distance's
+  heavy tail broke nullmap's floor, reading static at up to 28σ). Changing `REVISION`, `K` or
+  the preprocessing changes the statistic: re-run `looks fit`, re-fit its map, update
+  `tests/data/raw_reference.json`. It is not in `combined_tests`.
 - **Watch for single points of failure.** `sensitivity.json` → `load_total.only` counts the
   explored variants that a single test catches alone, today mostly `marks` on drawn strokes and
   outlines. A second test on mean shift was measured and rejected (plan B2). If that count grows,

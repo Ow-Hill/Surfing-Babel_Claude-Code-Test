@@ -324,7 +324,10 @@ def calibrate_from_log(log_path: Path, out: Path = CALIBRATION_FILE,
 
 def _simulated_raw(seed: int, tests: tuple) -> dict:
     data = babel_static(np.random.default_rng(seed))
-    if set(tests) <= set(classifier.PERCEPTUAL_TESTS):
+    if set(tests) <= set(classifier.VISION_TESTS):
+        from . import looks
+        r = {"looks": looks.raw(Image.open(io.BytesIO(data)))}
+    elif set(tests) <= set(classifier.PERCEPTUAL_TESTS):
         from . import perceptual
         rgb = np.asarray(Image.open(io.BytesIO(data)).convert("RGB"), dtype=np.float64)
         r = perceptual.raw(rgb)

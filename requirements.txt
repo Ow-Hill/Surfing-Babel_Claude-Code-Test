@@ -2,3 +2,5 @@
 # so every test statistic (tests/test_detector_regression.py would fail).
 numpy==2.5.3
 pillow==12.3.0
+# the looks test's vision model runtime (looks.py); its weights are pinned there by hash
+onnxruntime==1.29.0

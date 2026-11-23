@@ -45,6 +45,7 @@ jobs:
           cache-dependency-path: requirements*.txt
 
       - run: pip install -r requirements.txt
+      - uses: ./.github/actions/vision-model        # the looks test's model (cached, hash-checked)
 
       - name: Earlier results and the scan's live calibration
         run: |

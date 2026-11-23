@@ -24,7 +24,7 @@ GitHub Actions (continuous) ─► scan.py ─► POST babelia.cgi location=N, N
   5–30 s to render a frame, so concurrency is **adaptive**: it starts at 3 parallel requests,
   opens more (up to 8, never more than 40 requests a minute) while response time stays near its best and each extra request brings more frames, and backs off (down to 1) as soon as
   responses slow or fail.
-* **Classifier** (`babel_surfer/classifier.py`): seventeen tests. Ten are statistical tests, each run on brightness and both colour
+* **Classifier** (`babel_surfer/classifier.py`): eighteen tests. Ten are statistical tests, each run on brightness and both colour
   channels, each expressed in **σ** (standard deviations away from what static produces):
 
   | test | catches |
@@ -54,8 +54,15 @@ GitHub Actions (continuous) ─► scan.py ─► POST babelia.cgi location=N, N
   | face | two spots above a third, the layout people read as a face |
   | marks | drawn marks: thin strokes and outlines (2–3 px strips, 16–32 px long, 12 angles) and small blots (6–12 px squares) whose colour stays nearly constant; added after the blind-spot probe found the other tests missed such marks before a person would |
 
+  The eighteenth, **looks** (`babel_surfer/looks.py`), asks an image-recognition model (CLIP
+  ViT-B/32, 89 MB, run on the CPU) what the whole frame looks like, and scores how far that is from
+  what it says for static. It is less sensitive than the hand-made tests but works on a different
+  principle, so it backs them up and reacts to things nobody wrote a test for. Its finds say what
+  the model thinks they look like. `python -m babel_surfer.looks download` fetches the model,
+  pinned to a revision and checked by hash.
+
   The headline score is the strongest test. Each find also shows a **frame-wide σ** that
-  allows for running all 17 tests (a 4σ reading on one test is about 3.3σ for the whole frame).
+  allows for running all 18 tests (a 4σ reading on one test is about 3.3σ for the whole frame).
   A **visibility** score (`visibility.py`) estimates whether a person would see anything. It
   looks for the three things that break static's flicker for the eye: a patch of colour, a
   patch smoother or busier than static, and a thin line whose colour stays constant along

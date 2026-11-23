@@ -23,7 +23,7 @@ import math
 import numpy as np
 from PIL import Image
 
-from . import classifier as C, perceptual, visibility
+from . import classifier as C, looks, perceptual, visibility
 
 CELL = 16                       # px per map cell (640x416 -> 40x26)
 ROW_BAND = 4                    # px per row/column profile entry
@@ -162,6 +162,7 @@ def analyze(image) -> dict:
         "eye_parts": {k: r1(eye[i]) for i, k in enumerate(EYE_KINDS)},
         "face": perc["face"],
         "mark": _mark(rgb),
+        "looks_like": looks.describe(img),
         "visibility": visibility.visibility(rgb),
         "size": [w, h], "cell": CELL, "grid": [int(mean_best.shape[1]), int(mean_best.shape[0])],
         "mean": r1(mean_best), "mean_channel": [int(v) for v in np.ravel(mean_ch)],
@@ -236,7 +237,7 @@ def _mark(rgb) -> dict:
 
 
 def _phrase(test: str, maps: dict, sigma: float) -> str:
-    if test in C.PERCEPTUAL_TESTS:
+    if test in C.PERCEPTUAL_TESTS or test in C.VISION_TESTS:
         return _eye_phrase(test, maps, sigma)
     w, h = maps["size"]
     gw, gh = maps["grid"]
@@ -324,6 +325,10 @@ def _eye_phrase(test: str, maps: dict, sigma: float) -> str:
         return f"a face-like arrangement of spots ({s})"
     if test == "spectrum":
         return f"more large-scale variation than static, like a photo's soft shading; nothing local ({s})"
+    if test == "looks":
+        like = [p for p, z in maps.get("looks_like") or [] if z >= 2.0]
+        what = f", most like {' or '.join(like)}" if like else ""
+        return f"a vision model sees this frame as unlike static{what} ({s})"
     if test == "marks":
         m = maps.get("mark") or {}
         if m.get("kind") == "stroke":
