@@ -47,4 +47,4 @@ jobs:
       - run: pip install -r requirements-dev.txt playwright==1.64.1
       - run: python -m playwright install --with-deps chromium
       - name: Browser tests
-        run: python -m pytest -q -m browser tests/test_site_browser.py
+        run: python -m pytest -q -m browser tests/test_site_browser.py tests/test_rate.py

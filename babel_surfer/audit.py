@@ -72,6 +72,21 @@ def surplus(obs: int, exp: float) -> bool:
     return obs >= MIN_RATIO * exp and poisson_sf(obs, exp) < P_ALERT
 
 
+def steps(v) -> dict:
+    """How stepped a raw statistic is (plan item B5). A statistic with few
+    distinct values has ties, and its map needs a knot at every step (#44,
+    #49). `distinct_per_100k` counts distinct values per 100,000 frames;
+    `stepped_tail` applies nullmap's rule: the top 300 values are less than
+    half distinct."""
+    v = np.asarray(v, dtype=float)
+    v = v[np.isfinite(v)]
+    if not len(v):
+        return {}
+    top = np.sort(v)[-300:]
+    return {"distinct_per_100k": int(round(len(np.unique(v)) * 100_000 / len(v))),
+            "stepped_tail": bool(len(np.unique(top)) < 0.5 * len(top))}
+
+
 def snapshots(d: Path) -> list[tuple[int, Path]]:
     """Archived logs in ``d``, oldest first, as (scan total, path)."""
     out = [(int(m.group(1)), p) for p in d.glob("scores-*.npz") if (m := NAME.match(p.name))]
@@ -129,6 +144,8 @@ def audit(d: Path, cal_path: Path | None = None) -> dict:
         if not len(zt):
             continue
         row = {"n": int(len(zt))}
+        if t in raw:
+            row.update(steps(raw[t]))
         for k in (3, 4):
             obs, exp = int((zt > k).sum()), len(zt) * tail(k)
             row[f"over_{k}"], row[f"expected_{k}"] = obs, round(exp, 1)
@@ -221,7 +238,9 @@ def format_report(report: dict) -> str:
     for t, r in (report.get("tests") or {}).items():
         mark = "  <-- surplus" if t in report.get("flagged", []) else ""
         out.append(f"  {t:10s} >3σ {r['over_3']:5d}/{r['expected_3']:<7} >4σ {r['over_4']:3d}/{r['expected_4']:<5}"
-                   f" p4 {r['p_4']:.3g}{mark}")
+                   f" p4 {r['p_4']:.3g}"
+                   + (f"  distinct/100k {r['distinct_per_100k']:6d}" if "distinct_per_100k" in r else "")
+                   + ("  stepped" if r.get("stepped_tail") else "") + mark)
     if report.get("headline"):
         h = report["headline"]
         out.append(f"  headline   >4σ {h['over_4']}/{h['expected_4']} p {h['p_4']:.3g}")
