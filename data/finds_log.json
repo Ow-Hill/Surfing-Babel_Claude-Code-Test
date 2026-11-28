@@ -1,0 +1,2218 @@
+[
+ {
+  "location": "2418100441781554",
+  "sigma": 4.005,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1794975787.0954242,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2418100441781705",
+  "sigma": 4.067,
+  "tier": "anomaly",
+  "reason": "spot",
+  "found_at": 1794976029.6965642,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5009279459770829",
+  "sigma": 4.324,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1794982045.466951,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1261963767131236",
+  "sigma": 4.22,
+  "tier": "anomaly",
+  "reason": "contrast",
+  "found_at": 1794984719.8201685,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2673956172997365",
+  "sigma": 4.521,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1794985708.219248,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "4730075639136127",
+  "sigma": 4.568,
+  "tier": "anomaly",
+  "reason": "contrast",
+  "found_at": 1794991606.3614163,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "4730075639136832",
+  "sigma": 4.481,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1794992662.65978,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6945159062271417",
+  "sigma": 4.077,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1794995364.879534,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1641429811438179",
+  "sigma": 4.501,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1794997439.5065546,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1641429811438513",
+  "sigma": 4.474,
+  "tier": "anomaly",
+  "reason": "repetition",
+  "found_at": 1794997948.5176952,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2709867893334252",
+  "sigma": 4.086,
+  "tier": "anomaly",
+  "reason": "face",
+  "found_at": 1795001530.7680752,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7962126403966965",
+  "sigma": 4.129,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795001932.1901765,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5601270181701409",
+  "sigma": 4.412,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795004450.164781,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5601270181701519",
+  "sigma": 4.161,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795004689.82196,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3137717545040508",
+  "sigma": 4.19,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795005594.585596,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "243585355199911",
+  "sigma": 4.172,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795007950.35069,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "243585355200130",
+  "sigma": 4.238,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795008282.7712374,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "243585355200233",
+  "sigma": 4.09,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795008464.537358,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1870549661536926",
+  "sigma": 4.005,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795013880.7429552,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1707124108149751",
+  "sigma": 4.004,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795023126.4823694,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3220213968710395",
+  "sigma": 4.098,
+  "tier": "anomaly",
+  "reason": "spot",
+  "found_at": 1795028227.816319,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "924401367143436",
+  "sigma": 4.185,
+  "tier": "anomaly",
+  "reason": "angled",
+  "found_at": 1795031030.3856509,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7502823990840476",
+  "sigma": 4.12,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795035737.755921,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "889769383081004",
+  "sigma": 4.26,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795039954.7342417,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2265228590402509",
+  "sigma": 4.297,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795043541.2287974,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2265228590402617",
+  "sigma": 4.558,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795043717.3420472,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6528576906992189",
+  "sigma": 4.048,
+  "tier": "anomaly",
+  "reason": "curves",
+  "found_at": 1795043896.433904,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8679189575686580",
+  "sigma": 4.061,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795050105.1323004,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7243961542562029",
+  "sigma": 4.177,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795065982.234367,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7243961542562527",
+  "sigma": 4.018,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795066734.3178418,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6019362353565839",
+  "sigma": 4.264,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795069137.3120728,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2170208408866761",
+  "sigma": 4.355,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795073292.6538582,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8138653889857798",
+  "sigma": 4.019,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795075540.2462502,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8138653889858319",
+  "sigma": 4.11,
+  "tier": "anomaly",
+  "reason": "curves",
+  "found_at": 1795076321.9431405,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2308221514216010",
+  "sigma": 4.08,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795082045.0576,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8950381481849280",
+  "sigma": 4.026,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795092780.1912072,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7120889853296426",
+  "sigma": 4.346,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795094480.76107,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7120889853296629",
+  "sigma": 4.025,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795094786.4967468,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5104235785600236",
+  "sigma": 4.594,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795100477.9090276,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5104235785600641",
+  "sigma": 4.128,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795101105.037307,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1109577495421936",
+  "sigma": 4.34,
+  "tier": "anomaly",
+  "reason": "repetition",
+  "found_at": 1795117611.6556466,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6752495505530164",
+  "sigma": 4.18,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795119003.650803,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1320171941550707",
+  "sigma": 4.656,
+  "tier": "anomaly",
+  "reason": "repetition",
+  "found_at": 1795119977.3701146,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1320171941551472",
+  "sigma": 4.052,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795121129.2298748,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7227604740075551",
+  "sigma": 4.031,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795129938.0784972,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1107440852573075",
+  "sigma": 4.491,
+  "tier": "anomaly",
+  "reason": "curves",
+  "found_at": 1795131627.6502154,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1107440852573632",
+  "sigma": 4.26,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795132445.770715,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3499423910522032",
+  "sigma": 4.417,
+  "tier": "anomaly",
+  "reason": "angled",
+  "found_at": 1795132911.965667,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3499423910522244",
+  "sigma": 4.46,
+  "tier": "anomaly",
+  "reason": "spot",
+  "found_at": 1795133221.0409737,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7302660749665818",
+  "sigma": 4.029,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795139854.3505802,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6281260508081729",
+  "sigma": 4.162,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795141493.408846,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "186015281773098",
+  "sigma": 4.32,
+  "tier": "anomaly",
+  "reason": "contrast",
+  "found_at": 1795144453.2770176,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8694874147340893",
+  "sigma": 4.093,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795162297.4156785,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7882797613707779",
+  "sigma": 5.135,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795165310.926562,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7338280160509491",
+  "sigma": 4.088,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795173143.2777631,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8153941159070035",
+  "sigma": 4.225,
+  "tier": "anomaly",
+  "reason": "curves",
+  "found_at": 1795175051.0408094,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6571831811721427",
+  "sigma": 4.052,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795178993.1926746,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1146577495098429",
+  "sigma": 4.037,
+  "tier": "anomaly",
+  "reason": "shape",
+  "found_at": 1795180320.6879172,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8380304108171220",
+  "sigma": 4.256,
+  "tier": "anomaly",
+  "reason": "face",
+  "found_at": 1795185698.6577504,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2963832347196509",
+  "sigma": 4.102,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795188237.6947865,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2963832347196724",
+  "sigma": 4.005,
+  "tier": "anomaly",
+  "reason": "curves",
+  "found_at": 1795188666.4271007,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "4386905019202977",
+  "sigma": 4.059,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795196653.104967,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8232850951949691",
+  "sigma": 4.034,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795200737.524602,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "69335982858549",
+  "sigma": 4.102,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795202736.77003,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5424722023204167",
+  "sigma": 4.338,
+  "tier": "anomaly",
+  "reason": "shape",
+  "found_at": 1795203960.197452,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5424722023204350",
+  "sigma": 4.088,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795204227.537201,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8749007276317522",
+  "sigma": 4.042,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795207269.5224373,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5459389677968859",
+  "sigma": 4.115,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795212180.3166165,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6115937648181837",
+  "sigma": 4.092,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795217665.7951813,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5167837873705496",
+  "sigma": 4.05,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795219834.9238715,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3559188854938062",
+  "sigma": 4.185,
+  "tier": "anomaly",
+  "reason": "angled",
+  "found_at": 1795225588.5825906,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3734477721148348",
+  "sigma": 4.079,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795230040.8584306,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6026911175508567",
+  "sigma": 4.04,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795230989.5849624,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "4170321771267258",
+  "sigma": 4.539,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795233287.0638225,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "4170321771267644",
+  "sigma": 4.197,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795233853.5044658,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3680438939988893",
+  "sigma": 4.083,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795236671.1586666,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5358855061071981",
+  "sigma": 4.063,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795239475.5433676,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5035757268935047",
+  "sigma": 4.108,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795248817.1283092,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3622312257584861",
+  "sigma": 4.02,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795253735.9513605,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "4637237873455560",
+  "sigma": 4.315,
+  "tier": "anomaly",
+  "reason": "repetition",
+  "found_at": 1795255222.6037283,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "4637237873456091",
+  "sigma": 4.543,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795256048.8215826,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6478857408942059",
+  "sigma": 4.178,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795258831.0239038,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2181231577741987",
+  "sigma": 4.142,
+  "tier": "anomaly",
+  "reason": "contrast",
+  "found_at": 1795261259.4464004,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2645483159865285",
+  "sigma": 4.076,
+  "tier": "anomaly",
+  "reason": "face",
+  "found_at": 1795266513.2457192,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3013669245763065",
+  "sigma": 4.199,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795268011.6489549,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6340997070591193",
+  "sigma": 4.149,
+  "tier": "anomaly",
+  "reason": "shape",
+  "found_at": 1795270070.040072,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8583078667711932",
+  "sigma": 4.016,
+  "tier": "anomaly",
+  "reason": "spot",
+  "found_at": 1795271783.6205254,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5912722985306073",
+  "sigma": 4.227,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795275949.5740414,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5441510807107788",
+  "sigma": 4.029,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795283176.9036481,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6843268104969095",
+  "sigma": 4.199,
+  "tier": "anomaly",
+  "reason": "contrast",
+  "found_at": 1795284822.8005643,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6843268104969351",
+  "sigma": 4.21,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795285259.0345175,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "861807453450899",
+  "sigma": 4.291,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795296833.4342089,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "861807453451847",
+  "sigma": 4.356,
+  "tier": "anomaly",
+  "reason": "contrast",
+  "found_at": 1795298282.6204708,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6493514598484486",
+  "sigma": 4.049,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795298728.123462,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6493514598485002",
+  "sigma": 4.573,
+  "tier": "anomaly",
+  "reason": "face",
+  "found_at": 1795299505.595806,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1557952815487428",
+  "sigma": 4.248,
+  "tier": "anomaly",
+  "reason": "curves",
+  "found_at": 1795303193.4099643,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1557952815487859",
+  "sigma": 4.176,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795303866.6265957,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8112038691740367",
+  "sigma": 4.038,
+  "tier": "anomaly",
+  "reason": "curves",
+  "found_at": 1795304928.5354679,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8112038691740398",
+  "sigma": 4.261,
+  "tier": "anomaly",
+  "reason": "spot",
+  "found_at": 1795304964.9307268,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "105958044711950",
+  "sigma": 4.211,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795309033.2079694,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1252326372363202",
+  "sigma": 4.162,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795310518.7214427,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "480917045316081",
+  "sigma": 5.425,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795311434.3255718,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2446518021897105",
+  "sigma": 4.063,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795318117.8298674,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2446518021897260",
+  "sigma": 4.109,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795318361.1149309,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1789102304951661",
+  "sigma": 4.262,
+  "tier": "anomaly",
+  "reason": "shape",
+  "found_at": 1795318846.3956215,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2874993344013627",
+  "sigma": 4.093,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795322195.0428543,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3241216140074389",
+  "sigma": 4.128,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795329776.6208258,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "4074728842827739",
+  "sigma": 4.15,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795332923.1021338,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7968733309206364",
+  "sigma": 4.416,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795333193.2915995,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7968733309206410",
+  "sigma": 4.766,
+  "tier": "anomaly",
+  "reason": "repetition",
+  "found_at": 1795333263.1312249,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1756084022659080",
+  "sigma": 4.427,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795338009.5261753,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1756084022659111",
+  "sigma": 4.262,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795338070.5988748,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1177957235662064",
+  "sigma": 4.429,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795342084.8534403,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "8504541734350486",
+  "sigma": 4.147,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795344654.7466068,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5295247378749262",
+  "sigma": 4.388,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795346412.2763476,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5295247378749928",
+  "sigma": 4.665,
+  "tier": "anomaly",
+  "reason": "angled",
+  "found_at": 1795347399.7634013,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "274207540966844",
+  "sigma": 4.199,
+  "tier": "anomaly",
+  "reason": "repetition",
+  "found_at": 1795351285.9235673,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1790497383844729",
+  "sigma": 4.183,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795362685.524222,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1790497383844792",
+  "sigma": 4.191,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795362780.5032341,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "7396810753979040",
+  "sigma": 4.615,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795369783.7319205,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3541264889869885",
+  "sigma": 4.099,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795375027.5751317,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3541264889870883",
+  "sigma": 4.092,
+  "tier": "anomaly",
+  "reason": "shape",
+  "found_at": 1795376556.8690112,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "19450028706908",
+  "sigma": 4.038,
+  "tier": "anomaly",
+  "reason": "repetition",
+  "found_at": 1795376808.6112695,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "4785386491847611",
+  "sigma": 4.353,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795379162.906945,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "4785386491847901",
+  "sigma": 4.175,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795379614.6846445,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "4785386491848394",
+  "sigma": 4.089,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795380366.7180436,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2151585078432700",
+  "sigma": 4.69,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795385280.0128646,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2050958397237283",
+  "sigma": 4.07,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795393605.6396003,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2050958397237774",
+  "sigma": 4.003,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795394400.8765967,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1063575283084480",
+  "sigma": 4.384,
+  "tier": "anomaly",
+  "reason": "angled",
+  "found_at": 1795397191.1160185,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1063575283084781",
+  "sigma": 4.433,
+  "tier": "anomaly",
+  "reason": "contrast",
+  "found_at": 1795397680.1398835,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3453142380208889",
+  "sigma": 4.26,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795401983.0653195,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "2263620264092888",
+  "sigma": 4.203,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795403239.5235004,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "5927987016684337",
+  "sigma": 4.26,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795408396.082486,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "6565058116936563",
+  "sigma": 4.16,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795411579.4868076,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "3256545015256045",
+  "sigma": 4.3,
+  "tier": "anomaly",
+  "reason": "shape",
+  "found_at": 1795414968.497954,
+  "detector": "7155051039a2"
+ },
+ {
+  "location": "1659227810500456",
+  "sigma": 4.308,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795418305.781077,
+  "detector": "284175cde236"
+ },
+ {
+  "location": "7257718519460231",
+  "sigma": 4.002,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795421545.0292993,
+  "detector": "284175cde236"
+ },
+ {
+  "location": "8494374472473191",
+  "sigma": 4.132,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795424368.3584254,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "1063575283085145",
+  "sigma": 4.059,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795424390.2125523,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3256545015255088",
+  "sigma": 4.006,
+  "tier": "anomaly",
+  "reason": "angled",
+  "found_at": 1795424403.0356333,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3020112072921931",
+  "sigma": 4.009,
+  "tier": "anomaly",
+  "reason": "face",
+  "found_at": 1795424404.9559472,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "861807453450838",
+  "sigma": 4.008,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795424406.989492,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "650607550177286",
+  "sigma": 4.008,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795424408.1323128,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6538202292678971",
+  "sigma": 4.04,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795426712.9480953,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5826925707047296",
+  "sigma": 4.22,
+  "tier": "anomaly",
+  "reason": "looks",
+  "found_at": 1795429506.5024164,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5585549483185332",
+  "sigma": 4.061,
+  "tier": "anomaly",
+  "reason": "repetition",
+  "found_at": 1795432331.9868734,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3687938523148846",
+  "sigma": 4.122,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795434254.95276,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3687938523148964",
+  "sigma": 4.042,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795434419.7004094,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3687938523149182",
+  "sigma": 4.048,
+  "tier": "anomaly",
+  "reason": "shape",
+  "found_at": 1795434775.3230665,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3687938523149328",
+  "sigma": 4.033,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795434989.5151033,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8524894459125951",
+  "sigma": 4.321,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795437772.9467084,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3194229659597167",
+  "sigma": 4.447,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795439416.348319,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8397237799557751",
+  "sigma": 4.361,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795447767.059932,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8458627985833943",
+  "sigma": 4.13,
+  "tier": "anomaly",
+  "reason": "curves",
+  "found_at": 1795452418.4371295,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6379244732770133",
+  "sigma": 4.123,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795458038.359817,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6379244732770235",
+  "sigma": 4.564,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795458203.3308337,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "1962676687496533",
+  "sigma": 4.188,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795459974.8545413,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6183794741597667",
+  "sigma": 4.383,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795462799.2123115,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "2836449219225243",
+  "sigma": 4.189,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795469096.104463,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "2836449219225701",
+  "sigma": 4.078,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795469910.8940434,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4329196745535689",
+  "sigma": 4.01,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795473000.8527815,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4329196745536146",
+  "sigma": 4.09,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795473713.4373474,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5871831931893917",
+  "sigma": 4.053,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795483451.0478275,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8261840659029984",
+  "sigma": 4.068,
+  "tier": "anomaly",
+  "reason": "contrast",
+  "found_at": 1795486414.5365531,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8048942119458169",
+  "sigma": 4.005,
+  "tier": "anomaly",
+  "reason": "face",
+  "found_at": 1795501164.622597,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6845139820263777",
+  "sigma": 4.32,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795503063.9398737,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "208064136046599",
+  "sigma": 4.669,
+  "tier": "anomaly",
+  "reason": "angled",
+  "found_at": 1795510619.6720524,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "208152740914000",
+  "sigma": 4.677,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795517806.758775,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6313057294128974",
+  "sigma": 4.186,
+  "tier": "anomaly",
+  "reason": "face",
+  "found_at": 1795521029.8576863,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8198631110607179",
+  "sigma": 4.107,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795526312.832256,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "2663889586425175",
+  "sigma": 4.279,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795529646.1002603,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "2663889586425384",
+  "sigma": 4.462,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795530016.161946,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8152920463351448",
+  "sigma": 4.585,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795531900.3191578,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6811331394799416",
+  "sigma": 4.115,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795534536.6437795,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4205931722975749",
+  "sigma": 4.007,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795543848.7705925,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4205931722976139",
+  "sigma": 4.047,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795544480.7143104,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4256623870633840",
+  "sigma": 4.023,
+  "tier": "anomaly",
+  "reason": "face",
+  "found_at": 1795545417.293509,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4256623870634239",
+  "sigma": 4.2,
+  "tier": "anomaly",
+  "reason": "looks",
+  "found_at": 1795546017.4071949,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4256623870634648",
+  "sigma": 4.934,
+  "tier": "anomaly",
+  "reason": "looks",
+  "found_at": 1795546656.530878,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5018699446081080",
+  "sigma": 4.075,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795560098.4138107,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8979370468930183",
+  "sigma": 4.469,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795562371.9862883,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4438839997004985",
+  "sigma": 4.122,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795563923.340932,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4438839997005206",
+  "sigma": 4.305,
+  "tier": "anomaly",
+  "reason": "looks",
+  "found_at": 1795564282.8573637,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "607261144650217",
+  "sigma": 4.08,
+  "tier": "anomaly",
+  "reason": "spot",
+  "found_at": 1795565599.1161835,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "30552203112244",
+  "sigma": 4.116,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795573751.9548576,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6928470165788849",
+  "sigma": 4.107,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795574617.5654867,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7903524770158110",
+  "sigma": 4.165,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795578233.3476255,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7903524770158397",
+  "sigma": 4.047,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795578671.8156059,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7903524770158443",
+  "sigma": 4.095,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795578740.9558666,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7903524770158974",
+  "sigma": 4.153,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795579575.2763479,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "2626853135559345",
+  "sigma": 4.33,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795584126.673118,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5469828462459062",
+  "sigma": 4.234,
+  "tier": "anomaly",
+  "reason": "contrast",
+  "found_at": 1795587508.0393388,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5469828462459164",
+  "sigma": 4.51,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795587667.994168,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5469828462459617",
+  "sigma": 4.011,
+  "tier": "anomaly",
+  "reason": "contrast",
+  "found_at": 1795588376.1039982,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3148348442908456",
+  "sigma": 4.256,
+  "tier": "anomaly",
+  "reason": "looks",
+  "found_at": 1795596737.4420147,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4707495994574539",
+  "sigma": 4.093,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795598428.1643372,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4707495994575273",
+  "sigma": 4.044,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795599546.400367,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "1349556471685966",
+  "sigma": 4.016,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795600260.2451515,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "1349556471686152",
+  "sigma": 4.142,
+  "tier": "anomaly",
+  "reason": "repetition",
+  "found_at": 1795600596.209359,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6228435332964508",
+  "sigma": 4.114,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795611896.4711723,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7434353256006754",
+  "sigma": 4.083,
+  "tier": "anomaly",
+  "reason": "angled",
+  "found_at": 1795612798.7809243,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6074746569822571",
+  "sigma": 4.107,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795615652.4239998,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6074746569822776",
+  "sigma": 4.101,
+  "tier": "anomaly",
+  "reason": "face",
+  "found_at": 1795615966.775413,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6106270579536194",
+  "sigma": 4.84,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795618613.7519577,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "1007287412792613",
+  "sigma": 4.095,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795620979.259236,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "1007287412792847",
+  "sigma": 4.061,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795621324.9094744,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3657840671811755",
+  "sigma": 4.284,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795624229.2806864,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8258534520982722",
+  "sigma": 4.107,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795625595.0110416,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8258534520983656",
+  "sigma": 4.384,
+  "tier": "anomaly",
+  "reason": "curves",
+  "found_at": 1795626996.0645466,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "1237496755422567",
+  "sigma": 4.239,
+  "tier": "anomaly",
+  "reason": "shape",
+  "found_at": 1795632254.9676762,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4659378551359571",
+  "sigma": 4.24,
+  "tier": "anomaly",
+  "reason": "contrast",
+  "found_at": 1795638465.6271648,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4659378551359966",
+  "sigma": 4.104,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795639105.1291072,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5906759298006118",
+  "sigma": 4.035,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795641006.2244234,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8598042461252159",
+  "sigma": 4.161,
+  "tier": "anomaly",
+  "reason": "angled",
+  "found_at": 1795646142.3084154,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "2777327345772988",
+  "sigma": 4.139,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795650789.5749414,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5991088815834159",
+  "sigma": 4.548,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795654272.7175379,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7031994589940116",
+  "sigma": 4.029,
+  "tier": "anomaly",
+  "reason": "face",
+  "found_at": 1795661075.9960985,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4225492044453146",
+  "sigma": 4.391,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795666505.3632889,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "2462367552796558",
+  "sigma": 4.407,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795667772.9272697,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4270327746970735",
+  "sigma": 4.002,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795669975.3678198,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4270327746970773",
+  "sigma": 4.258,
+  "tier": "anomaly",
+  "reason": "spot",
+  "found_at": 1795670038.8814764,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4270327746971132",
+  "sigma": 4.107,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795670588.090072,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7156489667105205",
+  "sigma": 4.103,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795673766.5800915,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5910968999035526",
+  "sigma": 4.082,
+  "tier": "anomaly",
+  "reason": "curves",
+  "found_at": 1795675603.9384432,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "2184814717870568",
+  "sigma": 4.081,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795685658.6185937,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "2184814717871335",
+  "sigma": 4.014,
+  "tier": "anomaly",
+  "reason": "looks",
+  "found_at": 1795686805.6068745,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6416836960393006",
+  "sigma": 4.047,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795693116.284376,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5596378860005214",
+  "sigma": 4.334,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795694874.7975402,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7005920415894196",
+  "sigma": 4.179,
+  "tier": "anomaly",
+  "reason": "angled",
+  "found_at": 1795704433.3628247,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "1199691956750267",
+  "sigma": 5.026,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795712144.9030159,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4733609798601813",
+  "sigma": 4.328,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795716919.7321217,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4733609798602092",
+  "sigma": 4.087,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795717371.7998972,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "553477604570119",
+  "sigma": 4.157,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795720796.0847006,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8423287577255554",
+  "sigma": 4.196,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795722148.9039059,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "686368496667012",
+  "sigma": 4.196,
+  "tier": "anomaly",
+  "reason": "spectrum",
+  "found_at": 1795725597.7612886,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "686368496667035",
+  "sigma": 4.195,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795725660.2116766,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5844987507318888",
+  "sigma": 4.13,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795728326.5980308,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "711384769983859",
+  "sigma": 4.332,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795736032.437104,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3684365833189640",
+  "sigma": 4.439,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795739933.9193141,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6481159186672856",
+  "sigma": 4.123,
+  "tier": "anomaly",
+  "reason": "angled",
+  "found_at": 1795753602.5732949,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8703394608048506",
+  "sigma": 4.112,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795758588.6039407,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8703394608049112",
+  "sigma": 4.5,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795759566.7949662,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4549506585605142",
+  "sigma": 4.013,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795762929.4421048,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4549506585605283",
+  "sigma": 4.005,
+  "tier": "anomaly",
+  "reason": "repetition",
+  "found_at": 1795763166.8276575,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "1449831524960176",
+  "sigma": 4.135,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795766810.3604734,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "1449831524960615",
+  "sigma": 4.306,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795767547.7269304,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4842090278051636",
+  "sigma": 5.031,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795770350.3471518,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3180057019091925",
+  "sigma": 4.107,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795772433.6204438,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3180057019092190",
+  "sigma": 4.095,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795772833.200094,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4160151705591637",
+  "sigma": 4.206,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795774941.9464538,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4827089974455283",
+  "sigma": 4.122,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795775227.1459107,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "8883843846906631",
+  "sigma": 4.323,
+  "tier": "anomaly",
+  "reason": "face",
+  "found_at": 1795777888.2415693,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "1133348951144787",
+  "sigma": 4.088,
+  "tier": "anomaly",
+  "reason": "texture",
+  "found_at": 1795784874.5138445,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7219522110824418",
+  "sigma": 4.548,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795789287.9301732,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "3793653965021940",
+  "sigma": 4.02,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795804563.5460663,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7616574709482333",
+  "sigma": 4.149,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795814597.9447546,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6349297208937530",
+  "sigma": 4.005,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795824589.610159,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4512664197227120",
+  "sigma": 4.146,
+  "tier": "anomaly",
+  "reason": "lines",
+  "found_at": 1795828571.9517412,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "822587240345596",
+  "sigma": 4.005,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795830242.164834,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "822587240345803",
+  "sigma": 4.068,
+  "tier": "anomaly",
+  "reason": "repetition",
+  "found_at": 1795830557.3147416,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "6000978031047213",
+  "sigma": 4.268,
+  "tier": "anomaly",
+  "reason": "repetition",
+  "found_at": 1795833027.5648453,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7032997040677408",
+  "sigma": 4.118,
+  "tier": "anomaly",
+  "reason": "blob",
+  "found_at": 1795840181.1997633,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5021736959409823",
+  "sigma": 4.022,
+  "tier": "anomaly",
+  "reason": "looks",
+  "found_at": 1795842931.0693743,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5021736959410090",
+  "sigma": 4.147,
+  "tier": "anomaly",
+  "reason": "symmetry",
+  "found_at": 1795843343.286638,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5021736959410219",
+  "sigma": 4.107,
+  "tier": "anomaly",
+  "reason": "colours",
+  "found_at": 1795843550.1971707,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7670654677117936",
+  "sigma": 4.207,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795845238.0870605,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4775604880816189",
+  "sigma": 4.365,
+  "tier": "anomaly",
+  "reason": "contrast",
+  "found_at": 1795851186.9683578,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4775604880816268",
+  "sigma": 4.14,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795851308.319052,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5487831422257980",
+  "sigma": 4.365,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795853791.9411414,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5487831422258569",
+  "sigma": 4.042,
+  "tier": "anomaly",
+  "reason": "curves",
+  "found_at": 1795854670.9109836,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "373955371895834",
+  "sigma": 4.342,
+  "tier": "anomaly",
+  "reason": "palette",
+  "found_at": 1795857544.0895696,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "373955371896387",
+  "sigma": 4.064,
+  "tier": "anomaly",
+  "reason": "marks",
+  "found_at": 1795858384.2105856,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "4008870719961854",
+  "sigma": 4.342,
+  "tier": "anomaly",
+  "reason": "angled",
+  "found_at": 1795868507.8016946,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "5711570996069572",
+  "sigma": 4.233,
+  "tier": "anomaly",
+  "reason": "tone",
+  "found_at": 1795874268.3256302,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "243129632601593",
+  "sigma": 4.076,
+  "tier": "anomaly",
+  "reason": "flat",
+  "found_at": 1795880597.851608,
+  "detector": "73ce851cddec"
+ },
+ {
+  "location": "7421146255336614",
+  "sigma": 4.189,
+  "tier": "anomaly",
+  "reason": "face",
+  "found_at": 1795886738.0015643,
+  "detector": "73ce851cddec"
+ }
+]
